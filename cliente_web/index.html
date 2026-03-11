@@ -2,275 +2,297 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mesala</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-  
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-  <link rel="stylesheet" href="./css/div_x_div.css">
-  <link rel="stylesheet" href="./css/estilo_salon.css">
-  <link rel="stylesheet" href="./css/estilo_popover.css">
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mesala | Los Ojos de tu salón</title>
+  <meta name="description" content="Mesala acelera el servicio en sala con vista total del salón y alertas por voz en segundos.">
 
-  <!-- MIS SCRIPTS JS -->
-  <script type='text/javascript' src='./js/Salon.js'></script> 
-  <script type='text/javascript' src='./js/Motor_Alergias.js'></script> 
-  <script type='text/javascript' src="./js/div_x_div.js"></script> 
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --mesala-blue: #0f4c81;
+      --mesala-blue-soft: #1b6aa8;
+      --mesala-orange: #e87722;
+      --mesala-bg: #bad5ff;
+      --mesala-text: #272f39;
+    }
+
+    body {
+      font-family: Candara, Segoe, "Segoe UI", Optima,  Calibri, Arial, sans-serif;
+      color: var(--mesala-text);
+      background: radial-gradient(circle at 20% 10%, #ffffff, var(--mesala-bg));
+    }
+
+    .cta-primary {
+      background: linear-gradient(135deg, var(--mesala-orange), #ff9f3f);
+      border: none;
+      color: #fff;
+    }
+
+    .cta-primary:hover,
+    .cta-primary:focus {
+      background: linear-gradient(135deg, #d26d1e, var(--mesala-orange));
+      color: #fff;
+    }
+
+    .cta-secondary {
+      border: 1px solid var(--mesala-blue);
+      color: var(--mesala-blue);
+    }
+
+    .hero-pill,
+    .metric-card,
+    .feature-card {
+      border: 1px solid #e7edf5;
+      background: #fff;
+      border-radius: 1rem;
+    }
+
+    .feature-icon {
+      color: var(--mesala-orange);
+      font-size: 1.5rem;
+    }
+
+    .visual-frame {
+      border-radius: 1.25rem;
+      border: 1px solid #dbe4ef;
+      box-shadow: 0 12px 35px rgba(15, 76, 129, 0.08);
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .brand-logo {
+      width: min(320px, 72vw);
+      height: auto;
+    }
+
+    .floating-mobile {
+      max-width: 320px;
+      width: 100%;
+      animation: floatMobile 4.5s ease-in-out infinite;
+      filter: drop-shadow(0 20px 28px rgba(15, 76, 129, 0.24));
+    }
+
+    @keyframes floatMobile {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-12px);
+      }
+    }
+  </style>
+</head>
 <body>
+  <main id="inicio" class="pb-5">
+    <!-- •••••••••••••••••••••••••••••• -->
+    <!-- ••••• HERO DE CONVERSIÓN ••••• -->
+    <!-- •••••••••••••••••••••••••••••• -->
+    <!-- Encabezado limpio sin navbar, con logo grande y CTA inmediato -->
+    <section class="container pt-4 pt-lg-5 pb-4 pb-lg-5">
+      <div class="text-center mb-4">
+        <img
+          class="brand-logo"
+          src="./imgs/logo.png"
+          alt="Logo Mesala"
+          onerror="this.onerror=null;this.src='./imgs/LOGO.gif';"
+        >
+      </div>
 
-  <!-- 
-  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
-  ■■■■■■■■■■■■■ Navbar ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
-  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
-  -->
-  <nav class="navbar fixed-top  border-bottom border-secondary">
-  
-  <!-- <div class="container-fluid d-flex flex-nowrap w-100 " > -->
-  <div class="container-fluid d-flex flex-nowrap w-100 navbar-layout" >
-
-      <!-- 
-      Espacio para la marca 
-      -->
-      <a class="navbar-brand" href="#" title="The Saloon">
-        <!-- <i class="bi bi-cup-hot me-2"></i> Salon -->
-      </a>
-      
-      <!-- <div class="d-flex align-items-center flex-nowrap  w-100"> -->
-      <div class="navbar-groups d-flex align-items-center flex-nowrap w-100">
-      
-        <!-- 
-        ■■■■■■■■■■■■■ Papelera (Exit) (a la izquierda) 
-        -->
-      <!-- <div class="col-auto d-flex align-items-center"> -->
-      <div class="navbar-left col-auto d-flex align-items-center flex-nowrap">
-
-        <div id="id_exit" class="exit-container" data-tipo="exit" title="Mueve aquí para ELIMINAR elementos del Salón">
-          <!-- <img src="./imgs/puerta.png" class="imagen_menu" alt="Salida"> -->
-          <svg  class="imagen_exit" width="30" height="30" viewBox="0 0 1024 1024" fill="currentColor" class="icon"  version="1.1" xmlns="http://www.w3.org/2000/svg">
-            <path  d="M32 241.6c-11.2 0-20-8.8-20-20s8.8-20 20-20l940 1.6c11.2 0 20 8.8 20 20s-8.8 20-20 20L32 241.6zM186.4 282.4c0-11.2 8.8-20 20-20s20 8.8 20 20v688.8l585.6-6.4V289.6c0-11.2 8.8-20 20-20s20 8.8 20 20v716.8l-666.4 7.2V282.4z" fill="currentColor" />
-            <path  d="M682.4 867.2c-11.2 0-20-8.8-20-20V372c0-11.2 8.8-20 20-20s20 8.8 20 20v475.2c0.8 11.2-8.8 20-20 20zM367.2 867.2c-11.2 0-20-8.8-20-20V372c0-11.2 8.8-20 20-20s20 8.8 20 20v475.2c0.8 11.2-8.8 20-20 20zM524.8 867.2c-11.2 0-20-8.8-20-20V372c0-11.2 8.8-20 20-20s20 8.8 20 20v475.2c0.8 11.2-8.8 20-20 20zM655.2 213.6v-48.8c0-17.6-14.4-32-32-32H418.4c-18.4 0-32 14.4-32 32.8V208h-40v-42.4c0-40 32.8-72.8 72.8-72.8H624c40 0 72.8 32.8 72.8 72.8v48.8h-41.6z" fill="currentColor" />
-          </svg>
+      <div class="row align-items-center g-4 g-lg-5">
+        <div class="col-12 col-lg-6">
+          <h1 class="display-5 fw-bold mb-3">Vista total del salón. Voz al instante. Cero errores en comandas.</h1>
+          <p class="lead mb-4">Mesala convierte cada móvil en un centro táctico: alerta alergias, peticiones especiales y estado de mesas sin frenar al equipo.</p>
+          <div class="d-flex flex-column flex-sm-row gap-2">
+            <a class="btn cta-primary btn-lg px-4" href="./mesala.html">Prueba Gratis</a>
+            <a class="btn cta-secondary btn-lg px-4" href="#demo">Ver demo</a>
+          </div>
+          <p class="small text-secondary mt-3 mb-0">Sin hardware propietario. Funciona en smartphone, tablet y PC.</p>
         </div>
-        
-      </div>
-      
-      <!-- 
-      ABRE/CIERRA EL SIDEBAR CON LOS ELEMENTOS DE LA APP -->
-      <!-- 
-      ■■■■■■■■■■■■■■■■■■■■■■■■ DISPARADOR DEL SIDEBAR DE ELEMENTOS-->
-      <div class="navbar-elementos d-flex align-items-center flex-nowrap">
-        <i class="bi bi-box-fill me-3 botones_accion" title="Elementos del salón" data-action-nav="elementos" data-side-active="false"></i>
-      </div>
 
-      <!-- 
-      ■■■■■■■■■■■■■■■■■■■■■■■■ BOTONES BI ACCIONES SOBRE EL NAVBAR
-      -->
-      <div class="navbar-actions d-flex align-items-center flex-nowrap">
-        <div class="navbar-actions-group d-flex align-items-center flex-nowrap">
-
-        <i class="bi bi-camera me-3 botones_accion" title="Guardar Foto"                        data-action-nav="save"></i>
-        <i class="bi bi-images me-3          botones_accion" title="Cargar Foto de BD"  data-action-nav="load" ></i>
-        <i class="bi bi-info-circle me-3      botones_accion" title="Ver Info Salon"            data-action-nav="info" ></i>
-        <i class="bi bi-arrow-clockwise me-3  botones_accion" title="Limpiar Salon"             data-action-nav="re-init" > </i>
-        <i class="bi bi-person-dash me-3 botones_accion navbar-login" title="Login / Registro"  data-action-nav="conn"></i>
+        <div class="col-12 col-lg-6 text-center">
+          <img
+            class="floating-mobile"
+            src="./imgs/movil-2.png"
+            alt="Pantalla móvil de Mesala flotando"
+            onerror="this.onerror=null;this.src='./imgs/estructura proyecto.jpg';"
+          >
         </div>
+      </div>
+    </section>
+
+    <!-- •••••••••••••••••••••••••••••• -->
+    <!-- ••••• BLOQUE DE IMPACTO ••••••• -->
+    <!-- •••••••••••••••••••••••••••••• -->
+    <section id="impacto" class="container pb-5">
+      <div class="row g-3 text-center">
+        <div class="col-12 col-md-4">
+          <article class="metric-card p-4 h-100">
+            <p class="h2 fw-bold mb-1" style="color: var(--mesala-blue);">1 dedo</p>
+            <p class="mb-0">Operativa rápida en movimiento.</p>
+          </article>
+        </div>
+        <div class="col-12 col-md-4">
+          <article class="metric-card p-4 h-100">
+            <p class="h2 fw-bold mb-1" style="color: var(--mesala-orange);">Voz → Acción</p>
+            <p class="mb-0">Menos clics, más servicio.</p>
+          </article>
+        </div>
+        <div class="col-12 col-md-4">
+          <article class="metric-card p-4 h-100">
+            <p class="h2 fw-bold mb-1" style="color: var(--mesala-blue);">0 lock-in</p>
+            <p class="mb-0">Usa dispositivos del local.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- •••••••••••••••••••••••••••••• -->
+    <!-- ••••• SECCIÓN DE VALOR •••••••• -->
+    <!-- •••••••••••••••••••••••••••••• -->
+    <section id="valor" class="container pb-5">
+      <div class="row g-3 g-lg-4">
+        <div class="col-12 col-md-6 col-lg-3">
+          <article class="feature-card p-4 h-100">
+            <p class="feature-icon mb-2">◉</p>
+            <h2 class="h5">Vista de Dios</h2>
+            <p class="mb-0">Controla todo el salón en un solo plano sin perder contexto.</p>
+          </article>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3">
+          <article class="feature-card p-4 h-100">
+            <p class="feature-icon mb-2">◉</p>
+            <h2 class="h5">Alergias visibles</h2>
+            <p class="mb-0">Avisos inmediatos para evitar errores críticos en cocina y sala.</p>
+          </article>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3">
+          <article class="feature-card p-4 h-100">
+            <p class="feature-icon mb-2">◉</p>
+            <h2 class="h5">Ficha Lean</h2>
+            <p class="mb-0">Solo información útil en servicio: VIP, alergias y notas clave.</p>
+          </article>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3">
+          <article class="feature-card p-4 h-100">
+            <p class="feature-icon mb-2">◉</p>
+            <h2 class="h5">Escala sin fricción</h2>
+            <p class="mb-0">Desde bares de barrio hasta salones con eventos multitudinarios.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- •••••••••••••••••••••••••••••• -->
+    <!-- ••••• DEMO VISUAL + VIDEO ••••• -->
+    <!-- •••••••••••••••••••••••••••••• -->
+    <!-- Se mantiene video local con fallback remoto para garantizar visualización -->
+    <section id="demo" class="container pb-5">
+      <div class="row g-4 align-items-stretch">
+        <div class="col-12 col-lg-6 text-center d-flex align-items-center justify-content-center">
+          <img
+            class="floating-mobile"
+            src="./imgs/movil-2.png"
+            alt="Demo móvil Mesala flotando"
+            onerror="this.onerror=null;this.src='./imgs/estructura proyecto.jpg';"
+          >
+        </div>
+        <div class="col-12 col-lg-6">
+          <div class="visual-frame p-3 h-100 d-flex flex-column gap-3">
+            <video id="videoCamarero" class="w-100 rounded" controls muted playsinline preload="metadata" poster="./imgs/LOGO.gif">
+              <source id="videoCamareroSource" src="./imgs/Camarero.mp4" type="video/mp4">
+              Tu navegador no soporta vídeo embebido.
+            </video>
+            <p id="videoStatus" class="small text-secondary mb-0">Comprobando reproducción del vídeo de demostración…</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- •••••••••••••••••••••••••••••• -->
+    <!-- ••••• CIERRE CON CTA FINAL •••• -->
+    <!-- •••••••••••••••••••••••••••••• -->
+    <section class="container pb-5 pb-lg-6">
+      <div class="p-4 p-lg-5 rounded-4 text-white" style="background: linear-gradient(135deg, var(--mesala-blue), var(--mesala-blue-soft));">
+        <h2 class="h1 mb-3">Tu sala no necesita más software. Necesita más velocidad.</h2>
+        <p class="mb-4">Activa Mesala hoy y convierte cada turno intenso en un servicio preciso, seguro y rentable.</p>
+        <a class="btn cta-primary btn-lg px-4" href="./mesala.html">Entrar en Prueba Gratis</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- •••••••••••••••••••••••••••••• -->
+  <!-- ••••• JAVASCRIPT MODULAR •••••• -->
+  <!-- •••••••••••••••••••••••••••••• -->
+  <script>
+    (function initSmoothScroll() {
+      const internalLinks = document.querySelectorAll('a[href^="#"]');
+
+      internalLinks.forEach(function (link) {
+        link.addEventListener('click', function (event) {
+          const targetId = this.getAttribute('href');
+          const targetNode = document.querySelector(targetId);
+
+          if (!targetNode) {
+            return;
+          }
+
+          event.preventDefault();
+          targetNode.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+    })();
+
+    (function initVideoFallback() {
+      const videoNode = document.getElementById('videoCamarero');
+      const sourceNode = document.getElementById('videoCamareroSource');
+      const statusNode = document.getElementById('videoStatus');
+      const fallbackVideo = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+      const NO_SOURCE_STATE = 3;
+
+      if (!videoNode || !sourceNode || !statusNode) {
+        return;
+      }
+
+      function loadFallbackVideo() {
+        if (sourceNode.getAttribute('src') === fallbackVideo) {
+          statusNode.textContent = 'No se pudo cargar el vídeo local ni el de respaldo.';
+          return;
+        }
+
+        sourceNode.setAttribute('src', fallbackVideo);
+        statusNode.textContent = 'Vídeo local no válido. Cargando vídeo de respaldo…';
+        videoNode.load();
+      }
+
+      videoNode.addEventListener('loadeddata', function handleLoadedData() {
+        const activeSource = sourceNode.getAttribute('src');
+
+        if (activeSource === fallbackVideo) {
+          statusNode.textContent = 'Vídeo local no disponible. Se está mostrando el vídeo de respaldo.';
+          return;
+        }
+
         
-        <!-- ■■■■■■■■ Toggler ■■■■■■■■ -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuOffcanvas" aria-label="Abrir menú de configuración">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-      </div>
+      });
 
-    </div>
-  </nav>
+      videoNode.addEventListener('error', loadFallbackVideo);
+      sourceNode.addEventListener('error', loadFallbackVideo);
 
+      window.setTimeout(function checkInitialSourceHealth() {
+        if (videoNode.readyState > 0) {
+          return;
+        }
 
-  <!-- █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ FIN HTML OBLIGATORIO .... a partir de aquí es Opcional -->
-  
-  <!-- 
-  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-  Offcanvas CONFIGURACION ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   -->
-  <div class="offcanvas offcanvas-end off-config" tabindex="-1" id="menuOffcanvas" data-tipo-bs="offcanvas-configuracion">
-    <div class="offcanvas-header">
-      <!-- <i class="bi bi-cup-hot me-2"></i> -->
-      ⚙️ Configuración - davidquesadaheredia@gmail.com
-      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar menú"></button>
-    </div>
-    <div class="offcanvas-body">
+        if (videoNode.networkState === NO_SOURCE_STATE) {
+          loadFallbackVideo();
+        }
+      }, 2000);
+    })();
+  </script>
 
-      <!-- Tabs personalizadas -->
-      <div class="custom-tabs">
-
-          <!-- ■■■■■ Contenido ■■■■■ -->
-          <div  class="tab-content-custom active">
-            
-            <!-- ┌•••••••••••••• -->
-            <!-- ┌•• Formulario  -->
-            <!-- ┌•••••••••••••• -->
-              <form id="form_config_salon">
-
-                <!-- <div class="options-bar w-100" data-config="sidebar-pos"> -->
-                  <span class="options-bar__label">Posición del sidebar</span>
-                  <div class="options-bar__group w-100" role="group" aria-label="Posición del sidebar">
-                    <button type="button" class="option-pill w-100" data-side-position="left">Izquierda</button>
-                    <button type="button" class="option-pill w-100" data-side-position="right"  aria-pressed = "true" >Derecha</button>
-                  </div>
-                <!-- </div> -->
-                
-                <label for="config_nombre_salon">Nombre Salon</label>
-                <input id="config_nombre_salon" type="text" name="nombre" placeholder="Ej: Mi Salón" readonly>
-
-
-                <div class="form-group-header">
-                  <label for="config_columnas">Número Columnas</label>
-                  <div class="config-info" data-config-info="columnas"></div>
-                </div>
-                <input id="config_columnas" type="text" name="columnas" placeholder="Ej: 4" readonly>
-                
-                <div class="form-group-header">
-                    <label for="config_filas">Número Filas</label>
-                    <div class="config-info" data-config-info="filas"></div>
-                </div>
-                <input id="config_filas" type="text" name="filas" placeholder="Ej: 3" readonly>
-
-                <button type="submit">Guardar</button>
-              </form>
-          </div>               
-      </div>
-      
-      <div class="d-lg-none align-self-center py-3 social-icons-container">
-          <!-- <a href="https://www.laforjadeprometeo.com/"> <i class="bi bi-twitter  px-2 text-info fs-2"></i></a> -->
-          <a href="mailto:davidquesadaheredia@gmail.com" title="Enviar email"><i class="bi bi-envelope px-2 text-white fs-2"></i></a>
-          <a href="https://www.laforjadeprometeo.com/" title="Ir a Facebook"> <i class="bi bi-facebook px-2 text-info fs-2"></i></a>
-          <a href="https://www.github.com/" title="Ir a GitHub">   <i class="bi bi-github   px-2 text-info fs-2"></i></a>
-          <a href="https://www.laforjadeprometeo.com/" title="Ir a WhatsApp"> <i class="bi bi-whatsapp px-2 text-info fs-2"></i></a>
-      </div>
-    </div>
-  </div>  
-
-  
-  <!-- 
-  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-  MODAL CU - Create/Update        ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ -->
-
-  <div class="modal fade" id="id_modal_cu"  data-creat="modal" data-tipo-bs="modal-cu" tabindex="-1" aria-labelledby="etiqueta_modal_save" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-      
-      <div class="modal-header">
-        <h5 class="modal-title" id="etiqueta_modal_save" data-creat="titulares">📸 Guardar Foto del Salón Activo</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-
-      <div class="modal-body" data-creat="contenedor-formulario">
-
-        <form id="form_guardar_foto" class="small" data-creat="formulario">
-          
-          <div class="alert d-none" role="alert" data-creat="feedback">FeedBack</div>
-          
-          <!-- <div class="alert  text-black-50" data-creat="dimension">Dimension(filas X columnas): </div> -->
-
-          <div class="accordion accordion-flush" data-creat="acordeon">
-              <div class="accordion-item">
-                <h3 class="accordion-header">
-                  <button class="accordion-button collapsed " type="button" data-bs-toggle="collapse" data-bs-target="#acordeon_reservas" aria-expanded="false" aria-controls="acordeon_reservas">
-                    Reservas
-                  </button>
-                </h3>
-                <div id="acordeon_reservas" class="accordion-collapse collapse">
-                  <div class="accordion-body " data-creat="acordeon-reservas"></div>
-                </div>
-              </div>
-              <div class="accordion-item">
-                <h3 class="accordion-header">
-                  <button class="accordion-button collapsed " type="button" data-bs-toggle="collapse" data-bs-target="#acordeon_mensajes" aria-expanded="false" aria-controls="acordeon_mensajes">
-                    Mensajes
-                  </button>
-                </h3>
-                <div id="acordeon_mensajes" class="accordion-collapse collapse">
-                  <div class="accordion-body " data-creat="acordeon-mensajes"></div>
-                </div>
-              </div>
-              <div class="accordion-item">
-                <h2 class="accordion-header">
-                  <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#acordeon_alergias" aria-expanded="false" aria-controls="acordeon_alergias">
-                    Alergias
-                  </button>
-                </h2>
-                <div id="acordeon_alergias" class="accordion-collapse collapse">
-                  <div class="accordion-body py-2" data-creat="acordeon-alergias"></div>
-                </div>
-              </div>
-          </div>
-
-          <div class="mb-2">
-              <div class="d-flex justify-content-between align-items-center">
-                  <label for="foto_titulo" class="form-label mb-1 text-black-50">Título</label>
-                  <label class="form-label mb-1 text-black-50" data-dimension="dimension">Dimension</label>
-              </div>
-              
-              <input id="foto_titulo" type="text" class="form-control form-control-sm" data-creat="titulo" required>
-          </div>
-
-          <div class="mb-2">
-            <label for="foto_slug_publico" class="form-label mb-1 text-black-25">Slug público</label>
-            <input id="foto_slug_publico" type="text" class="form-control form-control-sm text-black-50" data-creat="slug">
-          </div>
-
-          <div class="mb-2">
-            <label for="foto_mensaje_publico" class="form-label mb-1 text-black-50">Descripción (opcional)</label>
-            <textarea id="foto_mensaje_publico" class="form-control form-control-sm" rows="2" data-creat="mensaje"></textarea>
-          </div>
-
-          <div class="form-check mb-2">
-            <input id="foto_es_plantilla" class="form-check-input" type="checkbox" data-creat="plantilla">
-            <label class="form-check-label text-black-50" for="foto_es_plantilla">Es plantilla ( Copia Única... se Replica )</label>
-          </div>
-
-          <div class="form-check mb-3">
-            <input id="foto_es_publica" class="form-check-input" type="checkbox" data-creat="publica">
-            <label class="form-check-label text-black-50" for="foto_es_publica">Es pública ( ⚠️ Sin Uso de Momento)</label>
-          </div>
-
-        </form>
-      </div>
-      <div class="modal-footer">
-        <div class="d-flex gap-2 w-100">
-          <button type="submit" class="btn btn-primary btn-sm w-100" data-creat="submit">Guardar</button>
-        </div>        
-			</div>
-    </div>
-    </div>
-  </div> 
-
-
-<!-- 
-  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-  Offcanvas RUD - Load Foto ■■■■■■■■■■■■■■■■■■■■■■■■■
-  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ -->
-  <!-- 
-  <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas_load_foto" aria-labelledby="load_Label" 
-       data-rud="offcanvas" data-tipo-bs="offcanvas-rud">
-    <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="load_Label" data-rud="titulares">📝 Listado de •Fichas• de Foto.</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close" data-rud="cerrar"></button>        
-    </div>
-    
-    <div class="offcanvas-body">
-        <div id="feedback_RUD" class="alert d-none" role="alert" data-rud="feedback"></div>     
-        <div id="contenedor_RUD" data-rud="contenedor_lista"> </div>
-    </div>
-
-  </div> 
- -->
-
-
-  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
