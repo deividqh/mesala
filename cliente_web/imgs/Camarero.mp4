@@ -1,0 +1,2 @@
+Development placeholder in plain text to avoid 404 in environments where binary media is not allowed.
+The landing tries this local path first and then switches to a remote demo video if playback fails.
