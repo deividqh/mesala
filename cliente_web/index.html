@@ -88,6 +88,30 @@
     </div>
   </nav>
 
+  <header class="hero-banner" aria-labelledby="hero-title">
+    <img class="hero-banner__bg" src="./imgs/img-2.jpeg" alt="Camarero revisando alergias antes de servir" loading="eager">
+
+    <div class="hero-banner__overlay"></div>
+
+    <div class="hero-banner__content">
+      <p class="hero-banner__eyebrow">Mesala • Control de alergias en servicio</p>
+      <h1 id="hero-title" class="hero-banner__title">Servicio impecable, decisiones seguras en segundos.</h1>
+      <p class="hero-banner__description">
+        Simula el flujo real de sala: confirmar mesa, validar alergias y coordinar cocina sin fricciones.
+        Diseñado para que cada turno sea más claro, rápido y profesional.
+      </p>
+
+      <div class="hero-banner__workflow" aria-live="polite">
+        <span class="hero-step hero-step--active" data-step="0">Mesa confirmada</span>
+        <span class="hero-step" data-step="1">Alergias verificadas</span>
+        <span class="hero-step" data-step="2">Cocina notificada</span>
+        <span class="hero-step" data-step="3">Servicio entregado</span>
+      </div>
+
+      <button id="hero-cta" class="hero-banner__cta" type="button">Comenzar simulación</button>
+    </div>
+  </header>
+
 
   <!-- █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ FIN HTML OBLIGATORIO .... a partir de aquí es Opcional -->
   
@@ -272,5 +296,6 @@
 
 
   
+<script type='text/javascript' src='./js/hero_banner.js'></script>
 </body>
 </html>
