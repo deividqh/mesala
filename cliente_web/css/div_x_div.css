@@ -13,9 +13,15 @@
   --color-text:          #813737;
   --color-salon-border:  rgb(35, 118, 12);
   --color-salon-bg:      rgb(243, 243, 243);
+  --color-egg-white:     #ffffff;
    /*--color-baldosas-bg:   rgb(251, 251, 251);*/
-  --color-baldosas-bg:   #ff000080;
-  --color-baldosas-border: rgb(177, 179, 144);
+  /* --color-baldosas-bg:   #ff000080; */
+  /* --color-baldosas-border: rgb(177, 179, 144); */
+  /* --color-hover:         #0a885e; */
+
+  --color-salon-bg:      var(--color-egg-white);
+  --color-baldosas-bg:   var(--color-egg-white);
+  --color-baldosas-border: transparent;
   --color-hover:         #0a885e;
 
   /* sobre el nav-bar */
@@ -66,7 +72,8 @@ CONTENEDOR
     grid-template-columns: repeat(10, 1fr);               
     /* • • • • • • • • • • • • • • • • • • • • • • • • • • • 
     separacion entre columnas rendimensinada-responsive  */
-    gap: calc(0.1em * var(--scale-factor-min));      
+    /* gap: calc(0.1em * var(--scale-factor-min));       */
+    gap: 0;      
     /* separacion entre columnas */
     /* gap: var(--baldosa-gap);  */    
     /* • • • • • • • • • • • • • • • • • • • • • 
