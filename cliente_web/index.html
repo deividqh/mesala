@@ -13,12 +13,13 @@
       --mesala-blue: #0f4c81;
       --mesala-blue-soft: #1b6aa8;
       --mesala-orange: #e87722;
-      --mesala-bg: #bad5ff;
+      --mesala-bg: #f5f8ff;
       --mesala-text: #272f39;
+      --hero-overlay: rgba(7, 25, 43, 0.62);
     }
 
     body {
-      font-family: Candara, Segoe, "Segoe UI", Optima,  Calibri, Arial, sans-serif;
+      font-family: Candara, Segoe, "Segoe UI", Optima, Calibri, Arial, sans-serif;
       color: var(--mesala-text);
       background: radial-gradient(circle at 20% 10%, #ffffff, var(--mesala-bg));
     }
@@ -27,20 +28,162 @@
       background: linear-gradient(135deg, var(--mesala-orange), #ff9f3f);
       border: none;
       color: #fff;
+      box-shadow: 0 14px 26px rgba(232, 119, 34, 0.34);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
 
     .cta-primary:hover,
     .cta-primary:focus {
       background: linear-gradient(135deg, #d26d1e, var(--mesala-orange));
       color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 18px 30px rgba(232, 119, 34, 0.38);
     }
 
     .cta-secondary {
       border: 1px solid var(--mesala-blue);
       color: var(--mesala-blue);
+      background: #fff;
     }
 
-    .hero-pill,
+    .hero-banner {
+      position: relative;
+      overflow: hidden;
+      border-radius: 1.5rem;
+      min-height: 620px;
+      background: #081528;
+      box-shadow: 0 30px 50px rgba(8, 21, 40, 0.24);
+      isolation: isolate;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform-origin: center;
+      animation: heroZoom 16s ease-in-out infinite alternate;
+    }
+
+    .hero-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(130deg, var(--hero-overlay) 25%, rgba(11, 37, 63, 0.78) 62%, rgba(15, 76, 129, 0.58));
+      z-index: 1;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      color: #fff;
+      padding: 2.4rem 1.3rem;
+      display: grid;
+      gap: 1.6rem;
+    }
+
+    .hero-kicker {
+      margin: 0;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.88;
+    }
+
+    .hero-title {
+      margin: 0;
+      font-size: clamp(2rem, 7.8vw, 3.2rem);
+      line-height: 1.1;
+      max-width: 18ch;
+    }
+
+    .hero-copy {
+      margin: 0;
+      max-width: 52ch;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1.02rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      width: 100%;
+    }
+
+    .hero-actions .btn {
+      width: 100%;
+      font-weight: 700;
+    }
+
+    .workflow-panel {
+      background: rgba(255, 255, 255, 0.11);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 1rem;
+      padding: 1rem;
+      backdrop-filter: blur(2px);
+    }
+
+    .workflow-panel h2 {
+      font-size: 1rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .workflow-steps {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 0.7rem;
+    }
+
+    .workflow-step {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.5rem 0.65rem;
+      border-radius: 0.7rem;
+      background: rgba(255, 255, 255, 0.08);
+      transition: background-color 0.35s ease, transform 0.35s ease;
+    }
+
+    .workflow-step .step-dot {
+      width: 0.6rem;
+      height: 0.6rem;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.45);
+    }
+
+    .workflow-step .step-status {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    .workflow-step.is-active {
+      background: rgba(232, 119, 34, 0.24);
+      transform: translateX(5px);
+    }
+
+    .workflow-step.is-active .step-dot {
+      background: #ffaf55;
+      box-shadow: 0 0 14px rgba(255, 174, 83, 0.8);
+    }
+
+    .workflow-step.is-complete .step-status {
+      color: rgba(163, 255, 197, 0.95);
+    }
+
+    .hero-status-live {
+      font-size: 0.88rem;
+      color: rgba(255, 255, 255, 0.92);
+      margin: 0;
+      min-height: 1.4rem;
+    }
+
     .metric-card,
     .feature-card {
       border: 1px solid #e7edf5;
@@ -61,11 +204,6 @@
       background: #fff;
     }
 
-    .brand-logo {
-      width: min(320px, 72vw);
-      height: auto;
-    }
-
     .floating-mobile {
       max-width: 320px;
       width: 100%;
@@ -78,9 +216,42 @@
       100% {
         transform: translateY(0);
       }
-
       50% {
         transform: translateY(-12px);
+      }
+    }
+
+    @keyframes heroZoom {
+      0% {
+        transform: scale(1.05);
+      }
+      100% {
+        transform: scale(1.16);
+      }
+    }
+
+    @media (min-width: 768px) {
+      .hero-content {
+        padding: 3.2rem;
+      }
+
+      .hero-actions {
+        width: auto;
+        flex-direction: row;
+      }
+
+      .hero-actions .btn {
+        width: auto;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-bg,
+      .workflow-step,
+      .cta-primary,
+      .floating-mobile {
+        animation: none !important;
+        transition: none !important;
       }
     }
   </style>
@@ -90,37 +261,52 @@
     <!-- •••••••••••••••••••••••••••••• -->
     <!-- ••••• HERO DE CONVERSIÓN ••••• -->
     <!-- •••••••••••••••••••••••••••••• -->
-    <!-- Encabezado limpio sin navbar, con logo grande y CTA inmediato -->
+    <!-- Hero visual mobile-first con CTA y flujo de alergias en tiempo real -->
     <section class="container pt-4 pt-lg-5 pb-4 pb-lg-5">
-      <div class="text-center mb-4">
-        <img
-          class="brand-logo"
-          src="./imgs/logo.png"
-          alt="Logo Mesala"
-          onerror="this.onerror=null;this.src='./imgs/LOGO.gif';"
-        >
-      </div>
+      <article class="hero-banner">
+        <img class="hero-bg" src="./imgs/img-2.jpeg" alt="Equipo de sala coordinando servicio con foco en alergias.">
 
-      <div class="row align-items-center g-4 g-lg-5">
-        <div class="col-12 col-lg-6">
-          <h1 class="display-5 fw-bold mb-3">Vista total del salón. Voz al instante. Cero errores en comandas.</h1>
-          <p class="lead mb-4">Mesala convierte cada móvil en un centro táctico: alerta alergias, peticiones especiales y estado de mesas sin frenar al equipo.</p>
-          <div class="d-flex flex-column flex-sm-row gap-2">
-            <a class="btn cta-primary btn-lg px-4" href="./mesala.html">Prueba Gratis</a>
-            <a class="btn cta-secondary btn-lg px-4" href="#demo">Ver demo</a>
+        <div class="hero-content">
+          <div>
+            <p class="hero-kicker">Tecnología discreta para servicio impecable</p>
+            <h1 class="hero-title fw-bold">El camarero ve, valida y actúa antes de que el riesgo aparezca.</h1>
           </div>
-          <p class="small text-secondary mt-3 mb-0">Sin hardware propietario. Funciona en smartphone, tablet y PC.</p>
-        </div>
 
-        <div class="col-12 col-lg-6 text-center">
-          <img
-            class="floating-mobile"
-            src="./imgs/movil-2.png"
-            alt="Pantalla móvil de Mesala flotando"
-            onerror="this.onerror=null;this.src='./imgs/estructura proyecto.jpg';"
-          >
+          <p class="hero-copy">Mesala guía el flujo del salón en tiempo real: identifica alergias, prioriza acciones y mantiene al equipo alineado con una interfaz limpia, rápida y segura.</p>
+
+          <div class="hero-actions">
+            <a class="btn cta-primary btn-lg px-4" href="./mesala.html">Activar prueba gratis</a>
+            <a class="btn cta-secondary btn-lg px-4" href="#demo">Explorar demo</a>
+          </div>
+
+          <aside class="workflow-panel" aria-live="polite">
+            <h2 class="mb-0">Flujo inteligente de servicio</h2>
+            <ul class="workflow-steps" id="workflowSteps">
+              <li class="workflow-step is-active" data-label="Mesa 8 detectada">
+                <span class="step-dot" aria-hidden="true"></span>
+                <span class="step-text">Mesa 8 · Pedido confirmado</span>
+                <span class="step-status">En curso</span>
+              </li>
+              <li class="workflow-step" data-label="Alergia a frutos secos registrada">
+                <span class="step-dot" aria-hidden="true"></span>
+                <span class="step-text">Alergia · Frutos secos</span>
+                <span class="step-status">En espera</span>
+              </li>
+              <li class="workflow-step" data-label="Cocina validó protocolo seguro">
+                <span class="step-dot" aria-hidden="true"></span>
+                <span class="step-text">Cocina · Protocolo seguro</span>
+                <span class="step-status">En espera</span>
+              </li>
+              <li class="workflow-step" data-label="Servicio finalizado sin incidencias">
+                <span class="step-dot" aria-hidden="true"></span>
+                <span class="step-text">Entrega · Sin incidencias</span>
+                <span class="step-status">En espera</span>
+              </li>
+            </ul>
+            <p class="hero-status-live mt-3" id="heroStatusLive">Mesa 8 detectada</p>
+          </aside>
         </div>
-      </div>
+      </article>
     </section>
 
     <!-- •••••••••••••••••••••••••••••• -->
@@ -201,7 +387,7 @@
         </div>
         <div class="col-12 col-lg-6">
           <div class="visual-frame p-3 h-100 d-flex flex-column gap-3">
-            <video id="videoCamarero" class="w-100 rounded" controls muted playsinline preload="metadata" poster="./imgs/LOGO.gif">
+            <video id="videoCamarero" class="w-100 rounded" controls muted playsinline preload="metadata" poster="./imgs/img-3.jpeg">
               <source id="videoCamareroSource" src="./imgs/Camarero.mp4" type="video/mp4">
               Tu navegador no soporta vídeo embebido.
             </video>
@@ -227,6 +413,46 @@
   <!-- ••••• JAVASCRIPT MODULAR •••••• -->
   <!-- •••••••••••••••••••••••••••••• -->
   <script>
+    (function initHeroWorkflow() {
+      const steps = Array.from(document.querySelectorAll('#workflowSteps .workflow-step'));
+      const statusNode = document.getElementById('heroStatusLive');
+
+      if (!steps.length || !statusNode) {
+        return;
+      }
+
+      let activeIndex = 0;
+
+      function paintStep(nextIndex) {
+        steps.forEach(function (stepNode, index) {
+          stepNode.classList.remove('is-active', 'is-complete');
+
+          if (index < nextIndex) {
+            stepNode.classList.add('is-complete');
+            stepNode.querySelector('.step-status').textContent = 'OK';
+            return;
+          }
+
+          if (index === nextIndex) {
+            stepNode.classList.add('is-active');
+            stepNode.querySelector('.step-status').textContent = 'En curso';
+            return;
+          }
+
+          stepNode.querySelector('.step-status').textContent = 'En espera';
+        });
+
+        statusNode.textContent = steps[nextIndex].dataset.label;
+      }
+
+      paintStep(activeIndex);
+
+      window.setInterval(function rotateWorkflow() {
+        activeIndex = (activeIndex + 1) % steps.length;
+        paintStep(activeIndex);
+      }, 1800);
+    })();
+
     (function initSmoothScroll() {
       const internalLinks = document.querySelectorAll('a[href^="#"]');
 
