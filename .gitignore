@@ -1,0 +1,18 @@
+# Logs
+*.log
+
+# Virtual environments
+venv/
+env/
+.env
+node_modules/
+
+# IDE settings
+.vscode/
+.idea/
+
+.external_helps/
+.src/js/modules/
+.src/componentes/
+
+.estructura_carpetas.jpg/
