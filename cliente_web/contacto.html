@@ -5,24 +5,78 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mesala | Contacto</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <style>
+    :root {
+      --overlay-color: rgba(7, 25, 43, 0.45);
+      --footer-bg: rgba(0, 0, 0, 0.4);
+    }
+
     body {
       margin: 0;
       font-family: Candara, Segoe, "Segoe UI", Optima, Calibri, Arial, sans-serif;
       color: #fff;
+      background-color: #07192b;
     }
 
     .full-banner {
+      position: relative;
       min-height: 100vh;
-      background: linear-gradient(rgba(7, 25, 43, 0.35), rgba(7, 25, 43, 0.35)), url('./imgs/img-2.jpeg') center/cover no-repeat;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .hero-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -2;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(var(--overlay-color), var(--overlay-color));
+      z-index: -1;
     }
 
     .top-nav a {
       color: #fff;
       text-decoration: none;
-      margin-right: 1rem;
+    }
+
+    .logo-link {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .logo-image {
+      width: 130px;
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .audio-button {
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.35);
+      color: #fff;
+      padding: 0.35rem 0.8rem;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: background-color 0.2s ease;
+    }
+
+    .audio-button:hover,
+    .audio-button:focus-visible {
+      background: rgba(0, 0, 0, 0.55);
     }
 
     .contact-content {
@@ -33,14 +87,45 @@
     }
 
     .footer {
-      background: rgba(0, 0, 0, 0.4);
+      background: var(--footer-bg);
+    }
+
+    .social-links {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.9rem;
+    }
+
+    .social-links a {
+      color: #fff;
+      font-size: 1.2rem;
+      line-height: 1;
     }
   </style>
 </head>
 <body>
   <section class="full-banner">
-    <header class="top-nav p-3 p-lg-4">
-      <a href="./index.html">Inicio</a>            
+    <video
+      class="hero-video"
+      id="heroVideo"
+      autoplay
+      muted
+      loop
+      playsinline
+      aria-label="Video de fondo con temática móvil"
+    >
+      <source src="./imgs/movil-celestial.mp4" type="video/mp4">
+    </video>
+    <div class="hero-overlay" aria-hidden="true"></div>
+
+    <header class="top-nav p-3 p-lg-4 d-flex align-items-center justify-content-between">
+      <a class="logo-link" href="./index.html" aria-label="Ir al inicio de Mesala">
+        <img class="logo-image" src="./imgs/logo.png" alt="Logo de Mesala">
+      </a>
+      <button class="audio-button" id="audioToggle" type="button" aria-pressed="false">
+        <i class="bi bi-volume-mute-fill" aria-hidden="true"></i>
+        <span>Activar audio</span>
+      </button>
     </header>
 
     <main class="contact-content">
@@ -51,15 +136,43 @@
     </main>
 
     <footer class="footer py-3">
-      <div class="container d-flex flex-wrap justify-content-between gap-2">
-        <div>
-          <a href="#">Instagram</a> ·
-          <a href="#">LinkedIn</a> ·
-          <a href="#">X / Twitter</a>
+      <div class="container d-flex flex-wrap justify-content-between gap-2 align-items-center">
+        <div class="social-links" aria-label="Redes sociales de Mesala">
+          <a href="#" aria-label="Instagram"><i class="bi bi-instagram" aria-hidden="true"></i></a>
+          <a href="#" aria-label="LinkedIn"><i class="bi bi-linkedin" aria-hidden="true"></i></a>
+          <a href="#" aria-label="Twitter"><i class="bi bi-twitter-x" aria-hidden="true"></i></a>
+          <a href="#" aria-label="Facebook"><i class="bi bi-facebook" aria-hidden="true"></i></a>
         </div>
         <div>© 2026 Mesala Corp.</div>
       </div>
     </footer>
   </section>
+
+  <script>
+    const heroVideo = document.getElementById('heroVideo');
+    const audioToggle = document.getElementById('audioToggle');
+    const buttonText = audioToggle.querySelector('span');
+    const buttonIcon = audioToggle.querySelector('i');
+
+    function updateAudioButton(isMuted) {
+      buttonText.textContent = isMuted ? 'Activar audio' : 'Silenciar audio';
+      buttonIcon.className = isMuted ? 'bi bi-volume-mute-fill' : 'bi bi-volume-up-fill';
+      audioToggle.setAttribute('aria-pressed', String(!isMuted));
+    }
+
+    updateAudioButton(heroVideo.muted);
+
+    audioToggle.addEventListener('click', async () => {
+      heroVideo.muted = !heroVideo.muted;
+
+      try {
+        await heroVideo.play();
+      } catch (error) {
+        heroVideo.muted = true;
+      }
+
+      updateAudioButton(heroVideo.muted);
+    });
+  </script>
 </body>
 </html>
