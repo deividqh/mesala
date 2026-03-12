@@ -43,7 +43,7 @@
 
     <header id="inicio" class="relative h-screen w-full flex items-center justify-center overflow-hidden">
         <video autoplay loop muted playsinline class="absolute top-0 left-0 w-full h-full object-cover z-0">
-            <source src="./imgs/camarero.mp4" type="video/mp4">
+            <source src="./imgs/Camarero.mp4" type="video/mp4">
         </video>
         <div class="absolute inset-0 bg-gradient-to-b from-gray-900/80 via-gray-900/60 to-gray-900/90 z-10"></div>
         
@@ -150,12 +150,31 @@
                 <div class="relative w-64 md:w-80">
                     <div class="absolute -inset-4 bg-primary/30 blur-3xl rounded-full z-0"></div>
                     
-                    <video autoplay loop muted playsinline class="absolute top-[3%] left-[5%] w-[90%] h-[94%] object-cover rounded-[2rem] md:rounded-[2.5rem] z-10 shadow-inner">
+                    <video
+                        id="mobile-demo-video"
+                        autoplay
+                        loop
+                        muted
+                        playsinline
+                        webkit-playsinline
+                        preload="metadata"
+                        class="absolute top-[3%] left-[5%] w-[90%] h-[94%] object-contain bg-black rounded-[2rem] md:rounded-[2.5rem] z-10 shadow-inner"
+                    >
                         <source src="./imgs/movil-celestial.mp4" type="video/mp4">
+                        Tu navegador no soporta videos MP4.
                     </video>
 
                     <img src="./imgs/movil-2.png" alt="App en móvil" class="phone-frame-rotate relative z-20 w-full drop-shadow-2xl pointer-events-none">
                 </div>
+
+                <button
+                    id="mobile-video-audio-toggle"
+                    type="button"
+                    class="mt-6 inline-flex items-center justify-center rounded-full border border-primary/40 bg-gray-900/60 px-5 py-2 text-sm font-semibold text-white transition hover:bg-primary/20 focus:outline-none focus:ring-2 focus:ring-primary"
+                    aria-pressed="false"
+                >
+                    Activar audio del video
+                </button>
             </div>
 
         </div>
@@ -211,6 +230,33 @@
             elem.style.animationPlayState = 'paused';
             observer.observe(elem);
         });
+
+        // Audio del video del móvil (solo tras interacción para cumplir políticas del navegador)
+        const mobileDemoVideo = document.getElementById('mobile-demo-video');
+        const audioToggleButton = document.getElementById('mobile-video-audio-toggle');
+
+        if (mobileDemoVideo && audioToggleButton) {
+            const syncAudioButtonText = () => {
+                const audioEnabled = !mobileDemoVideo.muted;
+                audioToggleButton.textContent = audioEnabled ? 'Silenciar video' : 'Activar audio del video';
+                audioToggleButton.setAttribute('aria-pressed', audioEnabled ? 'true' : 'false');
+            };
+
+            syncAudioButtonText();
+
+            audioToggleButton.addEventListener('click', async () => {
+                mobileDemoVideo.muted = !mobileDemoVideo.muted;
+
+                try {
+                    await mobileDemoVideo.play();
+                } catch (error) {
+                    // Si el navegador bloquea la reproducción, volvemos al estado seguro.
+                    mobileDemoVideo.muted = true;
+                }
+
+                syncAudioButtonText();
+            });
+        }
     </script>
 </body>
 </html>
