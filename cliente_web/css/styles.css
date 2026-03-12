@@ -20,3 +20,25 @@
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }
+/* Rotación suave del frontal del móvil para acompañar la animación del video */
+.phone-frame-rotate {
+    transform-origin: center center;
+    animation: phoneFrameRotate 12s ease-in-out infinite;
+    will-change: transform;
+}
+
+@keyframes phoneFrameRotate {
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+    25% {
+        transform: rotate(1.2deg);
+    }
+    50% {
+        transform: rotate(0deg);
+    }
+    75% {
+        transform: rotate(-1.2deg);
+    }
+}
