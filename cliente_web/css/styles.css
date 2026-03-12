@@ -1,0 +1,22 @@
+/* Animaciones personalizadas suaves para el Scroll */
+.fade-in-up {
+    animation: fadeInUp 1s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Retrasos para que los elementos aparezcan en cascada */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+
+/* Ocultar scrollbar en el video del móvil si existiera */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
