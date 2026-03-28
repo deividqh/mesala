@@ -9304,17 +9304,18 @@ class Motor_Mensajes {
 		let bolita = elemento_dom.querySelector('.markador_mensaje');
 		// Si no existe, se crea.
 		if (!bolita) {
-			bolita = document.createElement('span');
-			bolita.className = 'markador_mensaje';		// clase que le pone estilo a la bolita.
+			bolita = document.createElement('i');
+			bolita.className = 'bi bi-chat-left-dots-fill markador_mensaje';
+			bolita.setAttribute('aria-hidden', 'true');
 			elemento_dom.appendChild(bolita);
 		}
 		
 		// Asegurar que está visible
 		bolita.style.display = 'block';
 		if(color_bolita && typeof color_bolita === 'string'){
-			bolita.style.backgroundColor = color_bolita;
+			bolita.style.color = color_bolita;
 		}else{
-			bolita.style.backgroundColor = '';
+			bolita.style.color = '#16a34a';
 		}
 	}
 
