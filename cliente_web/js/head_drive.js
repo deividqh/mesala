@@ -1,3 +1,11 @@
+// CONSTANTES GLOBALES PARA CREAR ELEMETOS EN EL HEADER.
+const IDLINK_XDEF 	= 'Id_Link_Noname';		//EL ID PARA LOS LINK CREADOS...POR DEFECTO 	• • • • [Head_Drive][Work__ClassName]
+const IDSCRIPT_XDEF = 'Id_Script_Noname';	//EL ID PARA LOS SCRIPT CREADOS...POR DEFECTO   • • • • [Head_Drive]
+
+// CONSTATES DE TAG HEAD DE LINKS Y SCRIPTS
+const CSS_TYPELINK 	= 'text/css';
+const CSS_RELLINK 	= 'stylesheet';
+const CSS_TYPESCRIPT = 'text/javascript';
 
 // ███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
 //  C L A S E  		Head_Drive

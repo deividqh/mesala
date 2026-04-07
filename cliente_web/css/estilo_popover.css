@@ -430,9 +430,9 @@ Tema DARK (RESERVAS)
 
 /* ██████████████████████████████████████████████████████████████████████████████████████████████████████ */
 
-/* ████████████████████████████████████████████████████
+/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
    2) ESTILOS COMUNES
-   ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
+   ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
 
 .popover{
   background:       var(--pop-bg);
@@ -466,9 +466,9 @@ Tema DARK (RESERVAS)
   border-color: var(--pop-arrow-border);
 }
 
-/* ──────────────────────────────────────────────────────────────
-   3) FORM (alias + mensaje) + SUMATORIO
-   ────────────────────────────────────────────────────────────── */
+/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+   FORM (alias + mensaje) + SUMATORIO
+   ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
 
 .popover .contenedor_popover textarea{
   border-radius: 10px;
@@ -523,9 +523,9 @@ Tema DARK (RESERVAS)
 
 .sumatorio-id-ppal{ font-weight: bold;  border-color: var(--ta-focus-border); color: var(--acento);}
 
-/* ──────────────────────────────────────────────────────────────
-   4) BOTONES (guardar / reset / eliminar / grabar / parar)
-   ────────────────────────────────────────────────────────────── */
+/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+   BOTONES (guardar / reset / eliminar / grabar / parar)
+   ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
 
 .btn.btn-guardar{
   background: var(--btn-guardar-bg);
@@ -563,23 +563,26 @@ Tema DARK (RESERVAS)
 }
 
 /* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-   5) CÍRCULO INDICADOR DEL MENSAJE (común, color por tema)
+   CÍRCULO INDICADOR DEL MENSAJE (común, color por tema)
    ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
 .elemento_con_mensaje{ position: relative; }
 .markador_mensaje{
     position: absolute;
-    top: -4px;
-    right: -4px;
+    top: -9px;
+    right: -9px;
     font-size: 0.82rem;
     line-height: 1;
-    color: #16a34a;
+    /* color: #16a34a; */
+    /* background-color: #0c5025; */
     text-shadow: 0 1px 2px rgba(15, 23, 42, 0.25);
     display: none;
     z-index: 100;
     pointer-events: none;
 }
 
-/* ========== Alergias: botón en header del popover ========== */
+/* ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ 
+   ■ ■ ■ ■ ■       ALERGIAS:     ■ ■ ■ ■ ■ 
+   ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ */
 .popover .popover-header-row {
   display: flex;
   align-items: center;
@@ -589,7 +592,7 @@ Tema DARK (RESERVAS)
 
 .popover .btn-alergias-pop {
   border: 1px solid #22c55e;
-  color: #14532d;
+  color: #000000;
   background: #dcfce7;
   font-size: 0.72rem;
   line-height: 1;
@@ -599,14 +602,14 @@ Tema DARK (RESERVAS)
 .popover .btn-alergias-pop:hover,
 .popover .btn-alergias-pop.is-open,
 .popover .btn-alergias-pop.has-selection {
-  color: #ffffff;
-  background: #16a34a;
-  border-color: #16a34a;
+  color: #151414;
+  background: #e1ece5;
+  border-color: #e1ece5;
 }
 
 /* ========== Modal de alergias (Bootstrap 5) ========== */
 #modal_motor_alergias .modal-content {
-  background: rgba(24, 24, 27, 0.94);
+  background: rgba(234, 234, 248, 0.93);
   border: 1px solid rgba(255, 255, 255, 0.14);
   color: #fff;
 }
@@ -625,7 +628,7 @@ Tema DARK (RESERVAS)
 }
 
 .w-alergias-label.is-valid {
-  color: #22c55e;
+  color: #0000007b;
 }
 
 .w-alergias-grid {
@@ -655,8 +658,8 @@ Tema DARK (RESERVAS)
 }
 
 .w-alergeno-btn.is-active {
-  border-color: #22c55e;
-  background: rgba(34, 197, 94, 0.2);
+  border-color: #000000;
+  background: rgba(34, 186, 197, 0.333);
 }
 
 .w-alergeno-text {
