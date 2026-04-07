@@ -2557,8 +2557,7 @@ class e_Salon extends Tablero_Drop {
 		const dicc_reserva_flat = Object.values(this.reservas[index_reserva]).flat();		
 		const arr_mesas_reserva_flat = Object.values(this.reservas[index_reserva].mesas).flat();		
 
-		let MM = this.MSG_M;
-		MM.id = id_mesa;                					// mesa actual (clave para guardar)
+		this.MSG_M.id = id_mesa;                					// mesa actual (clave para guardar)
 
 		// ■■ Recupera el diccionario de popover. (Recuerda que Las mesas son las keys de la propiedad diccionario_datos del popover)
 		const diccionario_mesas = this.MSG_M.diccionario_datos;
