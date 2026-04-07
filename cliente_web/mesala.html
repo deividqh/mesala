@@ -14,13 +14,65 @@
   <link rel="stylesheet" href="./css/estilo_salon.css">
   <link rel="stylesheet" href="./css/estilo_popover.css">
   
+  <style>
+    /*
+      Sistema tipográfico unificado para Mesala
+      - Alcance limitado a esta página (body[data-page="mesala"])
+      - Mantiene KISS: variables + reglas simples y predecibles
+    */
+    body[data-page="mesala"] {
+      --mesala-font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+      --mesala-font-size: 0.95rem;
+      --mesala-text-color: #334155;
+      --mesala-text-transform: none;
+      --mesala-letter-spacing: 0.01em;
+      --mesala-word-spacing: 0.01em;
+      --mesala-object-gap: 0.75rem;
+    }
+
+    body[data-page="mesala"],
+    body[data-page="mesala"] :where(
+      h1, h2, h3, h4, h5, h6,
+      p, span, small, strong, em,
+      label, legend,
+      input, textarea, select, option,
+      button, a,
+      .offcanvas-title, .modal-title,
+      .accordion-button, .alert, .config-info,
+      [data-creat], [data-rud], [data-updt], [data-config]
+    ) {
+      font-family: var(--mesala-font-family);
+      font-size: var(--mesala-font-size);
+      color: var(--mesala-text-color);
+      text-transform: var(--mesala-text-transform);
+      letter-spacing: var(--mesala-letter-spacing);
+      word-spacing: var(--mesala-word-spacing);
+    }
+
+    body[data-page="mesala"] :where(
+      .navbar-groups,
+      .navbar-left,
+      .navbar-elementos,
+      .navbar-actions-group,
+      .options-bar__group,
+      .social-icons-container,
+      .photo-actions-section,
+      .d-flex.gap-2
+    ) {
+      gap: var(--mesala-object-gap);
+    }
+  </style>
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- MIS SCRIPTS JS -->
   <script type='text/javascript' src='./js/Salon.js'></script> 
-  <script type='text/javascript' src='./js/Motor_Alergias.js'></script> 
+  <script type='text/javascript' src='./js/Motor_Mensajes.js'></script> 
+  <script type='text/javascript' src='./js/Ranghos.js'></script> 
+  <script type='text/javascript' src='./js/AlertasUI.js'></script> 
   <script type='text/javascript' src="./js/div_x_div.js"></script> 
-<body>
+</head>
+<body data-page="mesala">
 
   <!-- 
   ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
