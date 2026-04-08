@@ -2205,14 +2205,23 @@ class e_Salon extends Tablero_Drop {
 	dicc_config = null;	
 	/** ### Array de diccionarios de reservas. LOGICA DEL NEGOCIO DE SALON ► reservas = [ {'mesas':[], 'sillas':[]} , {...} ] {@link _modulo_reservas}*/
 	reservas = []; 	
+	
 	/** ### Modo Reserva ON/OFF. 
 	 * #### Se activa cuando se hace click en una mesa {@link mesa_click_handler} 
 	 * #### Se Desactiva cuando se hace doble click fuera de esa reserva {@link _desactivar_modo_reserva}. 	 */
 	is_mode_reserva = null;        	
+	
 	/** ### Variable que me sirve para gestionar cuando ha habido un cambio de reserva: {@link mesa_click_handler} ■ {@link _desactivar_modo_reserva} */
 	last_reserva_clicked = -1;	// el ultimo click sobre que reserva.... indice en reservas
 
 	static MODELOS_SALON = ['limitado', 'scrolado', 'apilado'];
+	// limitado: Según el ancho del dispositivo se muestran 8,16,24 columnas. 
+	// 			 dicc_config no tiene que poner columnas...necesita re-posicionar.
+	//  		 ACTUAL MODELO EN DESARROLLO, POR ESO SE PONE POR DEFECTO EN EL CONSTRUCTOR.
+	//
+	// scrolado: Puedes poner tantas columnas como quieras pero según el ancho del dispositivoo, el contenedor scrolará al ancho especificado.
+	// apilado:  No tiene limite de columnas y no hace scroll, es el usuario quien tiene la responsabilidad.
+
 	/**
 	 * ### Gestiona Reservas ,Mensajes y posiciones de un Tablero ó Salon.
 	 * #### • Hereda de las clases Tablero_Drop y Div_x_Div q crean las Baldosas del Salon con Métodos DROP.
@@ -2757,12 +2766,12 @@ class e_Salon extends Tablero_Drop {
 	 * @param {string} [tipo] 'todo' 'all' | 'mesa' | 'silla' ► definidos en this.dicc__config.tipos
 	 * @return {array} 
 	 * ```javascript
-	 *  get_ids_onplay(this.dicc__config.tipos.silla) ► ['silla_0', 'silla_1', ... ]
-	 *  get_ids_onplay(this.dicc__config.tipos.mesa)  ► ['mesa_0', 'mesa_1', ... ]	
+	 *  _get_ids_onplay(this.dicc__config.tipos.silla) ► ['silla_0', 'silla_1', ... ]
+	 *  _get_ids_onplay(this.dicc__config.tipos.mesa)  ► ['mesa_0', 'mesa_1', ... ]	
 	 * ```
 	 */
 
-	_get_mesas_sillas_onplay(tipo='todo'){		
+	_get_ids_onplay(tipo='todo'){		
 		// if (!Object.values(this.dicc__config.tipos).includes(tipo)) {
 		// 	return false;
 		// }
@@ -2927,7 +2936,7 @@ class e_Salon extends Tablero_Drop {
 
 
 		// ■■■■■■■■■■■■ Sillas Ronin
-		// const arr_id_sillas = this._get_mesas_sillas_onplay(this.dicc__config.tipos.silla);
+		// const arr_id_sillas = this._get_ids_onplay(this.dicc__config.tipos.silla);
 		// const sillas_no_asignadas = arr_id_sillas.filter(silla_id => !set_sillas_visited.has(silla_id));
 
 		// if (sillas_no_asignadas.length > 0) {
@@ -2951,7 +2960,7 @@ class e_Salon extends Tablero_Drop {
 	_get_sillas_ronin(set_sillas_visited=null){
 		let sillas_ronin = [];
 		// ■■■■■■■■■■■■ Sillas Ronin
-		const arr_id_sillas = this._get_mesas_sillas_onplay(this.dicc_config.tipos.silla);
+		const arr_id_sillas = this._get_ids_onplay(this.dicc_config.tipos.silla);
 		const sillas_no_asignadas = arr_id_sillas.filter(silla_id => !set_sillas_visited?.has(silla_id));
 
 		if (sillas_no_asignadas.length > 0) {
@@ -3508,7 +3517,7 @@ class e_Salon extends Tablero_Drop {
 	 */
 	clean_elementos_Salon(tipo = 'todo') {
 		// 1. Obtiene los IDs usando tu función existente que ya valida los tipos.
-		const ids_to_remove = this._get_mesas_sillas_onplay(tipo);		
+		const ids_to_remove = this._get_ids_onplay(tipo);		
 		if (!ids_to_remove || ids_to_remove.length === 0) return;
 
 		// 2. Recorre los IDs, busca el elemento y lo elimina de su padre (la baldosa).
@@ -3673,11 +3682,25 @@ class e_Salon extends Tablero_Drop {
 
 	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	/** ### Entra un id de mesa o silla pej: 'mesa_2' desde un rango y devuelve el elemento del menu equivalente (div mesa menu) 
+	 * ### _what_player_menu devuelve: { tipo:(str) , elemento: < object > }
+	 * 
 	 * ```javascript
 	 * const player_menu = this._what_player_menu(id_mesa_o_silla); 
-	 * console.log(player_menu.name); 		► "silla"
-	 * console.log(player_menu.element); 	► <div class="menu_to_clone" ... >
+	 * console.log(player_menu.tipo); 		► "silla"
+	 * console.log(player_menu.elemento); 	► <div class="menu_to_clone" ... >
 	 * ```
+	 * ### • PROCESO DE CREACIÓN DE UN ELEMENTO DEL SALON A PARTIR DE SU ID Y EL MENU:
+	 * ```javascript
+	 *	const menu_element = Salon?._what_player_menu(id_player);					
+	 *	if(!menu_element) return; 			
+	 *	const player = menu_element.elemento.cloneNode(true);
+	 *	if (player) {
+	 *		player.id = id_player; 
+	 *		Salon._saloniza_elemento(player);
+	 *	}
+	 *	// ┌• Se deposita sobre la baldosa.
+	 *	baldosa_destino.appendChild(player);						
+	 *```
 	*/
 	_what_player_menu(id_mesa_o_silla){		
 		
@@ -4299,7 +4322,7 @@ class Configuracion_Salon {
 				// ┌••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 				// ■ ■ ■ ■ No se puede Cambiar la dimensión de un salon si el Salon tiene elementos.
 				// ┌••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
-				const numero_elementos = this.Salon._get_mesas_sillas_onplay('all').length;				
+				const numero_elementos = this.Salon._get_ids_onplay('all').length;				
 				if(numero_elementos > 0) {
 					// console.log(`⚠️​ NO SE PUEDE CAMBIAR LA DIMENSION DEL SALON CUANDO TIENE ELEMENTOS.... Numero de Elementos ${numero_elementos}`);
 					// alert(`⚠️​ NO SE PUEDE CAMBIAR LA DIMENSION DEL SALON CUANDO TIENE ELEMENTOS\n.... Numero de Elementos ${numero_elementos}`);
@@ -6620,7 +6643,7 @@ class Foto_CRUD{
 		this.bs_modal_CU.show();
 		this.__actualizar_acordeon_CU();
 		
-		// ┌•• Authentication
+		// ┌•• Valida Authentication para no tener que esperar el error de la API al intentar guardar la foto.
 		const datos_auth = Login_Modal.get_datos_auth();		
 		if (!datos_auth?.is_authenticated || !datos_auth?.token) {
 			this._feedback_CU('⚠️ Necesitas iniciar sesión para guardar la foto.', 'warning');
@@ -8012,6 +8035,7 @@ class Side_Elementos {
 		Object.entries(this.diccionario_elementos).forEach(([key, config]) => {
 			const svg = config?.svg ?? '';
 			if (!svg) return;
+			
 			const item = document.createElement('div');
 			item.dataset.sideItem = key;
 			item.classList.add('menu_to_clone');

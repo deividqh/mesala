@@ -2529,7 +2529,7 @@ class Rango_Ghost extends Working_Rangos{
 					// ┌• Se deposita sobre la baldosa.
 					baldosa_destino.appendChild(player);						
 					
-					// ┌■ BUFFER de elementos
+					// ┌■ BUFFER de elementos(opcional)
 					this.llenar_buffer(player);
 					
 				}else if(!Cut && Copy){					

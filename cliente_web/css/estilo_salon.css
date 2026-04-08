@@ -216,7 +216,7 @@ Fullscreen en MOVILES
 
 
 /* PopOver sobre los elementos */
-.popover.popover-mensaje {
+/* .popover.popover-mensaje {
   --pop-bg:              rgba(24, 27, 34, 0.92);
   --pop-fg:              rgb(232, 234, 237);
   --pop-border-color:    rgba(var(--navbar-icon-rgb), 0.35);
@@ -229,7 +229,7 @@ Fullscreen en MOVILES
   --body-bg:             transparent;
   --body-fg:             rgb(232, 234, 237);
   --body-font-size:      0.85rem;
-}
+} */
 
 /* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
    █  DEL OFFCANVAS RUD Zona de Tabs de Visibilidad... Filtros

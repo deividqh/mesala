@@ -791,6 +791,9 @@ class Motor_Mensajes {
 		return Array.isArray(alergias) && alergias.length > 0;
 	}
 
+	/** ### Actualiza el markador de un elemento según tenga mensaje o alergias.
+	 * @param {String} id_elemento_dom ► 'mesa_0' , 'silla_2' ... es el elemento sobre el que aparecerá la bolita. 
+	 * */
 	_actualizar_markador_elemento(id_elemento_dom = '') {
 		if (!id_elemento_dom) return;
 		const b_mensajes = this._tiene_mensaje(id_elemento_dom);
