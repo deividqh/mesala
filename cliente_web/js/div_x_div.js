@@ -2323,7 +2323,7 @@ class e_Salon extends Tablero_Drop {
 		
 		// ■■ Sidebar persistente de elementos (mesa/silla) conectado a este Salón
 		const $icono_elementos = document.querySelector('[data-action-nav="elementos"]');
-		this.Side_Elementos = new Side_Elementos(this, null, $icono_elementos);
+		this.Side_Elementos = new Side_Elementos($icono_elementos);
 
 		// ┌••••••••••••••••••••••••••••
 		// ┌• CONFIGURACION DEL SALON: 
@@ -7937,9 +7937,8 @@ class Side_Elementos {
 	 * • Se mantiene vivo en el DOM para reutilizarlo muchas veces (KISS).
 	 * {@link e_Salon}
 	 */
-	constructor(salon = null, diccionario_elementos = null, icono_disparador = null, opciones = {}) {
+	constructor(icono_disparador = null, diccionario_elementos = null, opciones = {}) {
 		this.icono_disparador = icono_disparador;
-		this.Salon = salon;
 		this.diccionario_elementos = this._normaliza_elementos(diccionario_elementos);
 		this.posicion = opciones.posicion ?? 'right';
 		this.modo_tamano = opciones.modo_tamano ?? 'content';
@@ -8165,15 +8164,23 @@ class Side_Elementos {
 	 */
 	_activar_drag(item) {
 		if (!item) return;
-		const tablero = this.Salon;
-		if (tablero?.toouch_me?.add_listeners_touchraton) {
-			tablero.toouch_me.add_listeners_touchraton(item);
-			return;
-		}
-		if (tablero?.dragStart) {
-			item.addEventListener('dragstart', tablero.dragStart.bind(tablero));
-		}
+		item.setAttribute('draggable', 'true');
+		item.removeEventListener('dragstart', this._on_item_dragstart);
+		item.addEventListener('dragstart', this._on_item_dragstart);
 	}
+
+	/**
+	 * ### Serializa solo el mínimo de datos permitido para el drop (KISS + seguridad).
+	 * @link _activar_drag
+	 */
+	_on_item_dragstart = (event) => {
+		const item = event?.currentTarget;
+		const tipo = `${item?.dataset?.tipo ?? ''}`.toLowerCase();
+		if (!item?.id) return;
+		if (tipo !== 'mesa' && tipo !== 'silla') return;
+		event.dataTransfer?.setData('text', item.id);
+		event.dataTransfer?.setData('tipo', tipo);
+	};
 
 	/**
 	 * ### Abre el sidebar y activa el estado visual del icono (verde inmediato).
