@@ -1700,13 +1700,19 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 		// ​​​​​​​const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");		
 		// ​​​​​​​if (items_html_to_matriz.length > 0) {	
-		// ​​​​​​​	items_html_to_matriz.forEach(el => el.addEventListener("dragstart", this.dragStart.bind(this)));
-		// ​​​​​​​}
+			// ​​​​​​​	items_html_to_matriz.forEach(el => el.addEventListener("dragstart", this.dragStart.bind(this)));
+			// ​​​​​​​}
 		const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");
 		if (items_html_to_matriz.length > 0) {
 			items_html_to_matriz.forEach(el => this.toouch_me.add_listeners_touchraton(el));
 		}
 		console.log('✅ Tablero_Drop - Touch-Raton ​​👆​🖱️​ • • • Loaded ✔️');		
+			
+		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		// ■■ Sidebar persistente de elementos (mesa/silla) conectado a este Salón
+		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		const $icono_elementos = document.querySelector('[data-action-nav="elementos"]');
+		this.Side_Elementos = new Side_Elementos(this, null, $icono_elementos);
 
 
 	}
@@ -1731,6 +1737,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 	 * ### KISS: Bloquea o desbloquea el movimiento del sidebar.
 	 */
 	_set_bloqueo_sidebar(bloqueado = false) {
+		
 		if (!this.Side_Elementos?.set_bloqueo_movimiento) return;
 		this.Side_Elementos.set_bloqueo_movimiento(bloqueado);
 	}
@@ -2321,9 +2328,9 @@ class e_Salon extends Tablero_Drop {
 			log: '[data-action-nav="conn"]',
 		};
 		
-		// ■■ Sidebar persistente de elementos (mesa/silla) conectado a este Salón
-		const $icono_elementos = document.querySelector('[data-action-nav="elementos"]');
-		this.Side_Elementos = new Side_Elementos(this, null, $icono_elementos);
+		// // ■■ Sidebar persistente de elementos (mesa/silla) conectado a este Salón
+		// const $icono_elementos = document.querySelector('[data-action-nav="elementos"]');
+		// this.Side_Elementos = new Side_Elementos(this, null, $icono_elementos);
 
 		// ┌••••••••••••••••••••••••••••
 		// ┌• CONFIGURACION DEL SALON: 
@@ -8418,11 +8425,12 @@ class Touch_aMe {
         /**
          * ###  ​👂​👂 Añade manejadores de drag y touch al mismo elemento para escritorio y móvil.
 		 * • Amplia y sustituye este codigo:\
+		 * ```javascript
 		 * const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");
 		 * ​​​​​​​if (items_html_to_matriz.length > 0) {
 		 * 		​items_html_to_matriz.forEach(el => el.addEventListener("dragstart", this.dragStart.bind(this)));
 		 * ​​​​​​​}
-         */
+		 * ``` */
         add_listeners_touchraton(elemento){
                 if (!elemento || !this.tablero) return;
                 elemento.draggable = true;
