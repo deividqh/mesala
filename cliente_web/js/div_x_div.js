@@ -2321,9 +2321,13 @@ class e_Salon extends Tablero_Drop {
 			log: '[data-action-nav="conn"]',
 		};
 		
-		// ■■ Sidebar persistente de elementos (mesa/silla) conectado a este Salón
+		// ■■ Sidebar persistente de elementos (mesa/silla) desacoplado del Salón (solo UI + callback drag)
 		const $icono_elementos = document.querySelector('[data-action-nav="elementos"]');
-		this.Side_Elementos = new Side_Elementos(this, null, $icono_elementos);
+		this.Side_Elementos = new Side_Elementos(
+			this.toouch_me.add_listeners_touchraton.bind(this.toouch_me),
+			null,
+			$icono_elementos
+		);
 
 		// ┌••••••••••••••••••••••••••••
 		// ┌• CONFIGURACION DEL SALON: 
@@ -7937,9 +7941,9 @@ class Side_Elementos {
 	 * • Se mantiene vivo en el DOM para reutilizarlo muchas veces (KISS).
 	 * {@link e_Salon}
 	 */
-	constructor(salon = null, diccionario_elementos = null, icono_disparador = null, opciones = {}) {
+	constructor(dragCallback = null, diccionario_elementos = null, icono_disparador = null, opciones = {}) {
 		this.icono_disparador = icono_disparador;
-		this.Salon = salon;
+		this.dragCallback = typeof dragCallback === 'function' ? dragCallback : null;
 		this.diccionario_elementos = this._normaliza_elementos(diccionario_elementos);
 		this.posicion = opciones.posicion ?? 'right';
 		this.modo_tamano = opciones.modo_tamano ?? 'content';
@@ -8165,14 +8169,7 @@ class Side_Elementos {
 	 */
 	_activar_drag(item) {
 		if (!item) return;
-		const Salon = this.Salon;
-		if (Salon?.toouch_me?.add_listeners_touchraton) {
-			Salon.toouch_me.add_listeners_touchraton(item);
-			return;
-		}
-		if (Salon?.dragStart) {
-			item.addEventListener('dragstart', Salon.dragStart.bind(Salon));
-		}
+		if (this.dragCallback) this.dragCallback(item);
 	}
 
 	/**
