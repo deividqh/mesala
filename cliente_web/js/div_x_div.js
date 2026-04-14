@@ -3821,8 +3821,7 @@ class Configuracion_Salon {
 		
 		// •••••••••••••••••••••••••••••••••••••• 
 		// OFFCANVAS DE CONFIGURACION DE LA APP
-		// •••••••••••••••••••••••••••••••••••••• 
-		
+		// •••••••••••••••••••••••••••••••••••••• 		
 		// ┌•• Cacho el trigger que abre el offcanvas
 		this.$trigger = e_Salon._to_element(icono_trigger);
 		if(!this.$trigger) {
