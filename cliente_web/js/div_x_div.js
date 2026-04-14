@@ -1700,19 +1700,13 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 		// ​​​​​​​const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");		
 		// ​​​​​​​if (items_html_to_matriz.length > 0) {	
-			// ​​​​​​​	items_html_to_matriz.forEach(el => el.addEventListener("dragstart", this.dragStart.bind(this)));
-			// ​​​​​​​}
+		// ​​​​​​​	items_html_to_matriz.forEach(el => el.addEventListener("dragstart", this.dragStart.bind(this)));
+		// ​​​​​​​}
 		const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");
 		if (items_html_to_matriz.length > 0) {
 			items_html_to_matriz.forEach(el => this.toouch_me.add_listeners_touchraton(el));
 		}
 		console.log('✅ Tablero_Drop - Touch-Raton ​​👆​🖱️​ • • • Loaded ✔️');		
-			
-		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-		// ■■ Sidebar persistente de elementos (mesa/silla) conectado a este Salón
-		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-		const $icono_elementos = document.querySelector('[data-action-nav="elementos"]');
-		this.Side_Elementos = new Side_Elementos(this, null, $icono_elementos);
 
 
 	}
@@ -1737,7 +1731,6 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 	 * ### KISS: Bloquea o desbloquea el movimiento del sidebar.
 	 */
 	_set_bloqueo_sidebar(bloqueado = false) {
-		
 		if (!this.Side_Elementos?.set_bloqueo_movimiento) return;
 		this.Side_Elementos.set_bloqueo_movimiento(bloqueado);
 	}
@@ -2328,9 +2321,9 @@ class e_Salon extends Tablero_Drop {
 			log: '[data-action-nav="conn"]',
 		};
 		
-		// // ■■ Sidebar persistente de elementos (mesa/silla) conectado a este Salón
-		// const $icono_elementos = document.querySelector('[data-action-nav="elementos"]');
-		// this.Side_Elementos = new Side_Elementos(this, null, $icono_elementos);
+		// ■■ Sidebar persistente de elementos (mesa/silla) conectado a este Salón
+		const $icono_elementos = document.querySelector('[data-action-nav="elementos"]');
+		this.Side_Elementos = new Side_Elementos(this, null, $icono_elementos);
 
 		// ┌••••••••••••••••••••••••••••
 		// ┌• CONFIGURACION DEL SALON: 
@@ -8172,13 +8165,13 @@ class Side_Elementos {
 	 */
 	_activar_drag(item) {
 		if (!item) return;
-		const tablero = this.Salon;
-		if (tablero?.toouch_me?.add_listeners_touchraton) {
-			tablero.toouch_me.add_listeners_touchraton(item);
+		const Salon = this.Salon;
+		if (Salon?.toouch_me?.add_listeners_touchraton) {
+			Salon.toouch_me.add_listeners_touchraton(item);
 			return;
 		}
-		if (tablero?.dragStart) {
-			item.addEventListener('dragstart', tablero.dragStart.bind(tablero));
+		if (Salon?.dragStart) {
+			item.addEventListener('dragstart', Salon.dragStart.bind(Salon));
 		}
 	}
 
