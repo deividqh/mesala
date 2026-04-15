@@ -1657,8 +1657,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		
 		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 		// ■■ Gestor unificado de ratón y táctil
-		this.toouch_me = new Touch_aMe(this);
-
+		
 		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■		
 		// ■■ LISTENERS  ​👂​👂 PARA QUE LAS BALDOSAS DEL SALON SEAN DROP
 		const items_baldosa = document.querySelectorAll(".estiloBaldosas");		
@@ -1704,7 +1703,13 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// ​​​​​​​}
 		const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");
 		if (items_html_to_matriz.length > 0) {
-			items_html_to_matriz.forEach(el => this.toouch_me.add_listeners_touchraton(el));
+			items_html_to_matriz.forEach(el => {
+				if (typeof this.add_listeners_touchraton === 'function') {
+					this.add_listeners_touchraton(el);
+					return;
+				}
+				el.addEventListener("dragstart", this.dragStart.bind(this));
+			});
 		}
 		console.log('✅ Tablero_Drop - Touch-Raton ​​👆​🖱️​ • • • Loaded ✔️');		
 
@@ -1761,7 +1766,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// ■■ Guarda el objeto que se mueve en la clase.
                 // this.objeto_drag = new_obj_drag;
                 // ■■ Guarda el objeto que se mueve en la clase.
-                this.toouch_me?.get_origen_drag(new_obj_drag);
+                this.get_origen_drag?.(new_obj_drag);
 
 		// ■■ Bloquea el movimiento del sidebar si movemos una mesa o silla.
 		this._iniciar_bloqueo_sidebar(new_obj_drag);
@@ -1974,7 +1979,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// clon_item.draggable = true;
     	// clon_item.addEventListener('dragstart', this.dragStart.bind(this));
 		//  ​👂​👂  Hace el clon del item del menu DRAGGABLE para ratón y táctil
-		this.toouch_me.add_listeners_touchraton(clon_item);
+		this.add_listeners_touchraton(clon_item);
 		
 		// ■■ Añade el clon de la silla a la baldosa.
 		baldosa_matriz.appendChild(clon_item);           
@@ -2154,6 +2159,209 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 }
 
 
+
+/**
+ * ### Tablero_Touch unifica drag&drop de ratón y eventos táctiles directamente sobre el tablero.
+ * Hereda de Tablero_Drop para reutilizar toda la lógica de movimiento ya existente.
+ */
+class Tablero_Touch extends Tablero_Drop {
+	constructor(family = '', id_div_contenedor = '', div_maestro = null, columnas = 8, filas = 8 ) {
+		super(family, id_div_contenedor, div_maestro, columnas, filas);
+		this.touchState = { draggedElement: null, activeDropTarget: null };
+		this.tapThreshold = 10;
+		this._touchCancelRegistrado = false;
+	}
+
+	get_coordenadas_evento(evento){
+		if (!evento) return { x: 0, y: 0 };
+		const touch = (evento.touches && evento.touches[0]) || (evento.changedTouches && evento.changedTouches[0]);
+		if (touch) return { x: touch.clientX, y: touch.clientY };
+		return { x: evento.clientX || 0, y: evento.clientY || 0 };
+	}
+
+	get_origen_drag(elemento){
+		if (!elemento) return;
+		this.objeto_drag = elemento;
+		this.data_tipo = elemento.getAttribute('data-tipo') || '';
+	}
+
+	add_listeners_touchraton(elemento){
+		if (!elemento) return;
+		if (elemento.dataset.touchRatonReady === '1') return;
+		elemento.draggable = true;
+		elemento.style.touchAction = 'none';
+		elemento.addEventListener('dragstart',  this.dragStart.bind(this));
+		elemento.addEventListener('touchstart', this.handleTouch_start.bind(this), { passive: false });
+		elemento.addEventListener('touchmove',  this.handleTouch_movimiento.bind(this), { passive: false });
+		elemento.addEventListener('touchend',   this.handleTouch_end.bind(this), { passive: false });
+		elemento.dataset.touchRatonReady = '1';
+		if (!this._touchCancelRegistrado) {
+			window.addEventListener('touchcancel', this.finalizarArrastre.bind(this));
+			this._touchCancelRegistrado = true;
+		}
+	}
+
+	finalizarArrastre() {
+		this._cleanup_touch_preview();
+		this._reset_touch_state();
+		this._set_bloqueo_sidebar(false);
+	}
+
+	_create_drag_preview(elemento, rect){
+		if (!elemento || !rect) return null;
+		const preview = elemento.cloneNode(true);
+		preview.removeAttribute('id');
+		preview.setAttribute('aria-hidden', 'true');
+		preview.style.position = 'fixed';
+		preview.style.left = '0px';
+		preview.style.top = '0px';
+		preview.style.width = `${rect.width}px`;
+		preview.style.height = `${rect.height}px`;
+		preview.style.margin = '0';
+		preview.style.zIndex = '9999';
+		preview.style.pointerEvents = 'none';
+		preview.style.boxSizing = 'border-box';
+		preview.style.transformOrigin = 'top left';
+		preview.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0)`;
+		preview.style.willChange = 'transform';
+		document.body.appendChild(preview);
+		return preview;
+	}
+
+	_get_baldosa_from_point(x, y, fallbackTarget = null){
+		const elements = document.elementsFromPoint ? document.elementsFromPoint(x, y) : [];
+		const baldosa = elements.find(elemento => elemento.classList && elemento.classList.contains('estiloBaldosas'));
+		if (baldosa) return baldosa;
+		if (fallbackTarget && fallbackTarget.closest) return fallbackTarget.closest('.estiloBaldosas');
+		return null;
+	}
+
+	_obtener_contenedor_drop_real(elementoDetectado) {
+		if (!elementoDetectado) return null;
+		if (elementoDetectado.dataset && elementoDetectado.dataset.tipo) return elementoDetectado;
+		const contenedorExit = elementoDetectado.closest('[data-tipo]');
+		if (contenedorExit && contenedorExit.dataset.tipo) return contenedorExit;
+		if (elementoDetectado.classList && elementoDetectado.classList.contains('estiloBaldosas')) return elementoDetectado;
+		const contenedorBaldosa = elementoDetectado.closest('.estiloBaldosas');
+		if (contenedorBaldosa) return contenedorBaldosa;
+		return null;
+	}
+
+	_move_drag_preview(x, y){
+		const preview = this.touchState.dragPreview;
+		if (!preview) return;
+		const left = x - this.touchState.offsetX;
+		const top = y - this.touchState.offsetY;
+		preview.style.transform = `translate3d(${left}px, ${top}px, 0)`;
+	}
+
+	handleTouch_start(evento){
+		if (!evento) return;
+		if (evento.cancelable) evento.preventDefault();
+		const objetivo = evento.currentTarget;
+		const { x, y } = this.get_coordenadas_evento(evento);
+		const rect = objetivo.getBoundingClientRect();
+		const offsetX = x - rect.left;
+		const offsetY = y - rect.top;
+		const preview = this._create_drag_preview(objetivo, rect);
+		this.get_origen_drag(objetivo);
+		if (this._es_mesa_silla?.(this.data_tipo)) this._set_bloqueo_sidebar(true);
+		const previousVisibility = objetivo.style.visibility;
+		objetivo.style.visibility = 'hidden';
+		this.touchState = { draggedElement: objetivo, activeDropTarget: null, startX: x, startY: y, lastX: x, lastY: y, offsetX, offsetY, dragPreview: preview, previousVisibility, rafId: null, pendingMove: null };
+	}
+
+	handleTouch_movimiento(evento) {
+		if (!evento || !this.touchState.draggedElement) return;
+		if (evento.cancelable) evento.preventDefault();
+		const { x, y } = this.get_coordenadas_evento(evento);
+		this.touchState.lastX = x;
+		this.touchState.lastY = y;
+		this.touchState.pendingMove = { x, y };
+		if (!this.touchState.rafId) {
+			this.touchState.rafId = requestAnimationFrame(() => {
+				if (this.touchState.pendingMove) {
+					const { x: moveX, y: moveY } = this.touchState.pendingMove;
+					this._move_drag_preview(moveX, moveY);
+				}
+				this.touchState.rafId = null;
+			});
+		}
+		this.touchState.activeDropTarget = document.elementFromPoint(x, y);
+	}
+
+	handleTouch_end(evento) {
+		if (!this.touchState.draggedElement) return;
+		const el = this.touchState.draggedElement;
+		const coordenadas = this.get_coordenadas_evento(evento);
+		let x = coordenadas.x;
+		let y = coordenadas.y;
+		if (!x && !y) { x = this.touchState.lastX || 0; y = this.touchState.lastY || 0; }
+		const deltaX = x - this.touchState.startX;
+		const deltaY = y - this.touchState.startY;
+		const isTap = Math.hypot(deltaX, deltaY) <= this.tapThreshold;
+		if (this.touchState.dragPreview) this.touchState.dragPreview.style.display = 'none';
+		const elementoDetectado = document.elementFromPoint(x, y);
+		const targetReal = this._obtener_contenedor_drop_real(elementoDetectado);
+		if (this.touchState.dragPreview) this.touchState.dragPreview.style.display = 'block';
+		if (isTap) {
+			this._cleanup_touch_preview();
+			this._reset_touch_state();
+			queueMicrotask(() => el.click());
+			this._set_bloqueo_sidebar(false);
+			return;
+		}
+		const syntheticEvent = this._buildSyntheticDropEvent(targetReal, el, { x, y });
+		let dropExitoso = false;
+		if (targetReal) {
+			const isExit = targetReal.dataset && targetReal.dataset.tipo === 'exit';
+			if (isExit && this.drop_exit) {
+				syntheticEvent.target = targetReal;
+				dropExitoso = this.drop_exit(syntheticEvent);
+			} else {
+				const baldosaDestino = this._get_baldosa_from_point(x, y, targetReal) || targetReal;
+				if (this.drop_over_matriz) {
+					syntheticEvent.target = baldosaDestino;
+					dropExitoso = this.drop_over_matriz(syntheticEvent);
+				}
+			}
+		}
+		this._cleanup_touch_preview();
+		if (dropExitoso) el.style.visibility = 'visible';
+		this._reset_touch_state();
+		this._set_bloqueo_sidebar(false);
+	}
+
+	_reset_touch_state(){
+		this.touchState = { draggedElement: null, activeDropTarget: null, startX: 0, startY: 0, lastX: 0, lastY: 0, offsetX: 0, offsetY: 0, dragPreview: null, previousVisibility: '', rafId: null, pendingMove: null };
+	}
+
+	_cleanup_touch_preview(){
+		if (this.touchState.rafId) cancelAnimationFrame(this.touchState.rafId);
+		if (this.touchState.dragPreview) this.touchState.dragPreview.remove();
+		if (this.touchState.draggedElement) this.touchState.draggedElement.style.visibility = this.touchState.previousVisibility || '';
+	}
+
+	_buildSyntheticDropEvent(target, draggedElement, coords = {}){
+		const dataTipo = (draggedElement && draggedElement.getAttribute('data-tipo')) || '';
+		const { x = 0, y = 0 } = coords;
+		return {
+			preventDefault: () => {},
+			target,
+			clientX: x,
+			clientY: y,
+			dataTransfer: {
+				getData: (key) => {
+					if (key === 'text') return draggedElement ? draggedElement.id : '';
+					if (key === 'tipo') return dataTipo;
+					return '';
+				}
+			}
+		};
+	}
+}
+
+
 // ████████████████████████████████████████████████████████████████████████████████████████████████████████████
 
 /** 
@@ -2163,7 +2371,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
  * ##### • RESERVAS son asociaciones de mesas y sillas. Se pueden juntar varias mesas para formar 1 reserva
  * 	
 */
-class e_Salon extends Tablero_Drop {
+class e_Salon extends Tablero_Touch {
 	/** ### Imagen svg del elemento 'mesa'  ►  {@link Configuracion_Salon._asegurar_plantillas_menu}*/
 	static MESA = `
 		<div id="mesa_menu" class="menu_to_clone" data-tipo="mesa" draggable="true" title="Arrastra la Mesa hasta el Salón">
@@ -2324,7 +2532,7 @@ class e_Salon extends Tablero_Drop {
 		// ■■ Sidebar persistente de elementos (mesa/silla) desacoplado del Salón (solo UI + callback drag)
 		const $icono_elementos = document.querySelector('[data-action-nav="elementos"]');
 		this.Side_Elementos = new Side_Elementos(
-			this.toouch_me.add_listeners_touchraton.bind(this.toouch_me),
+			this.add_listeners_touchraton.bind(this),
 			null,
 			$icono_elementos
 		);
@@ -3410,7 +3618,7 @@ class e_Salon extends Tablero_Drop {
 				//  ​👂​👂  Hace el clon del item del menu DRAGGABLE
 				// clon_item.draggable = true;
 				// clon_item.addEventListener('dragstart', this.dragStart.bind(this));
-				this.toouch_me.add_listeners_touchraton(clon_item);
+				this.add_listeners_touchraton(clon_item);
 
 				
 				// ■■ Añade el clon  a la baldosa.
@@ -3659,7 +3867,7 @@ class e_Salon extends Tablero_Drop {
 		elemento.removeEventListener('dragstart', this.dragStart);
 		elemento.addEventListener('dragstart', this.dragStart.bind(this));
 
-		this.toouch_me.add_listeners_touchraton(elemento);		
+		this.add_listeners_touchraton(elemento);		
 		
 		// ┌• CAMBIA DE CLASE PARA NO HEREDAR EL ESTILO DEL MENU....
 		elemento.className = "";
@@ -8347,439 +8555,8 @@ class Side_Elementos {
 		this.sidebar.style.setProperty('--side-drag-y', '0px');
 	}
 }
+// La antigua clase Touch_aMe se integró en Tablero_Touch para simplificar la herencia.
 
-
-
-//  ◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘
-/** ◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘
- * ### Responsable de unificar el manejo de ratón y touch para drag and drop.  🧠
- *              Recibe una referencia al tablero y encapsula toda la lógica de eventos. 🧠
- *  ◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘
- */
-class Touch_aMe {
-
-	/**
-	 * ✨ SOLUCION KISS PARA TOUCH EN MOVIL + PAPELERA
-	 * 
-	 * 🎯 PROBLEMA ORIGINAL:
-	 *    • En móvil, document.elementFromPoint(x, y) devolvía el SVG dentro de la papelera,
-	 *    • No el contenedor con data-tipo="exit", causando que no se detectara correctamente.
-	 *    • Las baldosas sí funcionaban porque son elementos grandes sin SVGs internos.
-	 *
-	 * ✅ SOLUCIÓN IMPLEMENTADA (KISS):
-	 *    1. Nuevo método: _obtener_contenedor_drop_real(elemento)
-	 *       → Busca hacia arriba en el árbol DOM para encontrar el contenedor correcto
-	 *       → Maneja papeleras (data-tipo), baldosas (class estiloBaldosas)
-	 *       → Muy legible y mantenible por humanos
-	 *
-	 *    2. Simplificación en handleTouch_end():
-	 *       → Elimina lógica redundante _get_baldosa_from_point
-	 *       → Usa solo el nuevo método KISS unificado
-	 *       → Comentarios humanos claros y emojis descriptivos
-	 *
-	 * 📝 VENTAJAS:
-	 *    ✓ Funciona en móvil y escritorio
-	 *    ✓ Maneja SVGs, spans y otros elementos dentro de contenedores
-	 *    ✓ Código muy legible y fácil de mantener
-	 *    ✓ Solo 1 responsabilidad por función (KISS)
-	 */
-
-        constructor(tablero){
-                this.tablero = tablero;
-                this.touchState = { draggedElement: null, activeDropTarget: null };
-				this.tapThreshold = 10;
-        }
-
-        /**
-         * ### Extrae una posición {x, y} unificada para eventos de ratón o táctiles.
-         */
-        get_coordenadas_evento(evento){
-                if (!evento) return { x: 0, y: 0 };
-
-                const touch = (evento.touches && evento.touches[0]) || (evento.changedTouches && evento.changedTouches[0]);
-                if (touch) return { x: touch.clientX, y: touch.clientY };
-
-                return { x: evento.clientX || 0, y: evento.clientY || 0 };
-        }
-
-        /**
-         * ### Cachea el origen del drag para reutilizarlo en ratón o táctil.
-         */
-        get_origen_drag(elemento){
-			if (!elemento || !this.tablero) return;
-			this.tablero.objeto_drag = elemento;
-			this.tablero.data_tipo = elemento.getAttribute('data-tipo') || '';
-        }
-
-        /**
-         * ###  ​👂​👂 Añade manejadores de drag y touch al mismo elemento para escritorio y móvil.
-		 * • Amplia y sustituye este codigo:\
-		 * ```javascript
-		 * const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");
-		 * ​​​​​​​if (items_html_to_matriz.length > 0) {
-		 * 		​items_html_to_matriz.forEach(el => el.addEventListener("dragstart", this.dragStart.bind(this)));
-		 * ​​​​​​​}
-		 * ``` */
-        add_listeners_touchraton(elemento){
-                if (!elemento || !this.tablero) return;
-                elemento.draggable = true;
-                elemento.style.touchAction = 'none';
-
-                elemento.removeEventListener('dragstart',  this.tablero.dragStart);
-                elemento.removeEventListener('touchstart', this.handleTouch_start);
-                elemento.removeEventListener('touchmove',  this.handleTouch_movimiento);
-                elemento.removeEventListener('touchend',   this.handleTouch_end);
-				window.removeEventListener('touchcancel', this.finalizarArrastre); // <--- ESTO SOLUCIONA EL BLOQUEO
-
-                elemento.addEventListener('dragstart',  this.tablero.dragStart.bind(this.tablero));
-                elemento.addEventListener('touchstart', this.handleTouch_start.bind(this), { passive: false });
-                elemento.addEventListener('touchmove',  this.handleTouch_movimiento.bind(this), { passive: false });
-                elemento.addEventListener('touchend',   this.handleTouch_end.bind(this) , { passive: false }  );
-				window.addEventListener('touchcancel', this.finalizarArrastre.bind(this)); // <--- ESTO SOLUCIONA EL BLOQUEO
-        }
-		// 1. Definimos una función de limpieza única para cumplir con KISS
-		finalizarArrastre() {
-			this._cleanup_touch_preview();
-			this._reset_touch_state();
-
-			// Si aplicas clases CSS durante el drag, quítalas aquí
-			// document.body.classList.remove('dragging-active');
-			// ■■ Desbloquea el sidebar por si quedó enganchado tras un touchcancel.
-			this.tablero?._set_bloqueo_sidebar(false);
-			
-			console.log("Drag finalizado o cancelado: Estado reseteado.");
-		}
-
-		/**
-		 * ### Crea un clon visual para seguir el dedo sin alterar el DOM original.
-		 */
-		_create_drag_preview(elemento, rect){
-			if (!elemento || !rect) return null;
-			const preview = elemento.cloneNode(true);
-			preview.removeAttribute('id');
-			preview.setAttribute('aria-hidden', 'true');
-			preview.style.position = 'fixed';
-			preview.style.left = '0px';
-			preview.style.top = '0px';
-			preview.style.width = `${rect.width}px`;
-			preview.style.height = `${rect.height}px`;
-			preview.style.margin = '0';
-			preview.style.zIndex = '9999';
-			preview.style.pointerEvents = 'none';
-			preview.style.boxSizing = 'border-box';
-			preview.style.transformOrigin = 'top left';
-			preview.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0)`;
-			preview.style.willChange = 'transform';
-			document.body.appendChild(preview);
-			return preview;
-		}
-
-		/**
-		 * ### Obtiene la baldosa real bajo el punto indicado (x, y).
-		 */
-		_get_baldosa_from_point(x, y, fallbackTarget = null){
-			const elements = document.elementsFromPoint ? document.elementsFromPoint(x, y) : [];
-			const baldosa = elements.find(elemento => elemento.classList && elemento.classList.contains('estiloBaldosas'));
-			if (baldosa) return baldosa;
-
-			if (fallbackTarget && fallbackTarget.closest) {
-				return fallbackTarget.closest('.estiloBaldosas');
-			}
-			return null;
-		}
-
-		/**
-		 * ### ✨ METODO KISS: Busca el contenedor drop correcto en la jerarquía
-		 * Maneja tanto papeleras (exit) como baldosas.
-		 * El SVG dentro de la papelera causa que elementFromPoint devuelva el SVG,
-		 * así que buscamos hacia arriba en el árbol para encontrar el contenedor real.
-		 * 
-		 * @param {HTMLElement} elementoDetectado - Elemento que devolvió elementFromPoint(x,y)
-		 * @returns {HTMLElement|null} - El contenedor drop correcto (papelera o baldosa)
-		 */
-		_obtener_contenedor_drop_real(elementoDetectado) {
-			if (!elementoDetectado) return null;
-
-			// ┌•••• 1️⃣ Primero: ¿Es un elemento con data-tipo (papelera)?
-			// Si el mismo elemento tiene data-tipo, ya es lo que buscamos
-			if (elementoDetectado.dataset && elementoDetectado.dataset.tipo) {
-				return elementoDetectado;
-			}
-
-			// ┌•••• 2️⃣ Segundo: ¿Está dentro de un elemento con data-tipo?
-			// Esto ocurre cuando SVG o un span está dentro de <div data-tipo="exit">
-			const contenedorExit = elementoDetectado.closest('[data-tipo]');
-			if (contenedorExit && contenedorExit.dataset.tipo) {
-				return contenedorExit;
-			}
-
-			// ┌•••• 3️⃣ Tercero: ¿Es una baldosa?
-			if (elementoDetectado.classList && elementoDetectado.classList.contains('estiloBaldosas')) {
-				return elementoDetectado;
-			}
-
-			// ┌•••• 4️⃣ Cuarto: ¿Está dentro de una baldosa?
-			const contenedorBaldosa = elementoDetectado.closest('.estiloBaldosas');
-			if (contenedorBaldosa) {
-				return contenedorBaldosa;
-			}
-
-			// ┌•••• Si nada de lo anterior, devolver null
-			return null;
-		}
-
-		/**
-		 * ### Mueve el clon visual siguiendo el dedo.
-		 */
-		_move_drag_preview(x, y){
-			const preview = this.touchState.dragPreview;
-			if (!preview) return;
-			const left = x - this.touchState.offsetX;
-			const top = y - this.touchState.offsetY;
-			preview.style.transform = `translate3d(${left}px, ${top}px, 0)`;
-		}
-
-        /**
-         * ### Gestiona el inicio de arrastre táctil.
-         */
-		handleTouch_start(evento){
-                if (!evento) return;
-                if (evento.cancelable) evento.preventDefault();
-                const objetivo = evento.currentTarget;
-				const { x, y } = this.get_coordenadas_evento(evento);
-				const rect = objetivo.getBoundingClientRect();
-				const offsetX = x - rect.left;
-				const offsetY = y - rect.top;
-				const preview = this._create_drag_preview(objetivo, rect);
-                this.get_origen_drag(objetivo);
-				// ■■ Bloquea el sidebar si estamos moviendo mesa/silla.
-				if (this.tablero?._es_mesa_silla?.(this.tablero.data_tipo)) {
-					this.tablero._set_bloqueo_sidebar(true);
-				}
-				const previousVisibility = objetivo.style.visibility;
-				objetivo.style.visibility = 'hidden';
-                this.touchState = {
-					draggedElement: objetivo,
-					activeDropTarget: null,
-					startX: x,
-					startY: y,
-					lastX: x,
-					lastY: y,
-					offsetX,
-					offsetY,
-					dragPreview: preview,
-					previousVisibility,
-					rafId: null,
-					pendingMove: null
-				};
-        }
-
-        /**
-         * ### Actualiza la zona potencial de drop durante el movimiento táctil.
-         */
-        handleTouch_movimiento(evento) {
-			if (!evento || !this.touchState.draggedElement) return;
-			
-			// 1. Prevenir scroll (ya lo tenías)
-			if (evento.cancelable) evento.preventDefault(); 
-
-			const { x, y } = this.get_coordenadas_evento(evento);
-			this.touchState.lastX = x;
-			this.touchState.lastY = y;
-
-			// Algoritmo de suavidad: hace que el elemento siga al dedo.🪑 ► 👈
-			this.touchState.pendingMove = { x, y };
-			if (!this.touchState.rafId) {
-				this.touchState.rafId = requestAnimationFrame(() => {
-					if (this.touchState.pendingMove) {
-						const { x: moveX, y: moveY } = this.touchState.pendingMove;
-						this._move_drag_preview(moveX, moveY);
-					}
-					this.touchState.rafId = null;
-				});
-			}
-			this.touchState.activeDropTarget = document.elementFromPoint(x, y);
-		}
-
-        /**
-         * ### Finaliza el arrastre táctil y ejecuta la misma lógica de drop que en escritorio.
-		 * 				• Si el Drop funciona:  La lógica de Salon.js mueve el elemento en el DOM (nuevoPadre.appendChild(silla)). 
-		 * 										Al limpiar los estilos, la silla se queda en la nueva casa.
-		 * 				• Si el Drop falla: Tu lógica de Salon.js no hace nada. 
-		 * 										La silla sigue siendo hija del Padre_Viejo. 
-		 * 										Al limpiar los estilos (position: fixed fuera), la silla "aparece" de golpe en el Padre_Viejo.
-         */
-        handleTouch_end(evento) {
-			// ┌•••• Si no estábamos arrastrando nada, salir.
-			if (!this.touchState.draggedElement) return;
-
-			// ┌•••• drag
-			const el = this.touchState.draggedElement;
-			
-			// ┌•••• Referencia al padre original (por seguridad, aunque el DOM lo mantiene)
-			const padreOriginal = el.parentElement;
-
-			// ┌•••• Determinar dónde estamos soltando (Target)
-			const coordenadas = this.get_coordenadas_evento(evento);
-			let x = coordenadas.x;
-			let y = coordenadas.y;
-			if (!x && !y) {
-				x = this.touchState.lastX || 0;
-				y = this.touchState.lastY || 0;
-			}
-			const deltaX = x - this.touchState.startX;
-			const deltaY = y - this.touchState.startY;
-			// ■ Math.hypot asegura que:
-			// 	 • No importa la dirección (el resultado siempre es positivo).
-			// 	 • Mide el desplazamiento real en cualquier ángulo.
-			const isTap = Math.hypot(deltaX, deltaY) <= this.tapThreshold;
-
-			// ┌•••• Identificar elemento bajo el dedo (Baldosa destino)
-			// ┌•••• •• Es vital •ocultar• temporalmente el elemento arrastrado para ver "qué hay debajo"
-			if (this.touchState.dragPreview) {
-				this.touchState.dragPreview.style.display = 'none';
-			}
-			// ┌••••
-			let elementoDetectado = document.elementFromPoint(x, y);
-			// ┌•••• Usar método KISS para obtener contenedor drop correcto
-			let targetReal = this._obtener_contenedor_drop_real(elementoDetectado);
-
-			if (this.touchState.dragPreview) {
-				this.touchState.dragPreview.style.display = 'block';
-			}
-			// ┌•••• Si fue un tapeo y no un arrastre:
-			if (isTap) {
-				/**
-				 * ┌•••• • ABORTAR ARRASTRE Y RESETEAR ESTADO
-				 * Si el movimiento no superó el umbral, limpiamos el rastro del drag
-				 * y disparamos un evento click nativo.
-				 */
-				this._cleanup_touch_preview();			
-				this._reset_touch_state();
-				/**
-				 * ┌•••• • queueMicrotask: Ejecuta el click inmediatamente después de que el ciclo actual
-				 * de JavaScript termine, pero antes de que el navegador vuelva a pintar la pantalla.
-				 * Se usa para asegurar que el estado de 'touchState' esté limpio antes de que
-				 * cualquier lógica externa del 'click' se ejecute.
-				 */
-				queueMicrotask(() => el.click());
-
-				// ┌•••• • Detiene la ejecución para que no se procese como un evento de "soltar" (drop)
-				this.tablero?._set_bloqueo_sidebar(false);
-				return;
-			}
-
-			// ┌•••• Crear el evento sintético (simulación de HTML5 DragDrop)
-			const syntheticEvent = this._buildSyntheticDropEvent(targetReal, el, { x, y });
-
-			// ┌•••• Intentar realizar el DROP en el tablero
-			let dropExitoso = false;
-
-			if (this.tablero && targetReal) {
-				// ■■ Detectar si el target es una papelera (exit)
-				const isExit = targetReal.dataset && targetReal.dataset.tipo === 'exit';
-				x
-				if (isExit && this.tablero.drop_exit) {
-					// ► Es una papelera, usar drop_exit
-					syntheticEvent.target = targetReal; 
-					dropExitoso = this.tablero.drop_exit(syntheticEvent);
-					console.log(`📍 detectado: PAPELERA (exit) en ${targetReal.id}`);
-				} else {
-					// ► Es una baldosa, usar drop__over_matriz
-					const baldosaDestino = this._get_baldosa_from_point(x, y, targetReal) || targetReal; 
-					
-					// Esta función debe devolver TRUE si movió la silla, FALSE si falló.
-					if (this.tablero.drop_over_matriz) {
-						// Inyectamos el target correcto en el evento sintético
-						syntheticEvent.target = baldosaDestino; 
-						dropExitoso = this.tablero.drop_over_matriz(syntheticEvent);
-
-					}
-				}
-			}
-			// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-			// ■■■ 🧠LOGICA DE RETORNO (CLEANUP)🧠 ■■■
-			// Indiferentemente de si fue éxito o fallo, debemos limpiar el desorden visual.
-			// Quitamos el clon visual y restauramos la visibilidad original
-			this._cleanup_touch_preview();
-
-			// b) Manejo del resultado
-			if (dropExitoso) {
-				// El método drop__over_matriz SE ENCARGÓ de hacer appendChild al nuevo padre.
-				console.log("✅ Movimiento táctil exitoso");
-				el.style.visibility = "visible";
-
-			} else {
-				// 🛑 FALLO (Baldosa llena, fuera de pantalla, etc.)
-				// Como NO se hizo un appendChild nuevo, el elemento 'el' sigue siendo hijo de 'padreOriginal'.
-				// Al quitarle el position: fixed (paso 5a), el navegador lo vuelve a pintar en su origen automáticamente.
-				console.warn("⚠️ Movimiento inválido: El elemento vuelve a su origen.");
-			}
-
-			// 6. Resetear estado global
-			this._reset_touch_state();
-			this.tablero?._set_bloqueo_sidebar(false);
-
-
-		}
-
-		/**
-		 * ## 
-		 */
-		_reset_touch_state(){
-			this.touchState = {
-					draggedElement: null, 		// ┌• Referencia al nodo DOM que se estaba intentando mover
-					activeDropTarget: null, 	// ┌•  Referencia a la zona donde se podría haber soltado el objeto
-					// ┌• Coordenadas originales donde se puso el dedo por primera vez 👉
-					startX: 0, startY: 0,
-					// ┌•  Últimas coordenadas registradas antes de soltar o cancelar
-					lastX: 0, lastY: 0, 
-					// ┌•  Distancia relativa entre el dedo y la esquina superior izquierda del elemento 👉↖️
-					offsetX: 0,	 offsetY: 0,
-					dragPreview: null,			// ┌• Referencia al nodo clonado/transparente que se muestra durante el arrastre
-					previousVisibility: '',  	// ┌• Almacena el estilo 'visibility' original para restaurar el elemento tras ocultarlo
-					rafId: null,				// ┌• ID del RequestAnimationFrame activo para poder cancelarlo y evitar fugas de memoria
-					pendingMove: null			// ┌• Almacena el último evento de movimiento pendiente de ser procesado por el siguiente frame
-				};
-
-		}
-		/**
-		 * ### Elimina el elemento visual (fantasma) que seguía al dedo durante el intento de drag
-		 * ### {@link handleTouch_end}
-		 */
-		_cleanup_touch_preview(){
-			if (this.touchState.rafId) {
-				cancelAnimationFrame(this.touchState.rafId);
-			}
-			if (this.touchState.dragPreview) {
-				this.touchState.dragPreview.remove();
-			}
-			if (this.touchState.draggedElement) {
-				this.touchState.draggedElement.style.visibility = this.touchState.previousVisibility || '';
-			}
-		}
-
-        /**
-         * ### Construye un objeto de evento mínimo para reutilizar la lógica de drop existente.
-         */
-        _buildSyntheticDropEvent(target, draggedElement, coords = {}){
-			const dataTipo = (draggedElement && draggedElement.getAttribute('data-tipo')) || '';
-			const { x = 0, y = 0 } = coords;
-			return {
-					preventDefault: () => {},
-					target,
-					clientX: x,
-					clientY: y,
-					dataTransfer: {
-							getData: (key) => {
-									if (key === 'text') return draggedElement ? draggedElement.id : '';
-									if (key === 'tipo') return dataTipo;
-									return '';
-							}
-					}
-			};
-        }
-}		// ◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘ FIN CLASE  Touch_aMe
 
 const Herramientas = {
 	/**
