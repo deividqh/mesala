@@ -84,6 +84,8 @@ CONTENEDOR
     border: calc(3px * var(--scale-factor)) solid var(--color-salon-border);
     background: var(--color-salon-bg);
     float: none;
+    position: relative; /* Referencia estable para cálculos de coordenadas dentro del salón */
+    touch-action: none; /* Cede el control total de gestos al script dentro del tablero */
     
     /* height: calc(100svh - var(--navbar-h)); */
     width: auto;
@@ -154,6 +156,9 @@ CONTENEDOR
   background: var(--color-baldosas-bg);
   font-family: var(--font-secondary);     /* Fuente  */
   overflow: hidden;                       /* Evita que el contenido desborde */
+  user-select: none;                      /* Evita selección accidental durante drag */
+  -webkit-user-select: none;              /* Compatibilidad Safari/iOS */
+  -webkit-touch-callout: none;            /* Evita menú contextual prolongado en iOS */
 
     /* -webkit-overflow-scrolling: touch; */
 }
