@@ -2189,16 +2189,21 @@ class Tablero_Touch extends Tablero_Drop {
 		if (!elemento) return;
 		if (elemento.dataset.touchRatonReady === '1') return;
 		elemento.draggable = true;
-		elemento.style.touchAction = 'none';
+		const opcionesTouchNoPasivas = { passive: false };
 		elemento.addEventListener('dragstart',  this.dragStart.bind(this));
-		elemento.addEventListener('touchstart', this.handleTouch_start.bind(this), { passive: false });
-		elemento.addEventListener('touchmove',  this.handleTouch_movimiento.bind(this), { passive: false });
-		elemento.addEventListener('touchend',   this.handleTouch_end.bind(this), { passive: false });
+		elemento.addEventListener('touchstart', this.handleTouch_start.bind(this), opcionesTouchNoPasivas);
+		elemento.addEventListener('touchmove',  this.handleTouch_movimiento.bind(this), opcionesTouchNoPasivas);
+		elemento.addEventListener('touchend',   this.handleTouch_end.bind(this), opcionesTouchNoPasivas);
 		elemento.dataset.touchRatonReady = '1';
 		if (!this._touchCancelRegistrado) {
 			window.addEventListener('touchcancel', this.finalizarArrastre.bind(this));
 			this._touchCancelRegistrado = true;
 		}
+	}
+
+	_cancelar_evento_tactil(evento){
+		if (!evento || !evento.cancelable) return;
+		evento.preventDefault();
 	}
 
 	finalizarArrastre() {
@@ -2257,7 +2262,7 @@ class Tablero_Touch extends Tablero_Drop {
 
 	handleTouch_start(evento){
 		if (!evento) return;
-		if (evento.cancelable) evento.preventDefault();
+		this._cancelar_evento_tactil(evento);
 		const objetivo = evento.currentTarget;
 		const { x, y } = this.get_coordenadas_evento(evento);
 		const rect = objetivo.getBoundingClientRect();
@@ -2273,7 +2278,7 @@ class Tablero_Touch extends Tablero_Drop {
 
 	handleTouch_movimiento(evento) {
 		if (!evento || !this.touchState.draggedElement) return;
-		if (evento.cancelable) evento.preventDefault();
+		this._cancelar_evento_tactil(evento);
 		const { x, y } = this.get_coordenadas_evento(evento);
 		this.touchState.lastX = x;
 		this.touchState.lastY = y;
@@ -2291,6 +2296,7 @@ class Tablero_Touch extends Tablero_Drop {
 	}
 
 	handleTouch_end(evento) {
+		this._cancelar_evento_tactil(evento);
 		if (!this.touchState.draggedElement) return;
 		const el = this.touchState.draggedElement;
 		const coordenadas = this.get_coordenadas_evento(evento);
