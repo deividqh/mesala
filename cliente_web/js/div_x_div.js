@@ -1703,11 +1703,8 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// ​​​​​​​}
 		const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");
 		if (items_html_to_matriz.length > 0) {
-			items_html_to_matriz.forEach(el => {
-				if (typeof this.add_listeners_touchraton === 'function') {
-					this.add_listeners_touchraton(el);
-					return;
-				}
+			items_html_to_matriz.forEach(el => {				
+				this.add_listeners_touchraton(el);
 				el.addEventListener("dragstart", this.dragStart.bind(this));
 			});
 		}
@@ -1735,21 +1732,21 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 	/**
 	 * ### KISS: Bloquea o desbloquea el movimiento del sidebar.
 	 */
-	_set_bloqueo_sidebar(bloqueado = false) {
-		if (!this.Side_Elementos?.set_bloqueo_movimiento) return;
-		this.Side_Elementos.set_bloqueo_movimiento(bloqueado);
-	}
+	// _set_bloqueo_sidebar(bloqueado = false) {
+	// 	if (!this.Side_Elementos?.set_bloqueo_movimiento) return;
+	// 	this.Side_Elementos.set_bloqueo_movimiento(bloqueado);
+	// }
 
 	/**
 	 * ### KISS: Inicia el bloqueo del sidebar durante un drag de mesa/silla.
 	 */
-	_iniciar_bloqueo_sidebar(objeto_drag = null) {
-		if (!this._es_mesa_silla(this.data_tipo)) return;
-		this._set_bloqueo_sidebar(true);
-		if (objeto_drag) {
-			objeto_drag.addEventListener('dragend', () => this._set_bloqueo_sidebar(false), { once: true });
-		}
-	}
+	// _iniciar_bloqueo_sidebar(objeto_drag = null) {
+	// 	if (!this._es_mesa_silla(this.data_tipo)) return;
+	// 	this._set_bloqueo_sidebar(true);
+	// 	if (objeto_drag) {
+	// 		objeto_drag.addEventListener('dragend', () => this._set_bloqueo_sidebar(false), { once: true });
+	// 	}
+	// }
 	/**
 	 * ### SE PRODUCE CUANDO EMPIEZA EL MOVIMIENTO DE UN OBJETO DRAG ( Movible )
 	 *              • Se trata de guardar el objeto que se mueve mediante ev.dataTransfer.setData("text", id_objeto_drag) 
@@ -1764,12 +1761,12 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// const id = ev.currentTarget.id;
 		
 		// ■■ Guarda el objeto que se mueve en la clase.
-                // this.objeto_drag = new_obj_drag;
-                // ■■ Guarda el objeto que se mueve en la clase.
-                this.get_origen_drag?.(new_obj_drag);
+		// this.objeto_drag = new_obj_drag;
+		// ■■ Guarda el objeto que se mueve en la clase.
+		this.get_origen_drag?.(new_obj_drag);
 
 		// ■■ Bloquea el movimiento del sidebar si movemos una mesa o silla.
-		this._iniciar_bloqueo_sidebar(new_obj_drag);
+		// this._iniciar_bloqueo_sidebar(new_obj_drag);
 		
 		// ■■ ESTABLECE/GUARDA EL ID DEL OBJETO DRAG
 		ev.dataTransfer.setData("text", new_obj_drag.id);      	// ■ dataTransfer guarda en la transacción d&d un dato tipo "text" con el id del drag.
@@ -2434,7 +2431,7 @@ class e_Salon extends Tablero_Touch {
 
 	/**
 	 * ### Gestiona Reservas ,Mensajes y posiciones de un Tablero ó Salon.
-	 * #### • Hereda de las clases Tablero_Drop y Div_x_Div q crean las Baldosas del Salon con Métodos DROP.
+	 * #### • Hereda de las clases Tablero_Touch y Div_x_Div q crean las Baldosas del Salon con Métodos DROP.
 	 * ####	• App Cliente Servidor: clases Login | Configuracion | CRUD
 	 * @param {object} dicc_config se encuentra en: {@link dicc_salon Salon.js} ► diccionario de configuración inicial que tiene que rellenar el usuario o dejar vacío {}.
 	 * ```javascript
@@ -2684,7 +2681,34 @@ class e_Salon extends Tablero_Touch {
 		this.  _set_exit_toast_bs(this.objeto_drag.id);
 		
 	}
-	
+
+	/** ✒️✒️ 
+	 * #### SOBRE-ESCRIBE EL MÉTODO DE TABLERO_DROP Y AÑADE EL BLOQUEO DEL SIDEBAR DE ELEMENTOS MIENTRAS SE HACE DRAG.
+	 * @param {*} ev   evento de empezar a arrastrar un objeto en el salon.
+	*/
+	dragStart(ev) {
+
+		super.dragStart(ev);
+
+		this._iniciar_bloqueo_sidebar(ev.target);
+	}
+	/**
+	 * ### KISS: Bloquea o desbloquea el movimiento del sidebar.
+	 */
+	_set_bloqueo_sidebar(bloqueado = false) {
+		this.Side_Elementos.set_bloqueo_movimiento(bloqueado);
+	}
+
+	/**
+	 * ### KISS: Inicia el bloqueo del sidebar durante un drag de mesa/silla.
+	 */
+	_iniciar_bloqueo_sidebar(objeto_drag = null) {
+		if (!this._es_mesa_silla(this.data_tipo)) return;
+		this._set_bloqueo_sidebar(true);
+		if (objeto_drag) {
+			objeto_drag.addEventListener('dragend', () => this._set_bloqueo_sidebar(false), { once: true });
+		}
+	}
 	/**
 	 * ####  Maneja el evento click en una silla.
 	*/
@@ -8151,21 +8175,36 @@ class Side_Elementos {
 	 * {@link e_Salon}
 	 */
 	constructor(dragCallback = null, diccionario_elementos = null, icono_disparador = null, opciones = {}) {
+		/** ### Es el enlace disparador del sidebar en el navbar(cubo). */
 		this.icono_disparador = icono_disparador;
+		/** ### Callback para manejar el arrastre de elementos. */
 		this.dragCallback = typeof dragCallback === 'function' ? dragCallback : null;
+		/** ### Diccionario de elementos del salón(mesa, silla, ... ). */
 		this.diccionario_elementos = this._normaliza_elementos(diccionario_elementos);
+		
+		/** sidebar del dom */
+		this.$sidebar = null;		
+		/** posicion del sidebar */
 		this.posicion = opciones.posicion ?? 'right';
-		this.modo_tamano = opciones.modo_tamano ?? 'content';
-		this.sidebar = null;
-		this._estado = 'closed';
+		/** */
+		this.modo_tamano = opciones.modo_tamano ?? 'content';		
+		/** Estados del sidebar */
+		this._estado = 'closed';		
+		/** Último tiempo de pointerdown, sirve para evitar eventos duplicados */
 		this._ultimo_pointerdown = 0;
+		/** Bandera para bloquear el movimiendo del sidebar */
 		this._bloqueo_movimiento = false;
+		
+		/** ### El botoncito de abajo del sidebar para moverlo */
 		this._drag_handle = null;
+		
+		/** Offset para el arrastre (por el desfase de los puntos del dedo)*/
 		this._offset = {
 			x: 0,
 			y: 0,
 		};
-		this._drag = {
+		/** diccionario de datos para el arrastre */
+		this.d_drag = {
 			activo: false,
 			inicio_x: 0,
 			inicio_y: 0,
@@ -8229,7 +8268,7 @@ class Side_Elementos {
 	_crear_sidebar() {
 		const sidebar_existente = document.querySelector('[data-side-elementos="sidebar"]');
 		if (sidebar_existente) {
-			this.sidebar = sidebar_existente;
+			this.$sidebar = sidebar_existente;
 			this._sincronizar_sidebar_existente();
 			return;
 		}
@@ -8262,7 +8301,7 @@ class Side_Elementos {
 		});
 
 		sidebar.appendChild(contenido);
-		this.sidebar = sidebar;
+		this.$sidebar = sidebar;
 		this._asegurar_handle();
 		document.body.appendChild(sidebar);
 	}
@@ -8272,16 +8311,16 @@ class Side_Elementos {
 	 * @link _crear_sidebar
 	 */
 	_sincronizar_sidebar_existente() {
-		if (!this.sidebar) return;
-		this.sidebar.dataset.sidePosition = this.posicion;
-		this.sidebar.dataset.sideState = this._estado;
-		this.sidebar.dataset.sideSizeMode = this.modo_tamano;
-		this.sidebar.dataset.sideDragging = 'false';
-		this.sidebar.dataset.sideLocked = this._bloqueo_movimiento ? 'true' : 'false';
+		if (!this.$sidebar) return;
+		this.$sidebar.dataset.sidePosition = this.posicion;
+		this.$sidebar.dataset.sideState = this._estado;
+		this.$sidebar.dataset.sideSizeMode = this.modo_tamano;
+		this.$sidebar.dataset.sideDragging = 'false';
+		this.$sidebar.dataset.sideLocked = this._bloqueo_movimiento ? 'true' : 'false';
 		this._aplicar_offset();
 		this._asegurar_handle();
 
-		const items = this.sidebar.querySelectorAll('[data-side-item]');
+		const items = this.$sidebar.querySelectorAll('[data-side-item]');
 		items.forEach(item => this._activar_drag(item));
 	}
 
@@ -8290,8 +8329,8 @@ class Side_Elementos {
 	 * @link _crear_sidebar
 	 */
 	_asegurar_handle() {
-		if (!this.sidebar) return;
-		let handle = this.sidebar.querySelector('[data-side-handle]');
+		if (!this.$sidebar) return;
+		let handle = this.$sidebar.querySelector('[data-side-handle]');
 		if (!handle) {
 			handle = document.createElement('button');
 			handle.type = 'button';
@@ -8299,7 +8338,7 @@ class Side_Elementos {
 			handle.setAttribute('aria-label', 'Mover sidebar');
 			handle.title = 'Arrastra para mover el sidebar';
 			handle.innerHTML = '<i class="bi bi-disc-fill"></i>';
-			this.sidebar.appendChild(handle);
+			this.$sidebar.appendChild(handle);
 		}
 		this._drag_handle = handle;
 	}
@@ -8309,11 +8348,11 @@ class Side_Elementos {
 	 */
 	set_bloqueo_movimiento(bloqueado = false) {
 		this._bloqueo_movimiento = Boolean(bloqueado);
-		if (!this.sidebar) return;
-		this.sidebar.dataset.sideLocked = this._bloqueo_movimiento ? 'true' : 'false';
+		if (!this.$sidebar) return;
+		this.$sidebar.dataset.sideLocked = this._bloqueo_movimiento ? 'true' : 'false';
 		if (this._bloqueo_movimiento) {
 			this._resetear_drag();
-			this.sidebar.dataset.sideDragging = 'false';
+			this.$sidebar.dataset.sideDragging = 'false';
 		}
 	}
 
@@ -8334,8 +8373,8 @@ class Side_Elementos {
 		const posiciones_validas = ['left', 'right', 'bottom'];
 		if (!posiciones_validas.includes(nueva_posicion)) return;
 		this.posicion = nueva_posicion;
-		if (!this.sidebar) return;
-		this.sidebar.dataset.sidePosition = this.posicion;
+		if (!this.$sidebar) return;
+		this.$sidebar.dataset.sidePosition = this.posicion;
 		this._offset = { x: 0, y: 0 };
 		this._resetear_drag();
 		this._aplicar_offset();
@@ -8387,7 +8426,7 @@ class Side_Elementos {
 	 */
 	abrir() {
 		this._estado = 'open';
-		this.sidebar.dataset.sideState = 'open';
+		this.$sidebar.dataset.sideState = 'open';
 		this.icono_disparador.dataset.sideActive = 'true';
 		this.icono_disparador.setAttribute('aria-pressed', 'true');
 	}
@@ -8398,7 +8437,7 @@ class Side_Elementos {
 	 */
 	cerrar() {
 		this._estado = 'closed';
-		this.sidebar.dataset.sideState = 'closed';
+		this.$sidebar.dataset.sideState = 'closed';
 		this.icono_disparador.dataset.sideActive = 'false';
 		this.icono_disparador.setAttribute('aria-pressed', 'false');
 		this._resetear_drag();
@@ -8411,12 +8450,12 @@ class Side_Elementos {
 	_on_pointer_down(event) {
 		if (this._estado !== 'open' || this._bloqueo_movimiento) return;
 		if (event?.preventDefault) event.preventDefault();
-		this._drag.activo = true;
-		this._drag.inicio_x = event.clientX;
-		this._drag.inicio_y = event.clientY;
-		this._drag.rect_inicio = this.sidebar?.getBoundingClientRect() ?? null;
-		this.sidebar.dataset.sideDragging = 'true';
-		this.sidebar.setPointerCapture(event.pointerId);
+		this.d_drag.activo = true;
+		this.d_drag.inicio_x = event.clientX;
+		this.d_drag.inicio_y = event.clientY;
+		this.d_drag.rect_inicio = this.$sidebar?.getBoundingClientRect() ?? null;
+		this.$sidebar.dataset.sideDragging = 'true';
+		this.$sidebar.setPointerCapture(event.pointerId);
 	}
 
 	/**
@@ -8424,29 +8463,29 @@ class Side_Elementos {
 	 * @link _vincular_eventos
 	 */
 	_on_pointer_move(event) {
-		if (!this._drag.activo) return;
-		const delta_x = event.clientX - this._drag.inicio_x;
-		const delta_y = event.clientY - this._drag.inicio_y;
+		if (!this.d_drag.activo) return;
+		const delta_x = event.clientX - this.d_drag.inicio_x;
+		const delta_y = event.clientY - this.d_drag.inicio_y;
 		const { deltaX, deltaY } = this._limitar_delta(delta_x, delta_y);
-		this._drag.delta_x = deltaX;
-		this._drag.delta_y = deltaY;
+		this.d_drag.delta_x = deltaX;
+		this.d_drag.delta_y = deltaY;
 
 		if (this.posicion === 'right') {
-			const delta = Math.max(0, this._drag.delta_x);
-			this.sidebar.style.setProperty('--side-drag-x', `${delta}px`);
-			this.sidebar.style.setProperty('--side-drag-y', `${this._drag.delta_y}px`);
+			const delta = Math.max(0, this.d_drag.delta_x);
+			this.$sidebar.style.setProperty('--side-drag-x', `${delta}px`);
+			this.$sidebar.style.setProperty('--side-drag-y', `${this.d_drag.delta_y}px`);
 		}
 
 		if (this.posicion === 'left') {
-			const delta = Math.min(0, this._drag.delta_x);
-			this.sidebar.style.setProperty('--side-drag-x', `${delta}px`);
-			this.sidebar.style.setProperty('--side-drag-y', `${this._drag.delta_y}px`);
+			const delta = Math.min(0, this.d_drag.delta_x);
+			this.$sidebar.style.setProperty('--side-drag-x', `${delta}px`);
+			this.$sidebar.style.setProperty('--side-drag-y', `${this.d_drag.delta_y}px`);
 		}
 
 		if (this.posicion === 'bottom') {
-			const delta = Math.max(0, this._drag.delta_y);
-			this.sidebar.style.setProperty('--side-drag-y', `${delta}px`);
-			this.sidebar.style.setProperty('--side-drag-x', `${this._drag.delta_x}px`);
+			const delta = Math.max(0, this.d_drag.delta_y);
+			this.$sidebar.style.setProperty('--side-drag-y', `${delta}px`);
+			this.$sidebar.style.setProperty('--side-drag-x', `${this.d_drag.delta_x}px`);
 		}
 	}
 
@@ -8455,17 +8494,17 @@ class Side_Elementos {
 	 * @link _vincular_eventos
 	 */
 	_on_pointer_up() {
-		if (!this._drag.activo) return;
-		const rect = this.sidebar?.getBoundingClientRect();
+		if (!this.d_drag.activo) return;
+		const rect = this.$sidebar?.getBoundingClientRect();
 		const umbral_x = rect ? Math.max(24, rect.width * 0.2) : 40;
 		const umbral_y = rect ? Math.max(24, rect.height * 0.2) : 40;
 		const debe_cerrar =
-			(this.posicion === 'right' && this._drag.delta_x > umbral_x) ||
-			(this.posicion === 'left' && this._drag.delta_x < -umbral_x) ||
-			(this.posicion === 'bottom' && this._drag.delta_y > umbral_y);
+			(this.posicion === 'right' && this.d_drag.delta_x > umbral_x) ||
+			(this.posicion === 'left' && this.d_drag.delta_x < -umbral_x) ||
+			(this.posicion === 'bottom' && this.d_drag.delta_y > umbral_y);
 
-		this._drag.activo = false;
-		this.sidebar.dataset.sideDragging = 'false';
+		this.d_drag.activo = false;
+		this.$sidebar.dataset.sideDragging = 'false';
 
 		if (debe_cerrar) {
 			this.cerrar();
@@ -8481,19 +8520,19 @@ class Side_Elementos {
 	 * @link _on_pointer_up
 	 */
 	_consolidar_offset() {
-		if (!this.sidebar || !this._drag.rect_inicio) return;
+		if (!this.$sidebar || !this.d_drag.rect_inicio) return;
 		const margen = 12;
-		const rect = this._drag.rect_inicio;
+		const rect = this.d_drag.rect_inicio;
 
 		if (this.posicion === 'bottom') {
 			const min_delta = -(rect.left - margen);
 			const max_delta = window.innerWidth - rect.right - margen;
-			const delta = this._clamp(this._drag.delta_x, min_delta, max_delta);
+			const delta = this._clamp(this.d_drag.delta_x, min_delta, max_delta);
 			this._offset.x += delta;
 		} else {
 			const min_delta = -(rect.top - margen);
 			const max_delta = window.innerHeight - rect.bottom - margen;
-			const delta = this._clamp(this._drag.delta_y, min_delta, max_delta);
+			const delta = this._clamp(this.d_drag.delta_y, min_delta, max_delta);
 			this._offset.y += delta;
 		}
 
@@ -8505,9 +8544,9 @@ class Side_Elementos {
 	 * @link _consolidar_offset
 	 */
 	_aplicar_offset() {
-		if (!this.sidebar) return;
-		this.sidebar.style.setProperty('--side-offset-x', `${this._offset.x}px`);
-		this.sidebar.style.setProperty('--side-offset-y', `${this._offset.y}px`);
+		if (!this.$sidebar) return;
+		this.$sidebar.style.setProperty('--side-offset-x', `${this._offset.x}px`);
+		this.$sidebar.style.setProperty('--side-offset-y', `${this._offset.y}px`);
 	}
 
 	/**
@@ -8515,9 +8554,9 @@ class Side_Elementos {
 	 * @link _on_pointer_move
 	 */
 	_limitar_delta(delta_x, delta_y) {
-		if (!this._drag.rect_inicio) return { deltaX: delta_x, deltaY: delta_y };
+		if (!this.d_drag.rect_inicio) return { deltaX: delta_x, deltaY: delta_y };
 		const margen = 12;
-		const rect = this._drag.rect_inicio;
+		const rect = this.d_drag.rect_inicio;
 
 		if (this.posicion === 'bottom') {
 			const min_delta_x = -(rect.left - margen);
@@ -8549,12 +8588,12 @@ class Side_Elementos {
 	 * @link cerrar
 	 */
 	_resetear_drag() {
-		this._drag.delta_x = 0;
-		this._drag.delta_y = 0;
-		this._drag.rect_inicio = null;
-		if (!this.sidebar) return;
-		this.sidebar.style.setProperty('--side-drag-x', '0px');
-		this.sidebar.style.setProperty('--side-drag-y', '0px');
+		this.d_drag.delta_x = 0;
+		this.d_drag.delta_y = 0;
+		this.d_drag.rect_inicio = null;
+		if (!this.$sidebar) return;
+		this.$sidebar.style.setProperty('--side-drag-x', '0px');
+		this.$sidebar.style.setProperty('--side-drag-y', '0px');
 	}
 }
 // La antigua clase Touch_aMe se integró en Tablero_Touch para simplificar la herencia.
