@@ -2187,14 +2187,16 @@ class Tablero_Touch extends Tablero_Drop {
 
 	add_listeners_touchraton(elemento){
 		if (!elemento) return;
-		if (elemento.dataset.touchRatonReady === '1') return;
+		// Usamos una propiedad en memoria (no dataset) para no contaminar el HTML
+		// ni copiar accidentalmente la marca al clonar nodos del menú.
+		if (elemento._touchRatonReady === true) return;
 		elemento.draggable = true;
 		elemento.style.touchAction = 'none';
 		elemento.addEventListener('dragstart',  this.dragStart.bind(this));
 		elemento.addEventListener('touchstart', this.handleTouch_start.bind(this), { passive: false });
 		elemento.addEventListener('touchmove',  this.handleTouch_movimiento.bind(this), { passive: false });
 		elemento.addEventListener('touchend',   this.handleTouch_end.bind(this), { passive: false });
-		elemento.dataset.touchRatonReady = '1';
+		elemento._touchRatonReady = true;
 		if (!this._touchCancelRegistrado) {
 			window.addEventListener('touchcancel', this.finalizarArrastre.bind(this));
 			this._touchCancelRegistrado = true;
