@@ -1651,9 +1651,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		
 		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 		// ■■ LLAMADA AL PADRE /  CREA LA matriz_plana CON SUS ESTILOS.
-		super(family, id_div_contenedor, div_maestro, columnas, filas);
-
-		
+		super(family, id_div_contenedor, div_maestro, columnas, filas);		
 		
 		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 		// ■■ Gestor unificado de ratón y táctil
@@ -1694,21 +1692,21 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		window.addEventListener('resize', this._debounce(this._when_resize.bind(this), 250));
 		console.log('✅ Tablero_Drop - RESPONSIVE ​🔳​  on_resize • • • Loaded ✔️');
 
-		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-		//  ​👂​👂 Connfigura DRAG (con touchpad y raton)  del MENU HTML 
-		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-		// ​​​​​​​const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");		
-		// ​​​​​​​if (items_html_to_matriz.length > 0) {	
-		// ​​​​​​​	items_html_to_matriz.forEach(el => el.addEventListener("dragstart", this.dragStart.bind(this)));
-		// ​​​​​​​}
-		const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");
-		if (items_html_to_matriz.length > 0) {
-			items_html_to_matriz.forEach(el => {
+		// // ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		// //  ​👂​👂 Connfigura DRAG (con touchpad y raton)  del MENU HTML 
+		// // ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		// // ​​​​​​​const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");		
+		// // ​​​​​​​if (items_html_to_matriz.length > 0) {	
+		// // ​​​​​​​	items_html_to_matriz.forEach(el => el.addEventListener("dragstart", this.dragStart.bind(this)));
+		// // ​​​​​​​}
+		// const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");
+		// if (items_html_to_matriz.length > 0) {
+		// 	items_html_to_matriz.forEach(el => {
 				
-				this.add_listeners_touchraton(el);
-				el.addEventListener("dragstart", this.dragStart.bind(this));
-			});
-		}
+		// 		this.add_listeners_touchraton(el);
+		// 		el.addEventListener("dragstart", this.dragStart.bind(this));
+		// 	});
+		// }
 		console.log('✅ Tablero_Drop - Touch-Raton ​​👆​🖱️​ • • • Loaded ✔️');		
 
 
@@ -1725,60 +1723,30 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 	/**
 	 * ### KISS: Detecta si el tipo es mesa o silla.  Sirve para validar
 	 */
-	_es_mesa_silla(tipo = '') {
-		const tipo_normalizado = `${tipo}`.toLowerCase();
-		return tipo_normalizado === 'mesa' || tipo_normalizado === 'silla';
-	}
+	// _es_mesa_silla(tipo = '') {
+	// 	const tipo_normalizado = `${tipo}`.toLowerCase();
+	// 	return tipo_normalizado === 'mesa' || tipo_normalizado === 'silla';
+	// }
 
 	/**
 	 * ### KISS: Bloquea o desbloquea el movimiento del sidebar.
 	 */
-	_set_bloqueo_sidebar(bloqueado = false) {
-		if (!this.Side_Elementos?.set_bloqueo_movimiento) return;
-		this.Side_Elementos.set_bloqueo_movimiento(bloqueado);
-	}
+	// _set_bloqueo_sidebar(bloqueado = false) {
+	// 	if (!this.Side_Elementos?.set_bloqueo_movimiento) return;
+	// 	this.Side_Elementos.set_bloqueo_movimiento(bloqueado);
+	// }
 
 	/**
 	 * ### KISS: Inicia el bloqueo del sidebar durante un drag de mesa/silla.
 	 */
-	_iniciar_bloqueo_sidebar(objeto_drag = null) {
-		if (!this._es_mesa_silla(this.data_tipo)) return;
-		this._set_bloqueo_sidebar(true);
-		if (objeto_drag) {
-			objeto_drag.addEventListener('dragend', () => this._set_bloqueo_sidebar(false), { once: true });
-		}
-	}
-	/**
-	 * ### SE PRODUCE CUANDO EMPIEZA EL MOVIMIENTO DE UN OBJETO DRAG ( Movible )
-	 *              • Se trata de guardar el objeto que se mueve mediante ev.dataTransfer.setData("text", id_objeto_drag) 
-	 *              • Cuando este objeto_drag caiga en un objeto drop se tiene que recuperar con ev.dataTransfer.getData("text")
-	 *              • "text" es cualquier cosa xEjemplo "id_objeto_mueve", y además se puede poner mas de uno.
-	 * @see 
-	 * @param {*} ev   evento de inicio de arrastre de un objeto.
-	 * @returns 
-	 */
-	dragStart(ev) {
-		const new_obj_drag = ev.target;                         // ■ cacha el objeto que se mueve(drag).  
-		// const id = ev.currentTarget.id;
-		
-		// ■■ Guarda el objeto que se mueve en la clase.
-                // this.objeto_drag = new_obj_drag;
-                // ■■ Guarda el objeto que se mueve en la clase.
-                this.get_origen_drag?.(new_obj_drag);
-
-		// ■■ Bloquea el movimiento del sidebar si movemos una mesa o silla.
-		this._iniciar_bloqueo_sidebar(new_obj_drag);
-		
-		// ■■ ESTABLECE/GUARDA EL ID DEL OBJETO DRAG
-		ev.dataTransfer.setData("text", new_obj_drag.id);      	// ■ dataTransfer guarda en la transacción d&d un dato tipo "text" con el id del drag.
-		
-		// ■■ GUARDA EL data-tipo (HTML)
-		// this.data_tipo = new_obj_drag.getAttribute('data-tipo');  // Cacha el data-tipo del objeto que se mueve.				
-		ev.dataTransfer.setData("tipo", this.data_tipo); 
-
-		// ■■■■ LOG	🖥️															
-		// console.log(`▶️ drag_start ■ id ► ${new_obj_drag.id}  , tipo: ${this.data_tipo} , clase: ${new_obj_drag.className}`);  		
-	}
+	// _iniciar_bloqueo_sidebar(objeto_drag = null) {
+	// 	if (!this._es_mesa_silla(this.data_tipo)) return;
+	// 	this._set_bloqueo_sidebar(true);
+	// 	if (objeto_drag) {
+	// 		objeto_drag.addEventListener('dragend', () => this._set_bloqueo_sidebar(false), { once: true });
+	// 	}
+	// }
+	
 
 	/**
 	 * ### Maneja el evento de soltar un objeto en el salon
@@ -1811,7 +1779,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 			// ■■ No permite ir a una CELDA OCUPADA.
 			if (this.is_baldosa_vacia(objDrop) == false) {
 				console.log(`⚠️ ${objDrop.id} está OCUPADA. `); 
-				this._set_bloqueo_sidebar(false);
+				// this._set_bloqueo_sidebar(false);
 				return false; 
 			}
 			
@@ -1837,7 +1805,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 			console.log(error);
 			return false;			
 		}finally{
-			this._set_bloqueo_sidebar(false);
+			// this._set_bloqueo_sidebar(false);
 		}
 		
 	}
@@ -1884,7 +1852,8 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// ■■ Venga de quien venga, la puerta se lo traga y lo escupe. 
 		objDrop.appendChild(objDrag);
 		objDrop.removeChild(objDrag);		
-		this._set_bloqueo_sidebar(false);
+
+		// this._set_bloqueo_sidebar(false);
 		
 		// ■■ PUEDO ACTUALIZAR O NO LA LISTA-ONPLAY.
 		this._onplay_scan_salon(); 
@@ -1967,7 +1936,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// ■■ Verificamos que la baldosa de destino esté vacía
 		if (this.is_baldosa_vacia(baldosa_matriz) == false) return
 
-		// ■■ Creamos un Clon del MENU. El id que se asigna es un secuencial del data-tipo(del <data_tipo>)
+		// ■■ Creamos un Clon del item del MENU. El id que se asigna es un secuencial del data-tipo(del <data_tipo>)
 		const clon_item = item_menu.cloneNode(true);                  
 		clon_item.id = Herramientas.get_dom_secuency(data_tipo);				
 		clon_item.title = clon_item.id;
@@ -2048,8 +2017,8 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 	// ██████████████████████████████████████████████████████████████████████████████████ 
 
 	/** 
-	 * ### Saca por consola un informe de todos los MyDiv's onplay
-	*/
+	 * ### Saca por consola un informe de todos los MyDiv's onplay...los que tienen elementos hijos.
+	 * */
 	onplay_read(lista_mydivs_onplay){
 		// console.log('\nON PLAY • • • READ: ');
 		try {
@@ -2069,8 +2038,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 	}
 
 	/** 
-	 * ### Scanner n-s-e-w actualizado de los elementos onplay del Salon.
-	*/
+	 * ### Scanner n-s-e-w actualizado de los elementos onplay del Salon. 	*/
 	_onplay_scan_salon(){    
 		try {
 			const lista_baldosas_onplay = this._get_mydivs_onplay();
@@ -2265,10 +2233,21 @@ class Tablero_Touch extends Tablero_Drop {
 		const offsetY = y - rect.top;
 		const preview = this._create_drag_preview(objetivo, rect);
 		this.get_origen_drag(objetivo);
-		if (this._es_mesa_silla?.(this.data_tipo)) this._set_bloqueo_sidebar(true);
+		// if (this._es_mesa_silla?.(this.data_tipo)) this._set_bloqueo_sidebar(true);
 		const previousVisibility = objetivo.style.visibility;
 		objetivo.style.visibility = 'hidden';
-		this.touchState = { draggedElement: objetivo, activeDropTarget: null, startX: x, startY: y, lastX: x, lastY: y, offsetX, offsetY, dragPreview: preview, previousVisibility, rafId: null, pendingMove: null };
+		this.touchState = { draggedElement: objetivo, 
+							activeDropTarget: null, 
+							startX: x, 
+							startY: y, 
+							lastX: x, 
+							lastY: y, 
+							offsetX, 
+							offsetY, 
+							dragPreview: preview, 
+							previousVisibility, 
+							rafId: null, 
+							pendingMove: null };
 	}
 
 	handleTouch_movimiento(evento) {
@@ -2361,6 +2340,61 @@ class Tablero_Touch extends Tablero_Drop {
 	}
 }
 
+class Tablero_Drag extends Tablero_Touch {
+	constructor(family = '', id_div_contenedor = '', div_maestro = null, columnas = 8, filas = 8 ) {
+		
+		super(family, id_div_contenedor, div_maestro, columnas, filas);
+
+		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		//  ​👂​👂 Connfigura DRAG (con touchpad y raton)  del MENU HTML 
+		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		// ​​​​​​​const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");		
+		// ​​​​​​​if (items_html_to_matriz.length > 0) {	
+		// ​​​​​​​	items_html_to_matriz.forEach(el => el.addEventListener("dragstart", this.dragStart.bind(this)));
+		// ​​​​​​​}
+		const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");
+		if (items_html_to_matriz.length > 0) {
+			items_html_to_matriz.forEach($el => {
+				
+				this.add_listeners_touchraton($el);
+				$el.addEventListener("dragstart", this.dragStart.bind(this));
+			});
+		}
+	}
+
+	/**
+	 * ### SE PRODUCE CUANDO EMPIEZA EL MOVIMIENTO DE UN OBJETO DRAG ( Movible )
+	 *              • Se trata de guardar el objeto que se mueve mediante ev.dataTransfer.setData("text", id_objeto_drag) 
+	 *              • Cuando este objeto_drag caiga en un objeto drop se tiene que recuperar con ev.dataTransfer.getData("text")
+	 *              • "text" es cualquier cosa xEjemplo "id_objeto_mueve", y además se puede poner mas de uno.
+	 * @see 
+	 * @param {*} ev   evento de inicio de arrastre de un objeto.
+	 * @returns 
+	 */
+	dragStart(ev) {
+		const new_obj_drag = ev.target;                         // ■ cacha el objeto que se mueve(drag).  
+		// const id = ev.currentTarget.id;
+		
+		// ■■ Guarda el objeto que se mueve en la clase.
+		// this.objeto_drag = new_obj_drag;
+		// ■■ Guarda el objeto que se mueve en la clase.
+		this.get_origen_drag?.(new_obj_drag);
+
+		// ■■ Bloquea el movimiento del sidebar si movemos una mesa o silla.
+		// this._iniciar_bloqueo_sidebar(new_obj_drag);
+		
+		// ■■ ESTABLECE/GUARDA EL ID DEL OBJETO DRAG
+		ev.dataTransfer.setData("text", new_obj_drag.id);      	// ■ dataTransfer guarda en la transacción d&d un dato tipo "text" con el id del drag.
+		
+		// ■■ GUARDA EL data-tipo (HTML)
+		// this.data_tipo = new_obj_drag.getAttribute('data-tipo');  // Cacha el data-tipo del objeto que se mueve.				
+		ev.dataTransfer.setData("tipo", this.data_tipo); 
+
+		// ■■■■ LOG	🖥️															
+		// console.log(`▶️ drag_start ■ id ► ${new_obj_drag.id}  , tipo: ${this.data_tipo} , clase: ${new_obj_drag.className}`);  		
+	}
+}
+
 
 // ████████████████████████████████████████████████████████████████████████████████████████████████████████████
 
@@ -2371,7 +2405,7 @@ class Tablero_Touch extends Tablero_Drop {
  * ##### • RESERVAS son asociaciones de mesas y sillas. Se pueden juntar varias mesas para formar 1 reserva
  * 	
 */
-class e_Salon extends Tablero_Touch {
+class e_Salon extends Tablero_Drag {
 	/** ### Imagen svg del elemento 'mesa'  ►  {@link Configuracion_Salon._asegurar_plantillas_menu}*/
 	static MESA = `
 		<div id="mesa_menu" class="menu_to_clone" data-tipo="mesa" draggable="true" title="Arrastra la Mesa hasta el Salón">
@@ -2522,11 +2556,6 @@ class e_Salon extends Tablero_Touch {
 						login:'[data-action-nav="conn"]', 
 						config:'data-tipo-bs="offcanvas-configuracion"',
 						elementos: '[data-action-nav="elementos"]',
-					};
-
-		this.objs = {
-			configuracion: '[data-bs-toggle="offcanvas"]',
-			log: '[data-action-nav="conn"]',
 		};
 		
 		// ■■ Sidebar persistente de elementos (mesa/silla) desacoplado del Salón (solo UI + callback drag)
@@ -2727,16 +2756,11 @@ class e_Salon extends Tablero_Touch {
 		// ■■ Siempre hace click el elemento con el listener(div contenedor), no la imagen 
 		const id_mesa = ev.currentTarget.id;                    
 		
-		// ■■ BUSCA EN EL ARRAY DE RESERVAS LA MESA CLICADA.
-		const index_reserva = this.reservas.findIndex(dicc => {
-			return dicc.mesas.includes(id_mesa);
-		});
-		// ► Si No está en ninguna reserva.	@
-		if (index_reserva == -1) return;        	
-		
-		// ► para accion__save()
-		this.index_reserva = index_reserva; 
-		
+		// ■■ Busca en el array de diccionario de reserva el indice de la reserva que contiene la mesa clickada.
+		const index_reserva = this.reservas.findIndex(dicc => {	return dicc.mesas.includes(id_mesa); });
+		if (index_reserva == -1) return;       	
+
+		this.index_reserva = index_reserva; 		
 		// ■■ LOG DE LA RESERVA CLICKADA. 🖥️
 		// console.log(`mesa ${id_mesa} está en la reserva ${index_reserva} con mesas: ${reservas[index_reserva].mesas} y sillas: ${reservas[index_reserva].sillas}`);    
 		
@@ -2782,7 +2806,7 @@ class e_Salon extends Tablero_Touch {
 
 		// ■■ Recupera el diccionario de popover. (Recuerda que Las mesas son las keys de la propiedad diccionario_datos del popover)
 		const diccionario_mesas = this.MSG_M.diccionario_datos;
-		if (Object.keys(diccionario_mesas).length <= 0) console.warn('\t\tVACÍO ');
+		// if (Object.keys(diccionario_mesas).length <= 0) console.warn('\t\tVACÍO ');
 		// console.log(JSON.stringify(diccionario_mesas));
 		
 		// ■■ Si is_single=true, no se pinta el sumatorio.
@@ -3234,6 +3258,7 @@ class e_Salon extends Tablero_Touch {
 		try {
 			// REGISTRO LOS CAMBIOS EN EL SALON.
 			this._onplay_scan_salon(); 		
+			
 			// LLAMO AL MODULO DE RESERVAS SOBRE LOS OBJETOS CUYO ID EMPIEZA POR 'mesa' 
 			const reservas = this._modulo_reservas(this.dicc_config.tipos.mesa);
 			return reservas;
