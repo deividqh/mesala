@@ -1703,7 +1703,8 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// ​​​​​​​}
 		const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");
 		if (items_html_to_matriz.length > 0) {
-			items_html_to_matriz.forEach(el => {				
+			items_html_to_matriz.forEach(el => {
+				
 				this.add_listeners_touchraton(el);
 				el.addEventListener("dragstart", this.dragStart.bind(this));
 			});
@@ -1732,21 +1733,21 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 	/**
 	 * ### KISS: Bloquea o desbloquea el movimiento del sidebar.
 	 */
-	// _set_bloqueo_sidebar(bloqueado = false) {
-	// 	if (!this.Side_Elementos?.set_bloqueo_movimiento) return;
-	// 	this.Side_Elementos.set_bloqueo_movimiento(bloqueado);
-	// }
+	_set_bloqueo_sidebar(bloqueado = false) {
+		if (!this.Side_Elementos?.set_bloqueo_movimiento) return;
+		this.Side_Elementos.set_bloqueo_movimiento(bloqueado);
+	}
 
 	/**
 	 * ### KISS: Inicia el bloqueo del sidebar durante un drag de mesa/silla.
 	 */
-	// _iniciar_bloqueo_sidebar(objeto_drag = null) {
-	// 	if (!this._es_mesa_silla(this.data_tipo)) return;
-	// 	this._set_bloqueo_sidebar(true);
-	// 	if (objeto_drag) {
-	// 		objeto_drag.addEventListener('dragend', () => this._set_bloqueo_sidebar(false), { once: true });
-	// 	}
-	// }
+	_iniciar_bloqueo_sidebar(objeto_drag = null) {
+		if (!this._es_mesa_silla(this.data_tipo)) return;
+		this._set_bloqueo_sidebar(true);
+		if (objeto_drag) {
+			objeto_drag.addEventListener('dragend', () => this._set_bloqueo_sidebar(false), { once: true });
+		}
+	}
 	/**
 	 * ### SE PRODUCE CUANDO EMPIEZA EL MOVIMIENTO DE UN OBJETO DRAG ( Movible )
 	 *              • Se trata de guardar el objeto que se mueve mediante ev.dataTransfer.setData("text", id_objeto_drag) 
@@ -1761,12 +1762,12 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// const id = ev.currentTarget.id;
 		
 		// ■■ Guarda el objeto que se mueve en la clase.
-		// this.objeto_drag = new_obj_drag;
-		// ■■ Guarda el objeto que se mueve en la clase.
-		this.get_origen_drag?.(new_obj_drag);
+                // this.objeto_drag = new_obj_drag;
+                // ■■ Guarda el objeto que se mueve en la clase.
+                this.get_origen_drag?.(new_obj_drag);
 
 		// ■■ Bloquea el movimiento del sidebar si movemos una mesa o silla.
-		// this._iniciar_bloqueo_sidebar(new_obj_drag);
+		this._iniciar_bloqueo_sidebar(new_obj_drag);
 		
 		// ■■ ESTABLECE/GUARDA EL ID DEL OBJETO DRAG
 		ev.dataTransfer.setData("text", new_obj_drag.id);      	// ■ dataTransfer guarda en la transacción d&d un dato tipo "text" con el id del drag.
@@ -1817,7 +1818,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 			// ■■ Si el objeto que se mueve es del MENU, se clona en la matriz. Si no, es un movimiento Interno.
 			if (objDrag.classList.contains("menu_to_clone")) {
 				
-				this.elemento_navbar_to_Salon(objDrag, objDrop, data_tipo);			
+				this.elemento_nuevo_to_Salon(objDrag, objDrop, data_tipo);			
 	
 			}else if (objDrag.classList.contains("class_onplay")) {    // ► Esta clase sólo se asigna a los objetos en juego dinámicamente.
 	
@@ -1961,7 +1962,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 	 * @param {string} data_tipo  'mesa', 'silla' . definidos en diccionario de configuracion dicc_config de Salon.js.
 	 * @returns {object}  el elemento nuevo creado (la silla), que ha sido llevada del menu a la matriz_plana (El Salon)
 	 */
-	elemento_navbar_to_Salon(item_menu = null, baldosa_matriz = null,  data_tipo = '') {
+	elemento_nuevo_to_Salon(item_menu = null, baldosa_matriz = null,  data_tipo = '') {
 
 		// ■■ Verificamos que la baldosa de destino esté vacía
 		if (this.is_baldosa_vacia(baldosa_matriz) == false) return
@@ -2681,34 +2682,7 @@ class e_Salon extends Tablero_Touch {
 		this.  _set_exit_toast_bs(this.objeto_drag.id);
 		
 	}
-
-	/** ✒️✒️ 
-	 * #### SOBRE-ESCRIBE EL MÉTODO DE TABLERO_DROP Y AÑADE EL BLOQUEO DEL SIDEBAR DE ELEMENTOS MIENTRAS SE HACE DRAG.
-	 * @param {*} ev   evento de empezar a arrastrar un objeto en el salon.
-	*/
-	dragStart(ev) {
-
-		super.dragStart(ev);
-
-		this._iniciar_bloqueo_sidebar(ev.target);
-	}
-	/**
-	 * ### KISS: Bloquea o desbloquea el movimiento del sidebar.
-	 */
-	_set_bloqueo_sidebar(bloqueado = false) {
-		this.Side_Elementos.set_bloqueo_movimiento(bloqueado);
-	}
-
-	/**
-	 * ### KISS: Inicia el bloqueo del sidebar durante un drag de mesa/silla.
-	 */
-	_iniciar_bloqueo_sidebar(objeto_drag = null) {
-		if (!this._es_mesa_silla(this.data_tipo)) return;
-		this._set_bloqueo_sidebar(true);
-		if (objeto_drag) {
-			objeto_drag.addEventListener('dragend', () => this._set_bloqueo_sidebar(false), { once: true });
-		}
-	}
+	
 	/**
 	 * ####  Maneja el evento click en una silla.
 	*/
@@ -2819,16 +2793,16 @@ class e_Salon extends Tablero_Touch {
 	}
 			
 	/** ✒️✒️
-	 * #### SOBRE-ESCRIBE ✒️ EL MÉTODO elemento_navbar_to_Salon DE DRAG_X_DROP 
+	 * #### SOBRE-ESCRIBE ✒️ EL MÉTODO elemento_nuevo_to_Salon DE DRAG_X_DROP 
 	 * 	* Añade un CLASSNAME según el data-tipo(html) del elemento (silla o mesa)
 	 * 	* Añade un Event Listener ​👂​👂 para el click en el nuevo elemento.
 	 * ```javascript
-	 * this.elemento_navbar_to_Salon(objDrag, objDrop, data_tipo);			
+	 * this.elemento_nuevo_to_Salon(objDrag, objDrop, data_tipo);			
 	 * ```
 	 * @see {@link Tablero_Drop.drop_over_matriz}
 	*/
-	elemento_navbar_to_Salon(item_menu = null, baldosa_matriz = null, data_tipo = ''){
-		const new_div_onplay = super.elemento_navbar_to_Salon(item_menu , baldosa_matriz , data_tipo);
+	elemento_nuevo_to_Salon(item_menu = null, baldosa_matriz = null, data_tipo = ''){
+		const new_div_onplay = super.elemento_nuevo_to_Salon(item_menu , baldosa_matriz , data_tipo);
 		const dc = this.dicc_config;
 		if (!dc) return;
 
@@ -3631,7 +3605,7 @@ class e_Salon extends Tablero_Touch {
 				const objDrop = this.get_objdiv_from_mydiv(value);
 				
 
-				// ■■ SIMILAR A this.elemento_navbar_to_Salon(mesa_o_silla, objDrop, data_tipo);pero con Id el que venga.
+				// ■■ SIMILAR A this.elemento_nuevo_to_Salon(mesa_o_silla, objDrop, data_tipo);pero con Id el que venga.
 				// ■■ Verificamos que la baldosa de destino esté vacía
 				if (this.is_baldosa_vacia(objDrop) == false) 
 					return;
