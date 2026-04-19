@@ -1692,23 +1692,22 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		window.addEventListener('resize', this._debounce(this._when_resize.bind(this), 250));
 		console.log('✅ Tablero_Drop - RESPONSIVE ​🔳​  on_resize • • • Loaded ✔️');
 
-		// // ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-		// //  ​👂​👂 Connfigura DRAG (con touchpad y raton)  del MENU HTML 
-		// // ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-		// // ​​​​​​​const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");		
-		// // ​​​​​​​if (items_html_to_matriz.length > 0) {	
-		// // ​​​​​​​	items_html_to_matriz.forEach(el => el.addEventListener("dragstart", this.dragStart.bind(this)));
-		// // ​​​​​​​}
-		// const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");
-		// if (items_html_to_matriz.length > 0) {
-		// 	items_html_to_matriz.forEach(el => {
+		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		//  ​👂​👂 Connfigura DRAG (con touchpad y raton)  del MENU HTML 
+		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		// ​​​​​​​const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");		
+		// ​​​​​​​if (items_html_to_matriz.length > 0) {	
+		// ​​​​​​​	items_html_to_matriz.forEach(el => el.addEventListener("dragstart", this.dragStart.bind(this)));
+		// ​​​​​​​}
+		const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");
+		if (items_html_to_matriz.length > 0) {
+			items_html_to_matriz.forEach(el => {
 				
-		// 		this.add_listeners_touchraton(el);
-		// 		el.addEventListener("dragstart", this.dragStart.bind(this));
-		// 	});
-		// }
-		console.log('✅ Tablero_Drop - Touch-Raton ​​👆​🖱️​ • • • Loaded ✔️');		
-
+				this.add_listeners_touchraton(el);
+				el.addEventListener("dragstart", this.dragStart.bind(this));
+			});
+		}
+		console.log('✅ Tablero_Drop - Touch-Raton ​​👆​🖱️​ • • • Loaded ✔️');
 
 	}
 	/**
@@ -1746,7 +1745,47 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 	// 		objeto_drag.addEventListener('dragend', () => this._set_bloqueo_sidebar(false), { once: true });
 	// 	}
 	// }
+	/**
+	 * ### SE PRODUCE CUANDO EMPIEZA EL MOVIMIENTO DE UN OBJETO DRAG ( Movible )
+	 *              • Se trata de guardar el objeto que se mueve mediante ev.dataTransfer.setData("text", id_objeto_drag) 
+	 *              • Cuando este objeto_drag caiga en un objeto drop se tiene que recuperar con ev.dataTransfer.getData("text")
+	 *              • "text" es cualquier cosa xEjemplo "id_objeto_mueve", y además se puede poner mas de uno.
+	 * @see 
+	 * @param {*} ev   evento de inicio de arrastre de un objeto.
+	 * @returns 
+	 */
+	dragStart(ev) {
+		const new_obj_drag = ev.target;                         // ■ cacha el objeto que se mueve(drag).  
+		// const id = ev.currentTarget.id;
+		
+		// ■■ Guarda el objeto que se mueve en la clase.
+		// this.objeto_drag = new_obj_drag;
+
+		// ■■ Guarda el objeto que se mueve en la clase.
+		const { objeto_drag, data_tipo } = this._set_origen_drag?.(new_obj_drag);
+
+		// ■■ Bloquea el movimiento del sidebar si movemos una mesa o silla.
+		// this._iniciar_bloqueo_sidebar(new_obj_drag);
+		
+		// ■■ ESTABLECE/GUARDA EL ID DEL OBJETO DRAG
+		ev.dataTransfer.setData("text", new_obj_drag.id);      	// ■ dataTransfer guarda en la transacción d&d un dato tipo "text" con el id del drag.
+		
+		// ■■ GUARDA EL data-tipo (HTML)
+		// this.data_tipo = new_obj_drag.getAttribute('data-tipo');  // Cacha el data-tipo del objeto que se mueve.				
+		ev.dataTransfer.setData("tipo", data_tipo); 
+
+		// ■■■■ LOG	🖥️															
+		// console.log(`▶️ drag_start ■ id ► ${new_obj_drag.id}  , tipo: ${this.data_tipo} , clase: ${new_obj_drag.className}`);  		
+	}
 	
+	/**
+	 * ### Guarda el objeto que se mueve y su data-tipo en la clase. */
+	_set_origen_drag(elemento){
+		if (!elemento) return;
+		this.objeto_drag = elemento;
+		this.data_tipo = elemento.getAttribute('data-tipo') || '';
+		return { objeto_drag: this.objeto_drag, data_tipo: this.data_tipo };
+	}
 
 	/**
 	 * ### Maneja el evento de soltar un objeto en el salon
@@ -1831,6 +1870,8 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 			id_obj_drag = ev.dataTransfer.getData("text");
 		} else if (this.objeto_drag) {
 			id_obj_drag = this.objeto_drag.id;
+		}else{
+			return false;
 		}
 		
 		const objDrag = document.getElementById(id_obj_drag);
@@ -2145,12 +2186,9 @@ class Tablero_Touch extends Tablero_Drop {
 		return { x: evento.clientX || 0, y: evento.clientY || 0 };
 	}
 
-	get_origen_drag(elemento){
-		if (!elemento) return;
-		this.objeto_drag = elemento;
-		this.data_tipo = elemento.getAttribute('data-tipo') || '';
-	}
+	
 
+	/** ### Agrega los listeners para los eventos de toque y ratón 	*/
 	add_listeners_touchraton(elemento){
 		if (!elemento) return;
 		// Usamos una propiedad en memoria (no dataset) para no contaminar el HTML
@@ -2169,12 +2207,14 @@ class Tablero_Touch extends Tablero_Drop {
 		}
 	}
 
+	/** ### Finaliza el arrastre del elemento táctil. */
 	finalizarArrastre() {
 		this._cleanup_touch_preview();
 		this._reset_touch_state();
 		this._set_bloqueo_sidebar(false);
 	}
 
+	/** ### Crea una vista previa del elemento arrastrado. */
 	_create_drag_preview(elemento, rect){
 		if (!elemento || !rect) return null;
 		const preview = elemento.cloneNode(true);
@@ -2196,6 +2236,12 @@ class Tablero_Touch extends Tablero_Drop {
 		return preview;
 	}
 
+	/** ### Obtiene la baldosa correspondiente a un punto específico 	
+	 * @param {number} x Coordenada X del punto.
+	 * @param {number} y Coordenada Y del punto.
+	 * @param {HTMLElement|null} fallbackTarget Elemento alternativo para buscar la baldosa si no se encuentra con elementsFromPoint.
+	 * @returns {HTMLElement|null} La baldosa encontrada o null si no se encuentra ninguna
+	*/
 	_get_baldosa_from_point(x, y, fallbackTarget = null){
 		const elements = document.elementsFromPoint ? document.elementsFromPoint(x, y) : [];
 		const baldosa = elements.find(elemento => elemento.classList && elemento.classList.contains('estiloBaldosas'));
@@ -2204,6 +2250,7 @@ class Tablero_Touch extends Tablero_Drop {
 		return null;
 	}
 
+	/** ### Obtiene el contenedor de caída real para un elemento detectado 	*/
 	_obtener_contenedor_drop_real(elementoDetectado) {
 		if (!elementoDetectado) return null;
 		if (elementoDetectado.dataset && elementoDetectado.dataset.tipo) return elementoDetectado;
@@ -2215,6 +2262,7 @@ class Tablero_Touch extends Tablero_Drop {
 		return null;
 	}
 
+	/** ### Mueve la vista previa del elemento arrastrado 	*/
 	_move_drag_preview(x, y){
 		const preview = this.touchState.dragPreview;
 		if (!preview) return;
@@ -2223,17 +2271,25 @@ class Tablero_Touch extends Tablero_Drop {
 		preview.style.transform = `translate3d(${left}px, ${top}px, 0)`;
 	}
 
+	/** ### Maneja el evento de inicio del toque (touch start) 	*/
 	handleTouch_start(evento){
 		if (!evento) return;
 		if (evento.cancelable) evento.preventDefault();
-		const objetivo = evento.currentTarget;
 		const { x, y } = this.get_coordenadas_evento(evento);
+		
+		const objetivo = evento.currentTarget;
+		
+		console.log(`${objetivo.id} ■ touch_start at (${x}, ${y})`);
+
 		const rect = objetivo.getBoundingClientRect();
 		const offsetX = x - rect.left;
 		const offsetY = y - rect.top;
 		const preview = this._create_drag_preview(objetivo, rect);
-		this.get_origen_drag(objetivo);
+		
+		this._set_origen_drag(objetivo);
+		
 		// if (this._es_mesa_silla?.(this.data_tipo)) this._set_bloqueo_sidebar(true);
+		
 		const previousVisibility = objetivo.style.visibility;
 		objetivo.style.visibility = 'hidden';
 		this.touchState = { draggedElement: objetivo, 
@@ -2250,6 +2306,7 @@ class Tablero_Touch extends Tablero_Drop {
 							pendingMove: null };
 	}
 
+	/** ### Maneja el evento de movimiento del toque (touch move) 	*/
 	handleTouch_movimiento(evento) {
 		if (!evento || !this.touchState.draggedElement) return;
 		if (evento.cancelable) evento.preventDefault();
@@ -2269,6 +2326,7 @@ class Tablero_Touch extends Tablero_Drop {
 		this.touchState.activeDropTarget = document.elementFromPoint(x, y);
 	}
 
+	/** ### Maneja el evento de finalización del toque (touch end) 	*/
 	handleTouch_end(evento) {
 		if (!this.touchState.draggedElement) return;
 		const el = this.touchState.draggedElement;
@@ -2321,6 +2379,7 @@ class Tablero_Touch extends Tablero_Drop {
 		if (this.touchState.draggedElement) this.touchState.draggedElement.style.visibility = this.touchState.previousVisibility || '';
 	}
 
+	/** ### Construye un evento sintético de tipo 'drop' para simular el comportamiento de arrastrar y soltar en dispositivos táctiles.*/
 	_buildSyntheticDropEvent(target, draggedElement, coords = {}){
 		const dataTipo = (draggedElement && draggedElement.getAttribute('data-tipo')) || '';
 		const { x = 0, y = 0 } = coords;
@@ -2340,60 +2399,7 @@ class Tablero_Touch extends Tablero_Drop {
 	}
 }
 
-class Tablero_Drag extends Tablero_Touch {
-	constructor(family = '', id_div_contenedor = '', div_maestro = null, columnas = 8, filas = 8 ) {
-		
-		super(family, id_div_contenedor, div_maestro, columnas, filas);
 
-		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-		//  ​👂​👂 Connfigura DRAG (con touchpad y raton)  del MENU HTML 
-		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-		// ​​​​​​​const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");		
-		// ​​​​​​​if (items_html_to_matriz.length > 0) {	
-		// ​​​​​​​	items_html_to_matriz.forEach(el => el.addEventListener("dragstart", this.dragStart.bind(this)));
-		// ​​​​​​​}
-		const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");
-		if (items_html_to_matriz.length > 0) {
-			items_html_to_matriz.forEach($el => {
-				
-				this.add_listeners_touchraton($el);
-				$el.addEventListener("dragstart", this.dragStart.bind(this));
-			});
-		}
-	}
-
-	/**
-	 * ### SE PRODUCE CUANDO EMPIEZA EL MOVIMIENTO DE UN OBJETO DRAG ( Movible )
-	 *              • Se trata de guardar el objeto que se mueve mediante ev.dataTransfer.setData("text", id_objeto_drag) 
-	 *              • Cuando este objeto_drag caiga en un objeto drop se tiene que recuperar con ev.dataTransfer.getData("text")
-	 *              • "text" es cualquier cosa xEjemplo "id_objeto_mueve", y además se puede poner mas de uno.
-	 * @see 
-	 * @param {*} ev   evento de inicio de arrastre de un objeto.
-	 * @returns 
-	 */
-	dragStart(ev) {
-		const new_obj_drag = ev.target;                         // ■ cacha el objeto que se mueve(drag).  
-		// const id = ev.currentTarget.id;
-		
-		// ■■ Guarda el objeto que se mueve en la clase.
-		// this.objeto_drag = new_obj_drag;
-		// ■■ Guarda el objeto que se mueve en la clase.
-		this.get_origen_drag?.(new_obj_drag);
-
-		// ■■ Bloquea el movimiento del sidebar si movemos una mesa o silla.
-		// this._iniciar_bloqueo_sidebar(new_obj_drag);
-		
-		// ■■ ESTABLECE/GUARDA EL ID DEL OBJETO DRAG
-		ev.dataTransfer.setData("text", new_obj_drag.id);      	// ■ dataTransfer guarda en la transacción d&d un dato tipo "text" con el id del drag.
-		
-		// ■■ GUARDA EL data-tipo (HTML)
-		// this.data_tipo = new_obj_drag.getAttribute('data-tipo');  // Cacha el data-tipo del objeto que se mueve.				
-		ev.dataTransfer.setData("tipo", this.data_tipo); 
-
-		// ■■■■ LOG	🖥️															
-		// console.log(`▶️ drag_start ■ id ► ${new_obj_drag.id}  , tipo: ${this.data_tipo} , clase: ${new_obj_drag.className}`);  		
-	}
-}
 
 
 // ████████████████████████████████████████████████████████████████████████████████████████████████████████████
@@ -2405,7 +2411,7 @@ class Tablero_Drag extends Tablero_Touch {
  * ##### • RESERVAS son asociaciones de mesas y sillas. Se pueden juntar varias mesas para formar 1 reserva
  * 	
 */
-class e_Salon extends Tablero_Drag {
+class e_Salon extends Tablero_Touch {
 	/** ### Imagen svg del elemento 'mesa'  ►  {@link Configuracion_Salon._asegurar_plantillas_menu}*/
 	static MESA = `
 		<div id="mesa_menu" class="menu_to_clone" data-tipo="mesa" draggable="true" title="Arrastra la Mesa hasta el Salón">
@@ -2701,7 +2707,6 @@ class e_Salon extends Tablero_Drag {
 		super.drop_exit(ev);		
 		
 		// ■■ Actualizo las Reservas:
-		// this._modulo_reservas(diccionario_configuracion.tipos.mesa);	
 		this.RegisteR();	
 		
 		// ■■ Elimino el mensaje del popover de clientes
@@ -2711,6 +2716,15 @@ class e_Salon extends Tablero_Drag {
 		this.  _set_exit_toast_bs(this.objeto_drag.id);
 		
 	}
+
+	elemento_onplay_handler(ev) {
+		ev.preventDefault();
+		const id = ev.currentTarget.id;
+		const tipo = ev.currentTarget.getAttribute('data-tipo');
+
+		// ■■ LOG 🖥
+		// 	
+	}	
 	
 	/**
 	 * ####  Maneja el evento click en una silla.
@@ -3008,9 +3022,6 @@ class e_Salon extends Tablero_Drag {
 	 */
 
 	_get_ids_onplay(tipo='todo'){		
-		// if (!Object.values(this.dicc__config.tipos).includes(tipo)) {
-		// 	return false;
-		// }
 		const dc = this.dicc_config;
 		if(!dc) return;
 
@@ -3165,24 +3176,11 @@ class e_Salon extends Tablero_Drag {
 			//     console.log('dicc_reservas:', ...dicc.mesas, ...dicc.sillas);
 			// });
 			
+		// ■■■■■■■■■■■■ Sillas Ronin
 		const sillas_ronin = this._get_sillas_ronin(set_sillas_visited);	
 		if (sillas_ronin && sillas_ronin.length > 0) {
 			arraydicc_rsrvs.push(...sillas_ronin);
 		}
-
-
-		// ■■■■■■■■■■■■ Sillas Ronin
-		// const arr_id_sillas = this._get_ids_onplay(this.dicc__config.tipos.silla);
-		// const sillas_no_asignadas = arr_id_sillas.filter(silla_id => !set_sillas_visited.has(silla_id));
-
-		// if (sillas_no_asignadas.length > 0) {
-		// 	// console.log('Sillas no asignadas a ninguna reserva:', sillas_no_asignadas);
-		// 	let dicc_reservas = {
-		// 		mesas: [],
-		// 		sillas: [...sillas_no_asignadas]  
-		// 	};
-		// 	arraydicc_rsrvs.push(dicc_reservas);
-		// }
 
 		return arraydicc_rsrvs;
 	}
@@ -3829,6 +3827,9 @@ class e_Salon extends Tablero_Drag {
 		}
 	}
 
+	/** 
+	 * ### Crea y muestra un toast de notificación al eliminar un elemento del Salon.
+	 * @param {string} id_elemento - El ID del elemento eliminado. 	 */
 	_set_exit_toast_bs(id_elemento) {
 		// ┌• Cacho la Papelera
 		const $contenedor = e_Salon._to_element('navbar') || null;
@@ -3874,13 +3875,15 @@ class e_Salon extends Tablero_Drag {
 	*/
 	_saloniza_elemento(elemento){
 		const dc = this?.CFG?.configuracion;
+		if(!elemento || !dc) return;
 
+		// ???????????
 		const tipos_validos = this?.CFG?.configuracion?.tipos;
-		
 		// ┌┌•  el diccionario tipos{} es {mesa:'mesa', silla:'silla'}		
 		const tipo_players = Object.values(tipos_validos);
+		// ???????????
 
-		if(!elemento) return;
+
 		const id_elemento = elemento.id;
 		if(!id_elemento) return;
 		// ┌• Titulo
@@ -3972,10 +3975,10 @@ class e_Salon extends Tablero_Drag {
 	}	
 	/** ## Valida el tipo contra dicc_config (soporta dos formas comunes)
 	 * ### funcion subordinada exclusivamente de {@link _what_player_menu}	 */
-	static __es_tipo_valido(tipo_a_validar , diccionario_setup){
-		const d_setup = diccionario_setup;
-		if (!d_setup || typeof d_setup !== 'object') return false;
-		const arr_values_tipos = Object.values(d_setup.tipos)
+	static __es_tipo_valido(tipo_a_validar , diccionario_configuracion){
+		const dc = diccionario_configuracion;
+		if (!dc || typeof dc !== 'object') return false;
+		const arr_values_tipos = Object.values(dc.tipos)
 		return arr_values_tipos.includes(tipo_a_validar);				
 	}
 	/** ## Dada una clave "mesa_0" o "silla_12", retorna el tipo. se compara contra los tipos presentes en el menú.
@@ -4871,8 +4874,8 @@ class Configuracion_Salon {
 				// Si el objeto de la reserva que quiero colocar es una mesa.....
 				if (item.id.toLowerCase().startsWith(tipo_mesa)) 
 					soy_mesa = true;
-				else  soy_mesa = false;
-				
+				else  
+					soy_mesa = false;
 				
 				// 1. Calculamos dónde caería esta mesa
 				const celda_destino = this.Salon.eRdS.suma_fc(celda_inicio_free, item.delta_y, item.delta_x);
@@ -4893,7 +4896,6 @@ class Configuracion_Salon {
 				// ...y eliminamos null/false
 				vecinos = vecinos.filter(x => x !== null && x !== false && x !== undefined && x.trim() !== '');	
 				if(vecinos.length === 0) continue; // No hay vecinos, no hay conflicto
-				
 				
 				// Recorremos los vecinos ya colocados antes de hacer scanner_nsew... si los tiene
 				for (const vecino_id of vecinos) {					
@@ -7413,6 +7415,7 @@ class Foto_CRUD{
 		// ┌•• Le hace una foto al salón en este momento
 		const dicc_api_foto = this.Salon?.api_foto();
 		const dimension = this.Salon.dimesion;		
+		
 		// ┌•• Cacho los rangos de las reservas de la foto.
 		const rangos_reservas = RnG._reservas_a_rangos(dicc_api_foto.reservas || [], dicc_api_foto.indices, dimension || null);
 		// ┌•• Cacho el Rango Matriz.
@@ -7424,7 +7427,7 @@ class Foto_CRUD{
 		const cfg = dicc_api_foto.configuracion || this.dicc_config || {};
 		return {
 			salon: {
-				nombre: 		 this.Salon?.family,
+				nombre: this.Salon?.family,
 				columnas: this.Salon?.columnas,
 				filas: 	 this.Salon?.filas,
 				family: cfg.family,
