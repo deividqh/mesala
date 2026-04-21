@@ -31,8 +31,10 @@ let dicc_salon = {
     modelo_salon: 'limitado',                 // 🍏🍏 Un modelo limitado, te dice cuantas columnas y filas tienes que poner según tu ancho de pantalla.
     estilo_UI: 'original',                    // 🍏🍏 De momento sin uso, esto está preparado para trabajar con los modos(oscuro, claro)
     tipos: { mesa: 'mesa', silla:'silla' } ,  // 🍏🍏 Lo tengo que cambiar por el array de elementos svg que quuiero que figuren en la logica de salon.
-    class_name : { contenedor: 'estiloSalon', baldosas: 'estiloBaldosas' },
-    
+    // Inyectamos el catálogo completo para que e_Salon lo propague
+    catalogo: CATALOGO_ELEMENTOS, 
+
+    clases_css : { contenedor: 'estiloSalon', baldosas: 'estiloBaldosas' },    
 };
 
 // Configuración principal reducida (KISS)
@@ -46,7 +48,7 @@ let dicc_salon__ = {
     estilo_UI: 'original',
     // Inyectamos el catálogo completo para que e_Salon lo propague
     catalogo: CATALOGO_ELEMENTOS, 
-    class_name: { contenedor: 'estiloSalon', baldosas: 'estiloBaldosas' }
+    clases_css: { contenedor: 'estiloSalon', baldosas: 'estiloBaldosas' }
 };
 
 let APP_SALON = null;

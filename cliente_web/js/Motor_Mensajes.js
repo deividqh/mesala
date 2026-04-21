@@ -395,13 +395,14 @@ class Motor_Mensajes {
 	 * @returns {void}
 	 */
 	_set_contexto_reserva_actual(id_elemento_dom = '', arr_mesas_reserva = []) {
+		// 1 •••••••••••• 
 		// Modo Single: Solo nos interesa el elemento actual. 
 		// Limpiamos con filter(Boolean) para evitar IDs vacíos.
 		if (this.is_single) {
 			this.ids_reserva_actual = [id_elemento_dom].filter(Boolean);
 			return;
 		}
-
+		// 2 •••••••••••• 
 		// Modo Múltiple: Procesamos el array de mesas proporcionado.
 		const ids = Array.isArray(arr_mesas_reserva) ? arr_mesas_reserva.filter(Boolean) : [];
 		
