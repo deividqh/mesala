@@ -1759,7 +1759,6 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// const id = ev.currentTarget.id;
 		
 		// ■■ Guarda el objeto que se mueve en la clase.
-		// const { objeto_drag, data_tipo } = this._set_origen_drag?.(new_obj_drag);
 		this.objeto_drag = new_obj_drag;
 		this.data_tipo = new_obj_drag.getAttribute('data-tipo') || '';
 
@@ -1775,15 +1774,6 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 
 		// ■■■■ LOG	🖥️															
 		// console.log(`▶️ drag_start ■ id ► ${new_obj_drag.id}  , tipo: ${this.data_tipo} , clase: ${new_obj_drag.className}`);  		
-	}
-	
-	/**
-	 * ### Guarda el objeto que se mueve y su data-tipo en la clase. */
-	_set_origen_drag(elemento){
-		if (!elemento) return;
-		this.objeto_drag = elemento;
-		this.data_tipo = elemento.getAttribute('data-tipo') || '';
-		return { objeto_drag: this.objeto_drag, data_tipo: this.data_tipo };
 	}
 
 	/**
@@ -2286,7 +2276,6 @@ class Tablero_Touch extends Tablero_Drop {
 		
 		this.objeto_drag = objeto_drag;
 		this.data_tipo = objeto_drag.getAttribute('data-tipo') || '';
-		// this._set_origen_drag(objeto_drag);
 		
 		// if (this._es_mesa_silla?.(this.data_tipo)) this._set_bloqueo_sidebar(true);
 		
@@ -2438,6 +2427,7 @@ class e_Salon extends Tablero_Touch {
 			</svg>
 		</div>
 	`;
+	static SILLA_ = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="50" height="50"> <g fill="#8B4513"> <rect x="262.97" y="298.368" width="33.329" height="155.344"/> <path d="M243.216,23.156l-50.788,201.47h-42.233l-89.148,13.431v36.624l10.08,1.437h-10.08v177.595h33.329V279.441l55.819,7.952V512h41.146V287.392h158.98V512h41.137V259.523L450.953,0L243.216,23.156z M349.317,224.626H225.884l43.386-172.06l122.188-11.116L349.317,224.626z"/> </g> </svg>`;
 		
 	/** ### Clase que Se encarga de la configuracion incial del Salon y metodos asociadas al Funcionamiento */
 	CFG = null; 
@@ -2531,24 +2521,22 @@ class e_Salon extends Tablero_Touch {
 				columnas_aplicadas, dicc_config.filas );		
 				
 		// 💥💥💥💥💥💥💥💥
-		const catalog = Catalogo.get();
-		const d_silla = Catalogo.get("silla");
-		const silla_1 = Catalogo.get("silla", "id");
-		const silla_2 = Catalogo.get("silla", 'visual');
-		const silla_3 = Catalogo.get("silla", 'visual', "css");
-		const silla_4 = Catalogo.get('visual', "css"); 	// NULL
-		
-		const arr_g1 = Catalogo.get_distinto_s("grupo");
-		const arr_g2 = Catalogo.get_distinto_s('visual');
-		const arr_g3 = Catalogo.get_distinto_s('logica', 'msg');
-		const arr_g31 = Catalogo.get_distinto_s('logica', 'msg', 'tipo');
-		const arr_g4 = Catalogo.get_distinto_s('id');
-		
-		const arr_g5 = Catalogo.get_distinto_s('mesa');	// NULL
-		const arr_g6 = Catalogo.get_distinto_s('mesa' , 'id');	// NULL
-
-		const z1 = Catalogo.get_keys();
-
+		const z = Catalogo.get();
+		const z01 = Catalogo.get("silla");
+		const z02 = Catalogo.get("silla", "id");
+		const z03 = Catalogo.get("silla", 'visual');
+		const z04 = Catalogo.get("silla", 'visual', "css");
+		const z05 = Catalogo.get('visual', "css"); 	// NULL		
+		const z06 = Catalogo.get_distinto_s("grupo");
+		const z07 = Catalogo.get_distinto_s('visual');
+		const z08 = Catalogo.get_distinto_s('logica', 'msg');
+		const z09 = Catalogo.get_distinto_s('logica', 'msg', 'tipo');
+		const z10 = Catalogo.get_distinto_s('id');		
+		const z11 = Catalogo.get_distinto_s('mesa');	// NULL
+		const z12 = Catalogo.get_distinto_s('mesa' , 'id');	// NULL
+		const z13 = Catalogo.get_keys();
+		const z14 = Catalogo.get_item_s("grupo", "player");
+		const z15 = Catalogo.get_item_s("logica", "b_alergias", true);
 		// 💥💥💥💥💥💥💥💥
 
 		// ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ 
@@ -2565,6 +2553,17 @@ class e_Salon extends Tablero_Touch {
 		else{}
 		
 		// ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ 
+		// Botones de Accion sobre el NavBar (Login, Ver-Info, Guardar, Cargar, Re-iniciar Salon): 
+		this.bi_nav = { cu:'[data-action-nav="save"]', 
+						rud:'[data-action-nav="load"]', 
+						ver_info:'[data-action-nav="info"]', 
+						api_reiniciar_salon:'[data-action-nav="re-init"]', 
+						login:'[data-action-nav="conn"]', 
+						config:'data-tipo-bs="offcanvas-configuracion"',
+						elementos: '[data-action-nav="elementos"]',
+		};
+		
+		// ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ 
 		// ■■ 🚫 DISEÑO UI 🖼️ : 'original' / 'clasico' / 'moderno'
 		// UPDATE: hay que aplicar el estilo(en Configuracion_Salon) para poder tener distintos estilos de UI.... para la version2... ainsss
 		this.estilo_UI = estilo_UI;
@@ -2576,18 +2575,9 @@ class e_Salon extends Tablero_Touch {
 		this.dimension = dimesion_inicial;
 		this.limites = limites;
 		
-		// Botones de Accion sobre el NavBar (Login, Ver-Info, Guardar, Cargar, Re-iniciar Salon): 
-		this.bi_nav = { cu:'[data-action-nav="save"]', 
-						rud:'[data-action-nav="load"]', 
-						ver_info:'[data-action-nav="info"]', 
-						api_reiniciar_salon:'[data-action-nav="re-init"]', 
-						login:'[data-action-nav="conn"]', 
-						config:'data-tipo-bs="offcanvas-configuracion"',
-						elementos: '[data-action-nav="elementos"]',
-		};
-		
+		// ┌••••••••••••••••••••••••••••
 		// ■■ Sidebar persistente de elementos (mesa/silla/...) 
-		// desacoplado del Salón (solo UI + callback drag)
+		// ┌••••••••••••••••••••••••••••
 		const $icono_elementos = document.querySelector('[data-action-nav="elementos"]');
 		this.Side_Elementos = new Side_Elementos(
 			this.add_listeners_touchraton.bind(this),
@@ -2743,14 +2733,12 @@ class e_Salon extends Tablero_Touch {
 	elemento_onplay_handler(ev) {
 		ev.preventDefault();
 		const id = ev.currentTarget.id;
-		const tipo = ev.currentTarget.getAttribute('data-tipo');
+		const data_tipo = ev.currentTarget.getAttribute('data-tipo');
 
 		// Calcula el indice de la reserva a la que pertenece el elemento clickado.
 		const index_reserva = this._get_indice_en_reserva_s(id);
 		if (index_reserva == -1) return null;
-		this.index_reserva = index_reserva;	
-
-		
+		this.index_reserva = index_reserva;			
 	}
 
 	_get_indice_en_reserva_s(id_elemento){	
@@ -2762,8 +2750,7 @@ class e_Salon extends Tablero_Touch {
 	}
 	
 	/**
-	 * ####  Maneja el evento click en una silla.
-	*/
+	 * ####  Maneja el evento click en una silla. */
 	silla_click_handler(ev) {
 		ev.preventDefault();
 		
@@ -2792,14 +2779,13 @@ class e_Salon extends Tablero_Touch {
 	}
 	
 	/**
-	 * ####   Listener cuando se hace click sobre una mesa_onplay
+	 * #### Listener cuando se hace click sobre una mesa_onplay
 	 *  *  Quiero Seleccionar todos los objetos de una **reserva** y ponerlos de color distinto.
 	 *  *  Cuando se hace 2 veces click sobre una mesa, **muestra** un popOver bootstrap para escribir o hablar mensajes.
 	 * ```javascript
 	 * const mesas_onplay  = document.querySelectorAll(".mesa_onplay");
 	 * const sillas_onplay = document.querySelectorAll(".silla_onplay");
-	 * ```
-	*/
+	 * ``` 	*/
 	mesa_click_handler(ev) {
 		
 		ev.preventDefault();
@@ -2849,6 +2835,7 @@ class e_Salon extends Tablero_Touch {
 		const index_reserva = this.reservas.findIndex(dicc => {
 			return dicc.mesas.includes(id_elemento) || dicc.sillas.includes(id_elemento);
 		});
+
 	}
 
 	/** ✒️✒️
