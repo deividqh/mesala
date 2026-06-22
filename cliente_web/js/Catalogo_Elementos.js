@@ -27,7 +27,7 @@ const CATALOGO_ELEMENTOS = Object.freeze({
         visual: {
             html: '<svg class="imagen_menu imagen_menu--silla st0" fill="currentColor" viewBox="0 0 512 512" width="30" height="30" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"><g><rect x="262.97" y="298.368" class="st0" width="33.329" height="155.344"/><path class="st0" d="M243.216,23.156l-50.788,201.47h-42.233l-89.148,13.431v36.624l10.08,1.437h-10.08v177.595h33.329V279.441l55.819,7.952V512h41.146V287.392h158.98V512h41.137V259.523L450.953,0L243.216,23.156z M349.317,224.626H225.884l43.386-172.06l122.188-11.116L349.317,224.626z"/></g></svg>',
             url: '',
-            css: 'estiloSilla'
+            css: 'estiloAsiento'
         },
         logica: {
             b_alergias: true,
@@ -62,17 +62,17 @@ const CATALOGO_ELEMENTOS = Object.freeze({
         },
         logica: { b_alergias: false, msg: null }
     },
-    esquina_muro: {
-        id: 'esquina_muro',
-        grupo: 'structure',
-        fisica: { ancho: 1, alto: 1, colision: true },
-        visual: {
-            html: '',
-            url: '',
-            css: 'estiloEsquinaMuro'
-        },
-        logica: { b_alergias: false, msg: null }
-    }
+    // esquina_muro: {
+    //     id: 'esquina_muro',
+    //     grupo: 'structure',
+    //     fisica: { ancho: 1, alto: 1, colision: true },
+    //     visual: {
+    //         html: '',
+    //         url: '',
+    //         css: 'estiloEsquinaMuro'
+    //     },
+    //     logica: { b_alergias: false, msg: null }
+    // }
 });
 
 
@@ -86,77 +86,79 @@ class Catalogo {
     mesa: {
         id: 'mesa',
         grupo: 'player',
+        sub_grupo: 'agrupador', // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc)
         fisica: {
             ancho: 1, // Medida en celdas/baldosas
             alto: 1,
-            colision: true // true = colisiona, false = no colisiona (ej: decoración)
+            colision: true // true = colisiona, false = no colisiona (ej: fondo)
         },
         visual: {
-            html: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="80" height="80" fill="#8B4513" stroke="#000000" stroke-width="2"/></svg>',
-            url: './imgs/mesa.svg',
+            content: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="80" height="80" fill="#8B4513" stroke="#000000" stroke-width="2"/></svg>',
             css: 'estiloMesa'
         },
         logica: {
             b_alergias: false,
             msg: {
                 tipo: 'sumatorio',              // Motor de mensajes: acumula valores por reserva.
-                estiloUI: 'estilo_Popover_Mesa'
+                css: 'estilo_Popover_Mesa'
             }
         }
     },
     silla: {
         id: 'silla',
         grupo: 'player',
+        sub_grupo: 'agrupado',   // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc) 
         fisica: { ancho: 1, alto: 1, colision: true },
         visual: {
-            html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="50" height="50"> <g fill="#8B4513"> <rect x="262.97" y="298.368" width="33.329" height="155.344"/> <path d="M243.216,23.156l-50.788,201.47h-42.233l-89.148,13.431v36.624l10.08,1.437h-10.08v177.595h33.329V279.441l55.819,7.952V512h41.146V287.392h158.98V512h41.137V259.523L450.953,0L243.216,23.156z M349.317,224.626H225.884l43.386-172.06l122.188-11.116L349.317,224.626z"/> </g> </svg>`,
-            url: './imgs/silla.svg',
-            css: 'estiloSilla'
+            content: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="50" height="50"> <g fill="#8B4513"> <rect x="262.97" y="298.368" width="33.329" height="155.344"/> <path d="M243.216,23.156l-50.788,201.47h-42.233l-89.148,13.431v36.624l10.08,1.437h-10.08v177.595h33.329V279.441l55.819,7.952V512h41.146V287.392h158.98V512h41.137V259.523L450.953,0L243.216,23.156z M349.317,224.626H225.884l43.386-172.06l122.188-11.116L349.317,224.626z"/> </g> </svg>`,
+            css: 'estiloAsiento'
         },
         logica: {
             b_alergias: true,
             msg: {
                 tipo: 'single', // Motor de mensajes: individual
-                estiloUI: 'estilo_Popover_Silla'
+                css: 'estilo_popover_agrupado'
             }
         }
     },
     taburete: {
         id: 'taburete',
         grupo: 'player',
+        sub_grupo: 'agrupado',   // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc)
         fisica: { ancho: 1, alto: 1, colision: true },
         visual: {
-            html: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50"> <g fill="#8B4513"> <rect x="12" y="25" width="4" height="20" rx="1" /> <rect x="34" y="25" width="4" height="20" rx="1" /> <rect x="18" y="20" width="4" height="15" rx="1" opacity="0.8" />        <rect x="28" y="20" width="4" height="15" rx="1" opacity="0.8" /> <ellipse cx="25" cy="20" rx="18" ry="12" /><path d="M7,20 Q7,30 25,30 Q43,30 43,20 L43,22 Q43,32 25,32 Q7,32 7,22 Z" /></g></svg>',
-            url: './imgs/taburete.svg',
-            css: 'estiloTaburete'
+            content: './imgs/taburete.svg',
+            css: 'estiloAsiento'
         },
         logica: {
             b_alergias: true,
-            msg: { tipo: 'single', estiloUI: 'estilo_Popover_Taburete' }
+            msg: { tipo: 'single', css: 'estilo_Popover_Taburete' }
         }
     },
-    planta: {
-        id: 'planta',
-        grupo: 'decoration',
-        fisica: { ancho: 1, alto: 1, colision: true },
-        visual: {
-            html: '',
-            url: '',
-            css: 'estiloPlanta'
-        },
-        logica: { b_alergias: false, msg: null }
-    },
-    esquina_muro: {
-        id: 'esquina_muro',
-        grupo: 'structure',
-        fisica: { ancho: 1, alto: 1, colision: true },
-        visual: {
-            html: '',
-            url: '',
-            css: 'estiloEsquinaMuro'
-        },
-        logica: { b_alergias: false, msg: null }
-    }
+    // planta: {
+    //     id: 'planta',
+    //     grupo: 'decoration',
+    //     sub_grupo: 'decoracion',   // Repito pq esto es futuro, no presente. pero quiero pensar ya en esto.
+    //     fisica: { ancho: 1, alto: 1, colision: true },
+    //     visual: {
+    //         html: '',
+    //         url: '',
+    //         css: 'estiloPlanta'
+    //     },
+    //     logica: { b_alergias: false, msg: null }
+    // },
+    // esquina_muro: {
+    //     id: 'esquina_muro',
+    //     grupo: 'structure',
+    //     sub_grupo: 'estructura',    // Repito pq esto es futuro, no presente. pero quiero pensar ya en esto.
+    //     fisica: { ancho: 1, alto: 1, colision: true },
+    //     visual: {
+    //         html: '',
+    //         url: '',
+    //         css: 'estiloEsquinaMuro'
+    //     },
+    //     logica: { b_alergias: false, msg: null }
+    // }
     });
 
     /**
@@ -180,8 +182,7 @@ class Catalogo {
 
     /**
      * Obtiene una lista de valores únicos (distintos) para una propiedad en todo el catálogo.
-     * Ejemplo: Catalogo.getUnicos('grupo') -> ['player', 'decoration', 'structure']
-     */
+     * Ejemplo: Catalogo.getUnicos('grupo') -> ['player', 'decoration', 'structure']     */
     static get_distinto_s(...niveles) {
         if (niveles.length === 0) return [];
 
@@ -252,7 +253,5 @@ class Catalogo {
 
     // Exportación para Node.js o Navegador moderno
     // export default Catalogo;
-
-
 
 }

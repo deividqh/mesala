@@ -32,24 +32,13 @@ let dicc_salon = {
     estilo_UI: 'original',                    // 🍏🍏 De momento sin uso, esto está preparado para trabajar con los modos(oscuro, claro)
     tipos: { mesa: 'mesa', silla:'silla' } ,  // 🍏🍏 Lo tengo que cambiar por el array de elementos svg que quuiero que figuren en la logica de salon.
     // Inyectamos el catálogo completo para que e_Salon lo propague
-    catalogo: CATALOGO_ELEMENTOS, 
+    catalogo: Catalogo.get(), 
+    // catalogo: CATALOGO_ELEMENTOS, 
 
     clases_css : { contenedor: 'estiloSalon', baldosas: 'estiloBaldosas' },    
 };
 
-// Configuración principal reducida (KISS)
-let dicc_salon__ = {
-    family: 'Gran-Salon',
-    columnas: 24,
-    filas: 15,
-    contenedor: '',
-    div_maestro: null,
-    modelo_salon: 'limitado',
-    estilo_UI: 'original',
-    // Inyectamos el catálogo completo para que e_Salon lo propague
-    catalogo: CATALOGO_ELEMENTOS, 
-    clases_css: { contenedor: 'estiloSalon', baldosas: 'estiloBaldosas' }
-};
+
 
 let APP_SALON = null;
 

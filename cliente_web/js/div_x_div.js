@@ -671,13 +671,6 @@ class Matriz_to_MyDiv extends Matriz_Plana {
 		else
 			this.filas = filas;
 		
-		// ■■■■■■■■■■■■■■■■■■■■■■■■
-		// ■ TAG DE LAS BALDOSAS DEL SALON.
-		// if (typeof (tag_baldosas) != 'string' || tag_baldosas.trim() === '')
-		// 	this.tag_baldosas = '#Baldosa';
-		// else
-		// 	this.tag_baldosas = tag_baldosas;
-		
 		// ■■■■■■■■■■■■■■■■■■■■■■■
 		// ■ Crea un primer div que será el patron de clonacion
 		this.my_div_one = this._crear_mydiv();		
@@ -2388,17 +2381,12 @@ class Tablero_Touch extends Tablero_Drop {
 	}
 }
 
-
-
-
 // ████████████████████████████████████████████████████████████████████████████████████████████████████████████
-
 /** 
  * ### SOBREESCRIBE Metodos Tablero_Drop y hace el comportamiento de Salon: 
  * ##### • Los elementos que pasan a jugar al Salon se selccionan de un Menu Externo al Salón
  * ##### • Los elementos de un salon son: sillas (o clientes) y mesas (o reservas)
  * ##### • RESERVAS son asociaciones de mesas y sillas. Se pueden juntar varias mesas para formar 1 reserva
- * 	
 */
 class e_Salon extends Tablero_Touch {
 	/** ### Imagen svg del elemento 'mesa'  ►  {@link Configuracion_Salon._asegurar_plantillas_menu}*/
@@ -2521,22 +2509,27 @@ class e_Salon extends Tablero_Touch {
 				columnas_aplicadas, dicc_config.filas );		
 				
 		// 💥💥💥💥💥💥💥💥
-		const z = Catalogo.get();
-		const z01 = Catalogo.get("silla");
-		const z02 = Catalogo.get("silla", "id");
-		const z03 = Catalogo.get("silla", 'visual');
-		const z04 = Catalogo.get("silla", 'visual', "css");
-		const z05 = Catalogo.get('visual', "css"); 	// NULL		
-		const z06 = Catalogo.get_distinto_s("grupo");
-		const z07 = Catalogo.get_distinto_s('visual');
-		const z08 = Catalogo.get_distinto_s('logica', 'msg');
-		const z09 = Catalogo.get_distinto_s('logica', 'msg', 'tipo');
-		const z10 = Catalogo.get_distinto_s('id');		
-		const z11 = Catalogo.get_distinto_s('mesa');	// NULL
-		const z12 = Catalogo.get_distinto_s('mesa' , 'id');	// NULL
-		const z13 = Catalogo.get_keys();
-		const z14 = Catalogo.get_item_s("grupo", "player");
-		const z15 = Catalogo.get_item_s("logica", "b_alergias", true);
+		const z_catalogo = Catalogo.get();
+		const z_silla = Catalogo.get("silla");
+		const z_silla_id = Catalogo.get("silla", "id");
+		const z_silla_visual = Catalogo.get("silla", 'visual');
+		const z_silla_visual_css = Catalogo.get("silla", 'visual', "css");
+		const z_visual_css = Catalogo.get('visual', "css"); 	// NULL		
+
+		const z_grupo = Catalogo.get_distinto_s("grupo");
+		const z_visual = Catalogo.get_distinto_s('visual');
+		const z_visual_content = Catalogo.get_distinto_s('visual', 'content');		
+		const z_log_msg = Catalogo.get_distinto_s('logica', 'msg');
+		const z_log_msg_tipo = Catalogo.get_distinto_s('logica', 'msg', 'tipo');
+		const z_id_s = Catalogo.get_distinto_s('id');		
+		const z_mesa = Catalogo.get_distinto_s('mesa');	// NULL
+		const z_mesa_id = Catalogo.get_distinto_s('mesa' , 'id');	// NULL
+		
+		const z_keys = Catalogo.get_keys();
+		
+		const z_players = Catalogo.get_item_s("grupo", "player");
+		const z_logica_alergias = Catalogo.get_item_s("logica", "b_alergias", true);
+		const z_sub_grupos = Catalogo.get_item_s("sub_grupo", "agrupado");
 		// 💥💥💥💥💥💥💥💥
 
 		// ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ 
@@ -2552,58 +2545,65 @@ class e_Salon extends Tablero_Touch {
 		else if(this.modelo_salon  === 'apilado'){}
 		else{}
 		
-		// ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ 
+		// ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ NO USADO. PREPARADO
 		// Botones de Accion sobre el NavBar (Login, Ver-Info, Guardar, Cargar, Re-iniciar Salon): 
+		// 🍏🍏
 		this.bi_nav = { cu:'[data-action-nav="save"]', 
 						rud:'[data-action-nav="load"]', 
 						ver_info:'[data-action-nav="info"]', 
-						api_reiniciar_salon:'[data-action-nav="re-init"]', 
+						reiniciar:'[data-action-nav="re-init"]', 
 						login:'[data-action-nav="conn"]', 
 						config:'data-tipo-bs="offcanvas-configuracion"',
+						boton_configuracion: '[data-bs-toggle="offcanvas"]' ,
 						elementos: '[data-action-nav="elementos"]',
 		};
+		this.$bi_nav = { cu:e_Salon._to_element( '[data-action-nav="save"]'), 
+						rud:e_Salon._to_element('[data-action-nav="load"]'), 
+						ver_info:e_Salon._to_element('[data-action-nav="info"]'), 
+						reiniciar:e_Salon._to_element('[data-action-nav="re-init"]'), 
+						login:e_Salon._to_element('[data-action-nav="conn"]'), 
+						config:e_Salon._to_element('data-tipo-bs="offcanvas-configuracion"'),
+						boton_configuracion: e_Salon._to_element('[data-bs-toggle="offcanvas"]') ,
+						elementos: e_Salon._to_element('[data-action-nav="elementos"]'),
+		};
 		
-		// ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ 
+		// ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ NO USADO
 		// ■■ 🚫 DISEÑO UI 🖼️ : 'original' / 'clasico' / 'moderno'
 		// UPDATE: hay que aplicar el estilo(en Configuracion_Salon) para poder tener distintos estilos de UI.... para la version2... ainsss
 		this.estilo_UI = estilo_UI;
 
 		// ┌•••••••••••••••••••••••••••••••••••
 		// ┌•• ENTORNO - DIMENSIONES - LIMITES
-		// ┌•••••••••••••••••••••••••••••••••••
 		this.entorno = entorno;
 		this.dimension = dimesion_inicial;
 		this.limites = limites;
 		
 		// ┌••••••••••••••••••••••••••••
 		// ■■ Sidebar persistente de elementos (mesa/silla/...) 
-		// ┌••••••••••••••••••••••••••••
 		const $icono_elementos = document.querySelector('[data-action-nav="elementos"]');
 		this.Side_Elementos = new Side_Elementos(
-			this.add_listeners_touchraton.bind(this),
-			null,
-			$icono_elementos
-		);
+											this.add_listeners_touchraton.bind(this),
+											z_catalogo,
+											$icono_elementos,
+											);
 
 		// ┌••••••••••••••••••••••••••••
 		// ┌• CONFIGURACION DEL SALON: 
-		// ┌••••••••••••••••••••••••••••
-		this.CFG = new Configuracion_Salon(this, dicc_config, '[data-bs-toggle="offcanvas"]');
+		const boton_configuracion = '[data-bs-toggle="offcanvas"]'
+		this.CFG = new Configuracion_Salon(this, dicc_config, boton_configuracion);
 		
 		// ■ ASEGURA QUE EL DICCIONARIO DE CONFIGURACION ESTA LIMPIO
 		this.dicc_config = this.CFG.diccionario;		
 		
 		// ┌••••••••••••••••••••••••
 		// ┌• LOGIN Y REGISTRO: 
-		// ┌••••••••••••••••••••••••
 		// 		• .botones_accion ► Busca elementos que tengan class="botones_accion".
 		// 		• data-action-nav="conn" ► selecciona el data-action-nav = "conn" en el dom html.
 		// 		• .botones_accion[data-action-nav="conn"] ► 1-Busca un elemento que tenga la clase botones_accion 2-Y que además tenga el atributo data-action-nav con el valor conn
         this.LoG = new Login_Modal('[data-action-nav="conn"]');
 		
 		// ┌••••••••••••••
-		// ┌•• C.R.U.D. •• 
-		// ┌••••••••••••••
+		// ┌• C.R.U.D. 
 		this.crud = new Foto_CRUD(this);
 		
 		// ┌••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
@@ -4052,14 +4052,13 @@ class Configuracion_Salon {
 		}
 		// •••••••••••••••••••••••••••••••
 		//  DICCIONARIO DE CONFIGURACION
-		// •••••••••••••••••••••••••••••••
 		this.configuracion = this.set_diccionario_configuracion(dicc_config);  
 
 		// •••••••••••••••
 		// ┌•• QUIEN SOY
-		// •••••••••••••••
 		/** ### Detección de Entorno ( Define la configuración ) */
 		this.entorno = Compatibilidad._detectar_entorno();
+		
 		
 		// ┌■ Determinar DIMENSIONES INICIALES dependiendo del tipo/ancho de la pantalla. 
 		// ┌• dimesion_inicial = {filas, columnas} 
@@ -4071,7 +4070,6 @@ class Configuracion_Salon {
 		
 		// •••••••••••••••••••••••••••••••••••••• 
 		// OFFCANVAS DE CONFIGURACION DE LA APP
-		// •••••••••••••••••••••••••••••••••••••• 		
 		// ┌•• Cacho el trigger que abre el offcanvas
 		this.$trigger = e_Salon._to_element(icono_trigger);
 		if(!this.$trigger) {
@@ -4085,28 +4083,24 @@ class Configuracion_Salon {
 		this.$formulario = e_Salon._to_element('form_config_salon'); 		// el formulario
 		this.$info_columnas = e_Salon._to_element('[data-config-info="columnas"]');
 		this.$info_filas = e_Salon._to_element('[data-config-info="filas"]');
-		this.$sidebar_posiciones = document.querySelectorAll('[data-config="sidebar-pos"] [data-side-position]');
-		const data_principal = document.querySelector('[data-tipo-bs="offcanvas-configuracion"]');		
+		this.$sidebar_posiciones = e_Salon._to_element('[data-side-position]');
+		// this.$sidebar_posiciones = document.querySelectorAll('[data-config="sidebar-pos"] [data-side-position]');
+		// const data_principal = document.querySelector('[data-tipo-bs="offcanvas-configuracion"]');		
 		
 		// ┌•• Cargo los txt's del formulario
-		this._load_offcanvas_configuracion(this.dimension, this.limites);		
+		this._load_offcanvas_configuracion(this.dimension_inicial, this.limites);		
 		Configuracion_Salon._asegurar_plantillas_menu();
 
-		// ••••••••••••••••••••••••••••••
 		// ■■ NUMERO COLUMNAS	
-		// ••••••••••••••••••••••••••••••
 		// ┌•• Fundamental para terminar de configuarar la cuadratura del Salon.
 		this.api_update_columnas('.' + this.configuracion.clases_css.contenedor, this.Salon.columnas);
 				
-		// ••••••••••••••••••••••
 		// ■■ Mensajes de la app	
 		this.UI = new Alertas_UI();
 
-		// •••••••••••••••••••••••••
 		// ■■ GAP de re-posicionar.
 		this.gap = 0;
 		
-		// •••••••••••••••••••••••••••••••••••••••••••
 		// ■■ Proporciones cuadradas de las Baldosas.
 		this.is_baldosa_cuadrada = true;
 
@@ -4119,9 +4113,9 @@ class Configuracion_Salon {
 	// }
 
 
-	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ VALIDACION DICCIONARIO CONFIGURACION
-	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	// ■■ VALIDACION DICCIONARIO CONFIGURACION
+	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	/** 
 	 * ### Valida y Completa el diccionario de configuración con los valores por defecto.
 	 * @param {Object} dicc_config  Diccionario de configuración proporcionado por el usuario.
@@ -4129,25 +4123,31 @@ class Configuracion_Salon {
 	 */
 	set_diccionario_configuracion(dicc_config){
 		// • Validación de existencia del catálogo (Principio NIST de integridad)
-        if (typeof CATALOGO_ELEMENTOS === 'undefined') {
-            throw new Error("[Seguridad/Integridad]: CATALOGO_ELEMENTOS no está definido. La aplicación no puede iniciar.");
-        }
+        // if (typeof CATALOGO_ELEMENTOS === 'undefined') {
+        //     throw new Error("[Seguridad/Integridad]: CATALOGO_ELEMENTOS no está definido. La aplicación no puede iniciar.");
+        // }
 		// • Esquema de validación simple (Fail-Fast)
         // Verificamos que los elementos esenciales existan para evitar errores de renderizado.
-        this._validar_contrato_catalogo(CATALOGO_ELEMENTOS);
+        this._validar_contrato_catalogo(dicc_config.catalogo);
 
 		// ■■ Valores por defecto
 		const dicc_default = {
 			family: 'Salon',		// Nombre de la baldosa
 			contenedor:  '',		// Nombre del div contendor salon
 			div_maestro: '',		// donde ubicamos el contenedor salon
-			filas: 8,		// Numero de filas del salon
-			columnas: 8,		// numero de columnas de salon.
-			estilo: 'original',	// id del offcanvas de configuración del salon.			
-			// ■ Tipos de elementos que se pueden colocar en el salon.
-			tipos: { silla: 'silla', mesa:  'mesa', },
+			filas: 8,				// Numero de filas del salon
+			columnas: 8,			// numero de columnas de salon.
+			estilo: 'original',		// 
+			
 			// ■ Nombres de las clases css que se van a asignar tanto al contendor como a cada baldosa.
 			clases_css: { contenedor: 'contenedor_salon' , baldosas: 'estiloBaldosas', },	
+			
+			// ■ Tipos de elementos que se pueden colocar en el salon.
+			tipos: { silla: 'silla', mesa:  'mesa', },
+			
+			// ■ Diccionario de Elementos definido en la clase Catalogo de Catalogo_Elementos.js
+			catalogo: {}
+
 		};
 		
 		// Limpia y estructura la configuración
@@ -4188,6 +4188,7 @@ class Configuracion_Salon {
 			estilo:	dicc_config.estilo || dicc_default.estilo,
 			tipos: cloneSimple(dicc_config.tipos) || dicc_default.tipos,
 			clases_css: cloneSimple(dicc_config.clases_css) || dicc_default.clases_css,
+			catalogo: dicc_config.catalogo || dicc_default.catalogo,
 		};
 
 		return config_limpio;
@@ -4555,16 +4556,16 @@ class Configuracion_Salon {
 		if (this.$filas) {
 			// this.$filas.value = this.dimension_inicial.filas;
 			this.$filas.value = this.Salon.filas;
-			this.$filas.min = this.limites.filas.min;
-			this.$filas.max = this.limites.filas.max;
+			this.$filas.min = this.Salon.limites.filas.min;
+			this.$filas.max = this.Salon.limites.filas.max;
 
 			rescate.fils = this.$filas.value;
 		}
 		if (this.$columnas) {
 			// this.$columnas.value = this.dimension_inicial.columnas;
 			this.$columnas.value = this.Salon.columnas;
-			this.$columnas.min = this.limites.columnas.min;
-			this.$columnas.max = this.limites.columnas.max;
+			this.$columnas.min = this.Salon.limites.columnas.min;
+			this.$columnas.max = this.Salon.limites.columnas.max;
 
 			rescate.cols = this.$columnas.value;
 		}
@@ -5146,6 +5147,7 @@ class Configuracion_Salon {
 	/**
      * ### Verifica que cada elemento tenga las propiedades físicas y lógicas mínimas.     */
     _validar_contrato_catalogo(catalogo) {
+		// Fisica y Visual son obligatorias, la lógica es opcional
         const campos_obligatorios = ['id', 'fisica', 'visual'];
         
         Object.entries(catalogo).forEach(([key, valor]) => {
@@ -8338,13 +8340,14 @@ class Side_Elementos {
 		sidebar.dataset.sideDragging = 'false';
 		sidebar.dataset.sideLocked = 'false';
 
+		// contenido es un div donde voy a meter todos los elementos players.
 		const contenido = document.createElement('div');
 		contenido.dataset.sideContent = 'lista';
 
+		// Esto viene de _normaliza_elementos() 
 		Object.entries(this.diccionario_elementos).forEach(([key, config]) => {
 			const svg = config?.svg ?? '';
-			if (!svg) return;
-			
+			if (!svg) return;	// aquí return pasa al siguiente.
 			const item = document.createElement('div');
 			item.dataset.sideItem = key;
 			item.classList.add('menu_to_clone');
