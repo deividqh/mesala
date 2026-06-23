@@ -2519,8 +2519,8 @@ class e_Salon extends Tablero_Touch {
 		const z_grupo = Catalogo.get_distinto_s("grupo");
 		const z_visual = Catalogo.get_distinto_s('visual');
 		const z_visual_content = Catalogo.get_distinto_s('visual', 'content');		
-		const z_log_msg = Catalogo.get_distinto_s('logica', 'msg');
-		const z_log_msg_tipo = Catalogo.get_distinto_s('logica', 'msg', 'tipo');
+		const z_log_msg = Catalogo.get_distinto_s('logica', 'motor_msg');
+		const z_log_msg_tipo = Catalogo.get_distinto_s('logica', 'motor_msg', 'tipo');
 		const z_id_s = Catalogo.get_distinto_s('id');		
 		const z_mesa = Catalogo.get_distinto_s('mesa');	// NULL
 		const z_mesa_id = Catalogo.get_distinto_s('mesa' , 'id');	// NULL
@@ -2528,7 +2528,7 @@ class e_Salon extends Tablero_Touch {
 		const z_keys = Catalogo.get_keys();
 		
 		const z_players = Catalogo.get_item_s("grupo", "player");
-		const z_logica_alergias = Catalogo.get_item_s("logica", "b_alergias", true);
+		const z_logica_alergias = Catalogo.get_item_s("logica", "motor_alerg", true);
 		const z_sub_grupos = Catalogo.get_item_s("sub_grupo", "agrupado");
 		// 💥💥💥💥💥💥💥💥
 
@@ -2562,7 +2562,7 @@ class e_Salon extends Tablero_Touch {
 						ver_info:e_Salon._to_element('[data-action-nav="info"]'), 
 						reiniciar:e_Salon._to_element('[data-action-nav="re-init"]'), 
 						login:e_Salon._to_element('[data-action-nav="conn"]'), 
-						config:e_Salon._to_element('data-tipo-bs="offcanvas-configuracion"'),
+						config:e_Salon._to_element('[data-tipo-bs="offcanvas-configuracion"]')  ,
 						boton_configuracion: e_Salon._to_element('[data-bs-toggle="offcanvas"]') ,
 						elementos: e_Salon._to_element('[data-action-nav="elementos"]'),
 		};
@@ -8238,8 +8238,6 @@ class Side_Elementos {
 		this.icono_disparador = icono_disparador;
 		/** ### Callback para manejar el arrastre de elementos. */
 		this.dragCallback = typeof dragCallback === 'function' ? dragCallback : null;
-		/** ### Diccionario de elementos del salón(mesa, silla, ... ). */
-		this.diccionario_elementos = this._normaliza_elementos(diccionario_elementos);
 		
 		/** sidebar del dom */
 		this.$sidebar = null;		
@@ -8279,46 +8277,7 @@ class Side_Elementos {
 		this._vincular_eventos();
 	}
 
-	/**
-	 * ### Normaliza el diccionario de elementos para trabajar siempre con el mismo formato.
-	 * @link constructor
-	 */
-	_normaliza_elementos(diccionario_elementos) {
-		if (diccionario_elementos && Object.keys(diccionario_elementos).length > 0) {
-			return Object.entries(diccionario_elementos).reduce((acc, [key, value]) => {
-				if (typeof value === 'string') {
-					acc[key] = { svg: value, dataTipo: key, baseId: `${key}_menu` };
-					return acc;
-				}
-				acc[key] = {
-					svg: value?.svg ?? '',
-					dataTipo: value?.dataTipo ?? key,
-					baseId: value?.baseId ?? `${key}_menu`,
-					title: value?.title ?? '',
-				};
-				return acc;
-			}, {});
-		}
-
-		Configuracion_Salon._asegurar_plantillas_menu();
-		const mesa_item = document.querySelector('#mesa_menu');
-		const silla_item = document.querySelector('#silla_menu');
-
-		return {
-			mesa: {
-				svg: mesa_item?.querySelector('svg')?.outerHTML ?? '',
-				dataTipo: mesa_item?.dataset?.tipo ?? 'mesa',
-				baseId: mesa_item?.id ?? 'mesa_menu',
-				title: mesa_item?.title ?? '',
-			},
-			silla: {
-				svg: silla_item?.querySelector('svg')?.outerHTML ?? '',
-				dataTipo: silla_item?.dataset?.tipo ?? 'silla',
-				baseId: silla_item?.id ?? 'silla_menu',
-				title: silla_item?.title ?? '',
-			},
-		};
-	}
+	
 
 	/**
 	 * ### Crea el sidebar una sola vez o reutiliza el existente para mantenerlo vivo.
@@ -8332,38 +8291,64 @@ class Side_Elementos {
 			return;
 		}
 
-		const sidebar = document.createElement('div');
-		sidebar.dataset.sideElementos = 'sidebar';
-		sidebar.dataset.sidePosition = this.posicion;
-		sidebar.dataset.sideState = this._estado;
-		sidebar.dataset.sideSizeMode = this.modo_tamano;
-		sidebar.dataset.sideDragging = 'false';
-		sidebar.dataset.sideLocked = 'false';
+		this.$sidebar = document.createElement('div');
+		this.$sidebar.dataset.sideElementos = 'sidebar';
+		this.$sidebar.dataset.sidePosition = this.posicion;
+		this.$sidebar.dataset.sideState = this._estado;
+		this.$sidebar.dataset.sideSizeMode = this.modo_tamano;
+		this.$sidebar.dataset.sideDragging = 'false';
+		this.$sidebar.dataset.sideLocked = 'false';
 
 		// contenido es un div donde voy a meter todos los elementos players.
-		const contenido = document.createElement('div');
-		contenido.dataset.sideContent = 'lista';
+		// const contenido = document.createElement('div');
+		// contenido.dataset.sideContent = 'lista';
+
+		// Consultar la nueva fuente de la verdad
+        const elementos_catalogo = Catalogo.get();
+
+        for (const key in elementos_catalogo) {
+			const el = elementos_catalogo[key];		// X cada elemento del dicc.	
+
+            // ■ Opcional: Aquí pongo un Malecon... only players.
+            if (el.grupo !== 'player') continue; 
+
+            // ■ Construir el contenedor del ítem
+            const div_item = document.createElement('div');
+			div_item.id = `${key}_menu`;
+			div_item.title = `Arrastra hacia el Salón`;            
+            div_item.className = 'menu_to_clone';             
+            div_item.dataset.tipo = key;       
+            div_item.dataset.grupo = el.grupo;   
+            // Asignar el contenido visual definido en el catálogo (el string SVG)
+            if (el.visual && el.visual.content) {
+                div_item.innerHTML = el.visual.content;
+            }
+            div_item.setAttribute('draggable', 'true'); 
+
+			// ■ Inyectar al Sidebar
+            this.$sidebar.appendChild(div_item);
+        }
 
 		// Esto viene de _normaliza_elementos() 
-		Object.entries(this.diccionario_elementos).forEach(([key, config]) => {
-			const svg = config?.svg ?? '';
-			if (!svg) return;	// aquí return pasa al siguiente.
-			const item = document.createElement('div');
-			item.dataset.sideItem = key;
-			item.classList.add('menu_to_clone');
-			item.dataset.tipo = config?.dataTipo ?? key;
-			item.id = `${config?.baseId ?? key}_sidebar`;
-			item.title = config?.title || `Arrastra ${item.dataset.tipo} al Salón`;
-			item.setAttribute('draggable', 'true');
-			item.innerHTML = svg;
-			contenido.appendChild(item);
-			this._activar_drag(item);
-		});
+		// Object.entries(this.diccionario_elementos).forEach(([key, config]) => {
+		// 	const svg = config?.visual.content ?? '';
+		// 	if (!svg) return;	// aquí return pasa al siguiente.
+		// 	// const item = document.createElement('div');
+		// 	item.dataset.sideItem = key;
+		// 	// item.classList.add('menu_to_clone');
+		// 	// item.dataset.tipo = config?.dataTipo ?? key;
+		// 	item.id = `${config?.baseId ?? key}_sidebar`;
+		// 	item.title = config?.title || `Arrastra ${item.dataset.tipo} al Salón`;
+		// 	item.setAttribute('draggable', 'true');
+		// 	item.innerHTML = svg;
+		// 	contenido.appendChild(item);
+		// 	this._activar_drag(item);
+		// });
+		// sidebar.appendChild(contenido);
 
-		sidebar.appendChild(contenido);
-		this.$sidebar = sidebar;
+		// this.$sidebar = sidebar;
 		this._asegurar_handle();
-		document.body.appendChild(sidebar);
+		document.body.appendChild(this.$sidebar);
 	}
 
 	/**
@@ -8385,10 +8370,10 @@ class Side_Elementos {
 	}
 
 	/**
-	 * ### Asegura el indicador/handle de movimiento del sidebar.
+	 * ### Asegura el indicador/handle (BOTONCITO DE ABAJO) de movimiento del sidebar.
 	 * @link _crear_sidebar
 	 */
-	_asegurar_handle() {
+	_asegurar_handle() {	
 		if (!this.$sidebar) return;
 		let handle = this.$sidebar.querySelector('[data-side-handle]');
 		if (!handle) {

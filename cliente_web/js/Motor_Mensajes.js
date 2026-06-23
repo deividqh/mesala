@@ -18,7 +18,7 @@ class Motor_Mensajes {
 	 *  ```javascript
 	 * {'silla_3': {usuario: 'usu', fecha: '25/8/2025', hora: '21:27:41', mensaje: 'una de gambas'},
 	 * 'silla_4': {usuario: 'usu', fecha: '25/8/2025', hora: '21:43:02', mensaje: 'gluten'},
-	 * 'silla_7': {usuario: 'usu', fecha: '25/8/2025', hora: '21:47:22', mensaje: 'marisco'} }
+	 * 'silla_7': {usuario: 'usu', fecha: '25/8/2025', hora: '21:47:22', mensaje: 'marisco'}, }
 	 *  ```	 */
 	diccionario_datos = {};		
 
