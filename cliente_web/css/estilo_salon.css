@@ -444,3 +444,49 @@ Side_Elementos: SIDE-BAR de elementos (mesa/silla)
                     background: transparent;  border: 0;  font-size: 1rem;  color: rgba(255, 255, 255, 0.7);  cursor: grab;}
 [data-side-handle] i {  font-size: 1.5rem;}
 [data-side-elementos][data-side-locked="true"] [data-side-handle] {  cursor: not-allowed;  opacity: 0.45;  pointer-events: none;}
+
+
+/* 1. ESPACIADO: Contenedor que agrupa todos los elementos */
+.side_lista_elementos {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--side-gap, 15px); /* Usa tu variable de gap, o 15px por defecto */
+    padding: 15px 0;
+    width: 100%;                /* Asegura que ocupa todo el ancho para centrar bien */
+}
+
+/* 2. PROPORCIÓN Y ESTILO VISUAL DE LA CAJA */
+.menu_to_clone {
+    width: 55px;                /* Hecho un pelín más grande que tus 42px originales */
+    height: 55px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: grab;
+    
+    /* RECUPERAMOS TU ESTILO VISUAL ANTERIOR */
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04); 
+    border: 1px solid rgba(255, 255, 255, 0.08); 
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+/* RECUPERAMOS TU EFECTO HOVER */
+.menu_to_clone:hover { 
+    transform: scale(1.15);     /* Un poco de zoom al pasar el ratón */
+    background: rgba(56, 189, 149, 0.12);
+}
+
+.menu_to_clone:active {
+    cursor: grabbing;
+}
+
+/* 3. PROPORCIÓN DEL SVG: Adapatado a su caja */
+.menu_to_clone svg {
+    width: 75%;                 /* 75% para que "respire" y no toque los bordes de la caja */
+    height: 75%;           
+    object-fit: contain;
+    pointer-events: none; 
+    /* fill: rgb(var(--navbar-icon-rgb)); Descomenta esto si los SVG deben heredar tu color verde/blanco */
+}

@@ -4217,7 +4217,7 @@ class Configuracion_Salon {
 				msgs.reservas += `<h6>■ TOTAL RESERVAS: ${matriz_reservas_flat.length}</h6>`;
 
 				matriz_reservas_flat.forEach( (reserva, i) => {
-					msgs.reservas += `<h1>Reserva ${i+1}:</h1> ${reserva.join(', ')}\n`;
+					msgs.reservas += `<b>Reserva ${i+1}:</b> ${reserva.join(', ')}\n`;
 				});       
 			}
 			
@@ -4225,7 +4225,7 @@ class Configuracion_Salon {
 			const dicc_mensajes = this.Salon.api_mensajes();
 
 			if ( !Object.keys(dicc_mensajes).length ){
-				msgs.clientes = '• No hay Mensajes. \n';
+				msgs.clientes = '<b>• No hay Mensajes.</b>\n';
 			}else{
 				msgs.clientes += `<h6>■ TOTAL MENSAJES: ${Object.keys(dicc_mensajes).length}</h6>`;
 				msgs.clientes += `${JSON.stringify(dicc_mensajes, null, 2)}`;
@@ -4234,7 +4234,7 @@ class Configuracion_Salon {
 			// ■■■■■■■■■■■■■■■ ALERGIAS
 			const dicc_alergias = this.Salon.MSG_S.api_alergias() || {};
 			if (!Object.keys(dicc_alergias).length) {
-				msgs.alergias = '• No hay Alergias. \n';
+				msgs.alergias = '<b>• No hay Alergias.</b>\n';
 			} else {
 				msgs.alergias += `<h6>■ TOTAL ALERGIAS: ${Object.keys(dicc_alergias).length}</h6>`;
 				msgs.alergias += `${JSON.stringify(dicc_alergias, null, 2)}`;
@@ -8305,6 +8305,9 @@ class Side_Elementos {
 
 		// Consultar la nueva fuente de la verdad
         const elementos_catalogo = Catalogo.get();
+		
+		const contenedor_elementos = document.createElement('div');
+		contenedor_elementos.className = 'side_lista_elementos';
 
         for (const key in elementos_catalogo) {
 			const el = elementos_catalogo[key];		// X cada elemento del dicc.	
@@ -8314,7 +8317,7 @@ class Side_Elementos {
 
             // ■ Construir el contenedor del ítem
             const div_item = document.createElement('div');
-			div_item.id = `${key}_menu`;
+			div_item.id = `${key}_menu`;	//mesa_menu, silla_menu
 			div_item.title = `Arrastra hacia el Salón`;            
             div_item.className = 'menu_to_clone';             
             div_item.dataset.tipo = key;       
@@ -8323,30 +8326,14 @@ class Side_Elementos {
             if (el.visual && el.visual.content) {
                 div_item.innerHTML = el.visual.content;
             }
-            div_item.setAttribute('draggable', 'true'); 
+            div_item.setAttribute('draggable', 'true'); 			
+			this.dragCallback(div_item);	// Listenners de drag de raton y point.
 
 			// ■ Inyectar al Sidebar
-            this.$sidebar.appendChild(div_item);
+            contenedor_elementos.appendChild(div_item);
         }
+		this.$sidebar.appendChild(contenedor_elementos);
 
-		// Esto viene de _normaliza_elementos() 
-		// Object.entries(this.diccionario_elementos).forEach(([key, config]) => {
-		// 	const svg = config?.visual.content ?? '';
-		// 	if (!svg) return;	// aquí return pasa al siguiente.
-		// 	// const item = document.createElement('div');
-		// 	item.dataset.sideItem = key;
-		// 	// item.classList.add('menu_to_clone');
-		// 	// item.dataset.tipo = config?.dataTipo ?? key;
-		// 	item.id = `${config?.baseId ?? key}_sidebar`;
-		// 	item.title = config?.title || `Arrastra ${item.dataset.tipo} al Salón`;
-		// 	item.setAttribute('draggable', 'true');
-		// 	item.innerHTML = svg;
-		// 	contenido.appendChild(item);
-		// 	this._activar_drag(item);
-		// });
-		// sidebar.appendChild(contenido);
-
-		// this.$sidebar = sidebar;
 		this._asegurar_handle();
 		document.body.appendChild(this.$sidebar);
 	}
