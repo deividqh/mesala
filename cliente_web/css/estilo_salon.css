@@ -458,8 +458,8 @@ Side_Elementos: SIDE-BAR de elementos (mesa/silla)
 
 /* 2. PROPORCIÓN Y ESTILO VISUAL DE LA CAJA */
 .menu_to_clone {
-    width: 55px;                /* Hecho un pelín más grande que tus 42px originales */
-    height: 55px;
+    width: 40px;                /* Hecho un pelín más grande que tus 42px originales */
+    height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;

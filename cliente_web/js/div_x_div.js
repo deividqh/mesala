@@ -119,7 +119,6 @@ class Work_ClassName {
 
 	}
 	
-	
 	/**
 	 * ### Busca una clase en el className y retorna un booleano SI LA ENCUENTRA.
 	 * @param {*} elemento_dom Objeto sobre el que se busca la clase.
@@ -2461,7 +2460,7 @@ class e_Salon extends Tablero_Touch {
      *	 };
 	 * ```
 	 */
-	constructor(dicc_config = {}, modelo_salon='limitado', estilo_UI='original'){
+	constructor(dicc_config = {}, modelo_salon='limitado'){
 
 		// Mensaje de entrada a Borrar :
 		// console.log(`${'■'.repeat(40)}\nDireccion Url del Front:  ${window.location}`);
@@ -2566,11 +2565,6 @@ class e_Salon extends Tablero_Touch {
 						boton_configuracion: e_Salon._to_element('[data-bs-toggle="offcanvas"]') ,
 						elementos: e_Salon._to_element('[data-action-nav="elementos"]'),
 		};
-		
-		// ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ NO USADO
-		// ■■ 🚫 DISEÑO UI 🖼️ : 'original' / 'clasico' / 'moderno'
-		// UPDATE: hay que aplicar el estilo(en Configuracion_Salon) para poder tener distintos estilos de UI.... para la version2... ainsss
-		this.estilo_UI = estilo_UI;
 
 		// ┌•••••••••••••••••••••••••••••••••••
 		// ┌•• ENTORNO - DIMENSIONES - LIMITES
@@ -4058,12 +4052,9 @@ class Configuracion_Salon {
 		// ┌•• QUIEN SOY
 		/** ### Detección de Entorno ( Define la configuración ) */
 		this.entorno = Compatibilidad._detectar_entorno();
-		
-		
 		// ┌■ Determinar DIMENSIONES INICIALES dependiendo del tipo/ancho de la pantalla. 
 		// ┌• dimesion_inicial = {filas, columnas} 
 		this.dimension_inicial = Compatibilidad._get_dimension_inicial(this.entorno.tipo);
-		
 		// ┌■ Determinar LIMITES MAX MIN de columnas y filas dependiendo del tipo/ancho de la pantalla. 
 		// ┌• limites = { columnas:{min:8, max:30}, filas: {min:8, max:100} }
 		this.limites = Compatibilidad._get_limites_max_min(this.entorno.tipo);
@@ -4084,12 +4075,10 @@ class Configuracion_Salon {
 		this.$info_columnas = e_Salon._to_element('[data-config-info="columnas"]');
 		this.$info_filas = e_Salon._to_element('[data-config-info="filas"]');
 		this.$sidebar_posiciones = e_Salon._to_element('[data-side-position]');
-		// this.$sidebar_posiciones = document.querySelectorAll('[data-config="sidebar-pos"] [data-side-position]');
-		// const data_principal = document.querySelector('[data-tipo-bs="offcanvas-configuracion"]');		
 		
 		// ┌•• Cargo los txt's del formulario
 		this._load_offcanvas_configuracion(this.dimension_inicial, this.limites);		
-		Configuracion_Salon._asegurar_plantillas_menu();
+		// Configuracion_Salon._asegurar_plantillas_menu();
 
 		// ■■ NUMERO COLUMNAS	
 		// ┌•• Fundamental para terminar de configuarar la cuadratura del Salon.
@@ -4149,7 +4138,11 @@ class Configuracion_Salon {
 			catalogo: {}
 
 		};
-		
+		// ■■■■■■■■■ la alternativa limpia
+		const dicc_new_default = {
+			salon: {}, 
+			catalogo:{},
+		}
 		// Limpia y estructura la configuración
 		// 	• Si le pasas un string, asume que es el ID.
 		// 	• Si le pasas un objeto (un elemento del DOM real), extrae su .id.
@@ -4204,6 +4197,7 @@ class Configuracion_Salon {
 	*/
 	api_ver_informacion_Salon(){
 		if(!this.diccionario) return false;
+
 		let msgs = { reservas:'', clientes:'', alergias:'' };
 		try {
 			// ■■■■■■■■■■■■■■■ DICCIONARIO DE CONFIGURACION 
@@ -4212,12 +4206,12 @@ class Configuracion_Salon {
 			// ■■■■■■■■■■■■■■■ DICCIONARIO DE RESERVAS			
 			const matriz_reservas_flat = this.Salon._get_array_reservas_flat();   
 			if (!matriz_reservas_flat) {
-				msgs.reservas = '• No hay RESERVAS en el salón\n';
+				msgs.reservas = '■ No hay RESERVAS en el salón\n';
 			}else{
 				msgs.reservas += `<h6>■ TOTAL RESERVAS: ${matriz_reservas_flat.length}</h6>`;
 
 				matriz_reservas_flat.forEach( (reserva, i) => {
-					msgs.reservas += `<b>Reserva ${i+1}:</b> ${reserva.join(', ')}\n`;
+					msgs.reservas += `<b>• Reserva ${i+1}:</b> ${reserva.join(', ')}\n`;
 				});       
 			}
 			
@@ -4225,7 +4219,7 @@ class Configuracion_Salon {
 			const dicc_mensajes = this.Salon.api_mensajes();
 
 			if ( !Object.keys(dicc_mensajes).length ){
-				msgs.clientes = '<b>• No hay Mensajes.</b>\n';
+				msgs.clientes = '<b>■ No hay Mensajes.</b>\n';
 			}else{
 				msgs.clientes += `<h6>■ TOTAL MENSAJES: ${Object.keys(dicc_mensajes).length}</h6>`;
 				msgs.clientes += `${JSON.stringify(dicc_mensajes, null, 2)}`;
@@ -4234,7 +4228,7 @@ class Configuracion_Salon {
 			// ■■■■■■■■■■■■■■■ ALERGIAS
 			const dicc_alergias = this.Salon.MSG_S.api_alergias() || {};
 			if (!Object.keys(dicc_alergias).length) {
-				msgs.alergias = '<b>• No hay Alergias.</b>\n';
+				msgs.alergias = '<b>■ No hay Alergias.</b>\n';
 			} else {
 				msgs.alergias += `<h6>■ TOTAL ALERGIAS: ${Object.keys(dicc_alergias).length}</h6>`;
 				msgs.alergias += `${JSON.stringify(dicc_alergias, null, 2)}`;

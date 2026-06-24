@@ -29,13 +29,15 @@ let dicc_salon = {
     contenedor: '',                // • (Opt) id del div donde voy a meter todas las Baldosas. ► Si '' , genera  'contenedor_0', 'contenedor_1'...
     div_maestro: null,              // • (Opt) id del div donde voy a meter el contenedor. ► Si null , se mete sobre document.body
     modelo_salon: 'limitado',                 // 🍏🍏 Un modelo limitado, te dice cuantas columnas y filas tienes que poner según tu ancho de pantalla.
-    estilo_UI: 'original',                    // 🍏🍏 De momento sin uso, esto está preparado para trabajar con los modos(oscuro, claro)
-    tipos: { mesa: 'mesa', silla:'silla' } ,  // 🍏🍏 Lo tengo que cambiar por el array de elementos svg que quuiero que figuren en la logica de salon.
-    // Inyectamos el catálogo completo para que e_Salon lo propague
-    catalogo: Catalogo.get(), 
-    // catalogo: CATALOGO_ELEMENTOS, 
-
     clases_css : { contenedor: 'estiloSalon', baldosas: 'estiloBaldosas' },    
+    
+    
+    tipos: { mesa: 'mesa', silla:'silla' } ,  // 🍏🍏 Lo tengo que cambiar por el array de elementos svg que quuiero que figuren en la logica de salon.
+    
+    
+    catalogo: Catalogo.get(),       // Inyectamos el catálogo completo para que e_Salon lo propague
+    
+
 };
 
 
