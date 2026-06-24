@@ -380,22 +380,44 @@ class Motor_Mensajes {
 		this.b_primera_vez = true;
 	}
 
-	/** */
+	/**
+	 * ## Establece el contexto de los elementos (IDs) que forman parte de la reserva activa.
+	 * ## Gestiona tanto el modo individual (sillas/mesas sueltas) como el modo múltiple (grupos de mesas). gracias al parametro arr_mesas_reserva que se le pasa desde fuera.
+	 * ### En modo Single, simplemente asigna el ID del elemento actual al contexto de reserva.
+	 * ### En modo Multiple, procesa el array de mesas proporcionado para establecer el contexto completo de la reserva, asegurando que el ID del elemento disparador esté incluido si no está ya presente.
+	 * ### Esto permite que el popover múltiple muestre y edite mensajes para todas las mesas relacionadas con la misma reserva, manteniendo la coherencia en la gestión de mensajes.
+	 * ### Evitando duplicados en el contexto de reserva mediante el uso de Set, lo que garantiza que cada ID de mesa aparezca solo una vez en la lista de mesas afectadas por el popover.
+	 * ### Este método es fundamental para que el popover pueda mostrar la información correcta y permitir la edición de mensajes en función de la reserva a la que pertenecen las mesas seleccionadas.
+	 * ### Llamado desde {@link api_mostrar}
+	 * @private
+	 * @param {string} id_elemento_dom - ID del elemento que dispara la acción (ej: 'mesa_1').
+	 * @param {Array<string>} arr_mesas_reserva - Lista de IDs de mesas que pertenecen a la misma reserva.
+	 * @returns {void}
+	 */
 	_set_contexto_reserva_actual(id_elemento_dom = '', arr_mesas_reserva = []) {
+		// 1 •••••••••••• 
+		// Modo Single: Solo nos interesa el elemento actual. 
+		// Limpiamos con filter(Boolean) para evitar IDs vacíos.
 		if (this.is_single) {
 			this.ids_reserva_actual = [id_elemento_dom].filter(Boolean);
 			return;
 		}
-
+		// 2 •••••••••••• 
+		// Modo Múltiple: Procesamos el array de mesas proporcionado.
 		const ids = Array.isArray(arr_mesas_reserva) ? arr_mesas_reserva.filter(Boolean) : [];
+		
+		// Si el array viene vacío pero tenemos un ID disparador, lo usamos como contexto único.
 		if (!ids.length && id_elemento_dom) {
 			this.ids_reserva_actual = [id_elemento_dom];
 			return;
 		}
 
+		// Si el ID disparador no está en el grupo (ej: una mesa recién añadida), lo incluimos.
 		if (id_elemento_dom && !ids.includes(id_elemento_dom)) {
 			ids.push(id_elemento_dom);
 		}
+
+		// Garantizamos la unicidad de los IDs usando Set para evitar duplicados en la UI.
 		this.ids_reserva_actual = Array.from(new Set(ids));
 	}
 	

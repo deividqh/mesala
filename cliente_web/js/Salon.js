@@ -31,48 +31,14 @@ let dicc_salon = {
     modelo_salon: 'limitado',                 // 🍏🍏 Un modelo limitado, te dice cuantas columnas y filas tienes que poner según tu ancho de pantalla.
     estilo_UI: 'original',                    // 🍏🍏 De momento sin uso, esto está preparado para trabajar con los modos(oscuro, claro)
     tipos: { mesa: 'mesa', silla:'silla' } ,  // 🍏🍏 Lo tengo que cambiar por el array de elementos svg que quuiero que figuren en la logica de salon.
-    class_name : { contenedor: 'estiloSalon', baldosas: 'estiloBaldosas' },
-    // No implementado 🔥🔥.
-    elementos: {
-        mesa: {
-            type: 'player',
-            html: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="80" height="80" fill="#8B4513" stroke="#000000" stroke-width="2"/></svg>',
-            url: './img/mesa.png',
-            class: 'estiloMesa',
-            b_alergias: false,
-        },
-        silla: {
-            type: 'player',
-            html: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" fill="#8B4513" stroke="#000000" stroke-width="2"/></svg>',
-            url: './img/silla.png',
-            class: 'estiloSilla',
-            b_alergias: true,
-        },
-        taburete: {
-            type: 'player',
-            html: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="80" height="80" fill="#8B4513" stroke="#000000" stroke-width="2"/></svg>',
-            url: './img/taburete.png',
-            class: 'estiloTaburete',
-            b_alergias: false,
-        },
-        planta: {
-            type: 'decoration',
-            html: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="80" height="80" fill="#8B4513" stroke="#000000" stroke-width="2"/></svg>',
-            url: './img/planta.png',
-            class: 'estiloPlanta',
-            b_alergias: false,
-        },
-        esquina_muro: {
-            type: 'structure',
-            html: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="80" height="80" fill="#8B4513" stroke="#000000" stroke-width="2"/></svg>',
-            url: './img/esquina_muro.png',
-            class: 'estiloEsquinaMuro',
-            b_alergias: false,
-        },        
+    // Inyectamos el catálogo completo para que e_Salon lo propague
+    catalogo: Catalogo.get(), 
+    // catalogo: CATALOGO_ELEMENTOS, 
 
-    }
-
+    clases_css : { contenedor: 'estiloSalon', baldosas: 'estiloBaldosas' },    
 };
+
+
 
 let APP_SALON = null;
 
@@ -80,6 +46,12 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('\n');
     console.log('██████████████████████████████████████████████████████████');
     console.log('██████████████ Inicializando Salón • • • • ███████████████\n');
+
+    // Validación de integridad antes de instanciar (Seguridad NIST)
+    if (!dicc_salon.catalogo || Object.keys(dicc_salon.catalogo).length === 0) {
+        console.error("Error crítico: Catálogo de elementos No encontrado... No puedo ejecutar Salon ☹️");
+        // return;
+    }
 
     APP_SALON = new e_Salon(dicc_salon);
 });

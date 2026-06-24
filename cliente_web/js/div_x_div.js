@@ -671,13 +671,6 @@ class Matriz_to_MyDiv extends Matriz_Plana {
 		else
 			this.filas = filas;
 		
-		// ■■■■■■■■■■■■■■■■■■■■■■■■
-		// ■ TAG DE LAS BALDOSAS DEL SALON.
-		// if (typeof (tag_baldosas) != 'string' || tag_baldosas.trim() === '')
-		// 	this.tag_baldosas = '#Baldosa';
-		// else
-		// 	this.tag_baldosas = tag_baldosas;
-		
 		// ■■■■■■■■■■■■■■■■■■■■■■■
 		// ■ Crea un primer div que será el patron de clonacion
 		this.my_div_one = this._crear_mydiv();		
@@ -1597,7 +1590,7 @@ class Matriz_to_MyDiv extends Matriz_Plana {
 // 		mesa_clone:        'mesa_menu',       // • (Oblig) id de mesa del Menu(div)  de donde se clonan mesas para situar en las Baldosas del Salon.
 // 		silla_clone:       'silla_menu'       // • (Oblig) id de silla del Menu(div) de donde se clonan sillas para situar en las Baldosas del Salon.
 // 	},
-// 	class_name : {
+// 	clases_css : {
 // 		contenedor: 'estiloSalon',        			// • (Oblig) className en div_x_div.css del Contenedor de Divs
 // 		baldosas:   'estiloBaldosas'      			// • (Oblig) className en div_x_div.css de Las Baldosas 
 // 	},
@@ -1651,14 +1644,11 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		
 		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 		// ■■ LLAMADA AL PADRE /  CREA LA matriz_plana CON SUS ESTILOS.
-		super(family, id_div_contenedor, div_maestro, columnas, filas);
-
-		
+		super(family, id_div_contenedor, div_maestro, columnas, filas);		
 		
 		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 		// ■■ Gestor unificado de ratón y táctil
-		this.toouch_me = new Touch_aMe(this);
-
+		
 		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■		
 		// ■■ LISTENERS  ​👂​👂 PARA QUE LAS BALDOSAS DEL SALON SEAN DROP
 		const items_baldosa = document.querySelectorAll(".estiloBaldosas");		
@@ -1704,10 +1694,13 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// ​​​​​​​}
 		const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");
 		if (items_html_to_matriz.length > 0) {
-			items_html_to_matriz.forEach(el => this.toouch_me.add_listeners_touchraton(el));
+			items_html_to_matriz.forEach(el => {
+				
+				this.add_listeners_touchraton(el);
+				el.addEventListener("dragstart", this.dragStart.bind(this));
+			});
 		}
-		console.log('✅ Tablero_Drop - Touch-Raton ​​👆​🖱️​ • • • Loaded ✔️');		
-
+		console.log('✅ Tablero_Drop - Touch-Raton ​​👆​🖱️​ • • • Loaded ✔️');
 
 	}
 	/**
@@ -1722,29 +1715,29 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 	/**
 	 * ### KISS: Detecta si el tipo es mesa o silla.  Sirve para validar
 	 */
-	_es_mesa_silla(tipo = '') {
-		const tipo_normalizado = `${tipo}`.toLowerCase();
-		return tipo_normalizado === 'mesa' || tipo_normalizado === 'silla';
-	}
+	// _es_mesa_silla(tipo = '') {
+	// 	const tipo_normalizado = `${tipo}`.toLowerCase();
+	// 	return tipo_normalizado === 'mesa' || tipo_normalizado === 'silla';
+	// }
 
 	/**
 	 * ### KISS: Bloquea o desbloquea el movimiento del sidebar.
 	 */
-	_set_bloqueo_sidebar(bloqueado = false) {
-		if (!this.Side_Elementos?.set_bloqueo_movimiento) return;
-		this.Side_Elementos.set_bloqueo_movimiento(bloqueado);
-	}
+	// _set_bloqueo_sidebar(bloqueado = false) {
+	// 	if (!this.Side_Elementos?.set_bloqueo_movimiento) return;
+	// 	this.Side_Elementos.set_bloqueo_movimiento(bloqueado);
+	// }
 
 	/**
 	 * ### KISS: Inicia el bloqueo del sidebar durante un drag de mesa/silla.
 	 */
-	_iniciar_bloqueo_sidebar(objeto_drag = null) {
-		if (!this._es_mesa_silla(this.data_tipo)) return;
-		this._set_bloqueo_sidebar(true);
-		if (objeto_drag) {
-			objeto_drag.addEventListener('dragend', () => this._set_bloqueo_sidebar(false), { once: true });
-		}
-	}
+	// _iniciar_bloqueo_sidebar(objeto_drag = null) {
+	// 	if (!this._es_mesa_silla(this.data_tipo)) return;
+	// 	this._set_bloqueo_sidebar(true);
+	// 	if (objeto_drag) {
+	// 		objeto_drag.addEventListener('dragend', () => this._set_bloqueo_sidebar(false), { once: true });
+	// 	}
+	// }
 	/**
 	 * ### SE PRODUCE CUANDO EMPIEZA EL MOVIMIENTO DE UN OBJETO DRAG ( Movible )
 	 *              • Se trata de guardar el objeto que se mueve mediante ev.dataTransfer.setData("text", id_objeto_drag) 
@@ -1759,15 +1752,14 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// const id = ev.currentTarget.id;
 		
 		// ■■ Guarda el objeto que se mueve en la clase.
-                // this.objeto_drag = new_obj_drag;
-                // ■■ Guarda el objeto que se mueve en la clase.
-                this.toouch_me?.get_origen_drag(new_obj_drag);
+		this.objeto_drag = new_obj_drag;
+		this.data_tipo = new_obj_drag.getAttribute('data-tipo') || '';
 
 		// ■■ Bloquea el movimiento del sidebar si movemos una mesa o silla.
-		this._iniciar_bloqueo_sidebar(new_obj_drag);
+		// this._iniciar_bloqueo_sidebar(new_obj_drag);
 		
 		// ■■ ESTABLECE/GUARDA EL ID DEL OBJETO DRAG
-		ev.dataTransfer.setData("text", new_obj_drag.id);      	// ■ dataTransfer guarda en la transacción d&d un dato tipo "text" con el id del drag.
+		ev.dataTransfer.setData("text", this.objeto_drag.id);      	// ■ dataTransfer guarda en la transacción d&d un dato tipo "text" con el id del drag.
 		
 		// ■■ GUARDA EL data-tipo (HTML)
 		// this.data_tipo = new_obj_drag.getAttribute('data-tipo');  // Cacha el data-tipo del objeto que se mueve.				
@@ -1808,14 +1800,14 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 			// ■■ No permite ir a una CELDA OCUPADA.
 			if (this.is_baldosa_vacia(objDrop) == false) {
 				console.log(`⚠️ ${objDrop.id} está OCUPADA. `); 
-				this._set_bloqueo_sidebar(false);
+				// this._set_bloqueo_sidebar(false);
 				return false; 
 			}
 			
 			// ■■ Si el objeto que se mueve es del MENU, se clona en la matriz. Si no, es un movimiento Interno.
 			if (objDrag.classList.contains("menu_to_clone")) {
 				
-				this.elemento_navbar_to_Salon(objDrag, objDrop, data_tipo);			
+				this.elemento_nuevo_to_Salon(objDrag, objDrop, data_tipo);			
 	
 			}else if (objDrag.classList.contains("class_onplay")) {    // ► Esta clase sólo se asigna a los objetos en juego dinámicamente.
 	
@@ -1834,7 +1826,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 			console.log(error);
 			return false;			
 		}finally{
-			this._set_bloqueo_sidebar(false);
+			// this._set_bloqueo_sidebar(false);
 		}
 		
 	}
@@ -1860,6 +1852,8 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 			id_obj_drag = ev.dataTransfer.getData("text");
 		} else if (this.objeto_drag) {
 			id_obj_drag = this.objeto_drag.id;
+		}else{
+			return false;
 		}
 		
 		const objDrag = document.getElementById(id_obj_drag);
@@ -1881,7 +1875,8 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// ■■ Venga de quien venga, la puerta se lo traga y lo escupe. 
 		objDrop.appendChild(objDrag);
 		objDrop.removeChild(objDrag);		
-		this._set_bloqueo_sidebar(false);
+
+		// this._set_bloqueo_sidebar(false);
 		
 		// ■■ PUEDO ACTUALIZAR O NO LA LISTA-ONPLAY.
 		this._onplay_scan_salon(); 
@@ -1959,12 +1954,12 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 	 * @param {string} data_tipo  'mesa', 'silla' . definidos en diccionario de configuracion dicc_config de Salon.js.
 	 * @returns {object}  el elemento nuevo creado (la silla), que ha sido llevada del menu a la matriz_plana (El Salon)
 	 */
-	elemento_navbar_to_Salon(item_menu = null, baldosa_matriz = null,  data_tipo = '') {
+	elemento_nuevo_to_Salon(item_menu = null, baldosa_matriz = null,  data_tipo = '') {
 
 		// ■■ Verificamos que la baldosa de destino esté vacía
 		if (this.is_baldosa_vacia(baldosa_matriz) == false) return
 
-		// ■■ Creamos un Clon del MENU. El id que se asigna es un secuencial del data-tipo(del <data_tipo>)
+		// ■■ Creamos un Clon del item del MENU. El id que se asigna es un secuencial del data-tipo(del <data_tipo>)
 		const clon_item = item_menu.cloneNode(true);                  
 		clon_item.id = Herramientas.get_dom_secuency(data_tipo);				
 		clon_item.title = clon_item.id;
@@ -1974,7 +1969,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// clon_item.draggable = true;
     	// clon_item.addEventListener('dragstart', this.dragStart.bind(this));
 		//  ​👂​👂  Hace el clon del item del menu DRAGGABLE para ratón y táctil
-		this.toouch_me.add_listeners_touchraton(clon_item);
+		this.add_listeners_touchraton(clon_item);
 		
 		// ■■ Añade el clon de la silla a la baldosa.
 		baldosa_matriz.appendChild(clon_item);           
@@ -2045,8 +2040,8 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 	// ██████████████████████████████████████████████████████████████████████████████████ 
 
 	/** 
-	 * ### Saca por consola un informe de todos los MyDiv's onplay
-	*/
+	 * ### Saca por consola un informe de todos los MyDiv's onplay...los que tienen elementos hijos.
+	 * */
 	onplay_read(lista_mydivs_onplay){
 		// console.log('\nON PLAY • • • READ: ');
 		try {
@@ -2066,8 +2061,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 	}
 
 	/** 
-	 * ### Scanner n-s-e-w actualizado de los elementos onplay del Salon.
-	*/
+	 * ### Scanner n-s-e-w actualizado de los elementos onplay del Salon. 	*/
 	_onplay_scan_salon(){    
 		try {
 			const lista_baldosas_onplay = this._get_mydivs_onplay();
@@ -2085,8 +2079,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 	}
 
 	/** 
-	 * ### Devuelve un array con los elementos que están en juego (onplay) en la matriz(salon, ajedrez, damas, ....)
-	*/
+	 * ### Devuelve un array con los elementos que están en juego (onplay) en el Tablero */
 	_get_mydivs_onplay() {
 		// const array_app = this.get_array_myDivs();
 		const array_app = this.matriz_plana;
@@ -2154,16 +2147,248 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 }
 
 
-// ████████████████████████████████████████████████████████████████████████████████████████████████████████████
 
+/**
+ * ### Tablero_Touch unifica drag&drop de ratón y eventos táctiles directamente sobre el tablero.
+ * Hereda de Tablero_Drop para reutilizar toda la lógica de movimiento ya existente.
+ */
+class Tablero_Touch extends Tablero_Drop {
+	constructor(family = '', id_div_contenedor = '', div_maestro = null, columnas = 8, filas = 8 ) {
+		super(family, id_div_contenedor, div_maestro, columnas, filas);
+		this.touchState = { draggedElement: null, activeDropTarget: null };
+		this.tapThreshold = 10;
+		this._touchCancelRegistrado = false;
+	}
+
+	get_coordenadas_evento(evento){
+		if (!evento) return { x: 0, y: 0 };
+		const touch = (evento.touches && evento.touches[0]) || (evento.changedTouches && evento.changedTouches[0]);
+		if (touch) return { x: touch.clientX, y: touch.clientY };
+		return { x: evento.clientX || 0, y: evento.clientY || 0 };
+	}
+
+	
+
+	/** ### Agrega los listeners para los eventos de toque y ratón 	*/
+	add_listeners_touchraton(elemento){
+		if (!elemento) return;
+		// Usamos una propiedad en memoria (no dataset) para no contaminar el HTML
+		// ni copiar accidentalmente la marca al clonar nodos del menú.
+		if (elemento._touchRatonReady === true) return;
+		elemento.draggable = true;
+		elemento.style.touchAction = 'none';
+		elemento.addEventListener('dragstart',  this.dragStart.bind(this));
+		elemento.addEventListener('touchstart', this.handleTouch_start.bind(this), { passive: false });
+		elemento.addEventListener('touchmove',  this.handleTouch_movimiento.bind(this), { passive: false });
+		elemento.addEventListener('touchend',   this.handleTouch_end.bind(this), { passive: false });
+		elemento._touchRatonReady = true;
+		if (!this._touchCancelRegistrado) {
+			window.addEventListener('touchcancel', this.finalizarArrastre.bind(this));
+			this._touchCancelRegistrado = true;
+		}
+	}
+
+	/** ### Finaliza el arrastre del elemento táctil. */
+	finalizarArrastre() {
+		this._cleanup_touch_preview();
+		this._reset_touch_state();
+		this._set_bloqueo_sidebar(false);
+	}
+
+	/** ### Crea una vista previa del elemento arrastrado. */
+	_create_drag_preview(elemento, rect){
+		if (!elemento || !rect) return null;
+		const preview = elemento.cloneNode(true);
+		preview.removeAttribute('id');
+		preview.setAttribute('aria-hidden', 'true');
+		preview.style.position = 'fixed';
+		preview.style.left = '0px';
+		preview.style.top = '0px';
+		preview.style.width = `${rect.width}px`;
+		preview.style.height = `${rect.height}px`;
+		preview.style.margin = '0';
+		preview.style.zIndex = '9999';
+		preview.style.pointerEvents = 'none';
+		preview.style.boxSizing = 'border-box';
+		preview.style.transformOrigin = 'top left';
+		preview.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0)`;
+		preview.style.willChange = 'transform';
+		document.body.appendChild(preview);
+		return preview;
+	}
+
+	/** ### Obtiene la baldosa correspondiente a un punto específico 	
+	 * @param {number} x Coordenada X del punto.
+	 * @param {number} y Coordenada Y del punto.
+	 * @param {HTMLElement|null} fallbackTarget Elemento alternativo para buscar la baldosa si no se encuentra con elementsFromPoint.
+	 * @returns {HTMLElement|null} La baldosa encontrada o null si no se encuentra ninguna
+	*/
+	_get_baldosa_from_point(x, y, fallbackTarget = null){
+		const elements = document.elementsFromPoint ? document.elementsFromPoint(x, y) : [];
+		const baldosa = elements.find(elemento => elemento.classList && elemento.classList.contains('estiloBaldosas'));
+		if (baldosa) return baldosa;
+		if (fallbackTarget && fallbackTarget.closest) return fallbackTarget.closest('.estiloBaldosas');
+		return null;
+	}
+
+	/** ### Obtiene el contenedor de caída real para un elemento detectado 	*/
+	_obtener_contenedor_drop_real(elementoDetectado) {
+		if (!elementoDetectado) return null;
+		if (elementoDetectado.dataset && elementoDetectado.dataset.tipo) return elementoDetectado;
+		const contenedorExit = elementoDetectado.closest('[data-tipo]');
+		if (contenedorExit && contenedorExit.dataset.tipo) return contenedorExit;
+		if (elementoDetectado.classList && elementoDetectado.classList.contains('estiloBaldosas')) return elementoDetectado;
+		const contenedorBaldosa = elementoDetectado.closest('.estiloBaldosas');
+		if (contenedorBaldosa) return contenedorBaldosa;
+		return null;
+	}
+
+	/** ### Mueve la vista previa del elemento arrastrado 	*/
+	_move_drag_preview(x, y){
+		const preview = this.touchState.dragPreview;
+		if (!preview) return;
+		const left = x - this.touchState.offsetX;
+		const top = y - this.touchState.offsetY;
+		preview.style.transform = `translate3d(${left}px, ${top}px, 0)`;
+	}
+
+	/** ### Maneja el evento de inicio del toque (touch start) 	*/
+	handleTouch_start(evento){
+		if (!evento) return;
+		if (evento.cancelable) evento.preventDefault();
+		const { x, y } = this.get_coordenadas_evento(evento);
+		
+		const objeto_drag = evento.currentTarget;
+		
+		console.log(`${objeto_drag.id} ■ touch_start at (${x}, ${y})`);
+
+		const rect = objeto_drag.getBoundingClientRect();
+		const offsetX = x - rect.left;
+		const offsetY = y - rect.top;
+		const preview = this._create_drag_preview(objeto_drag, rect);
+		
+		this.objeto_drag = objeto_drag;
+		this.data_tipo = objeto_drag.getAttribute('data-tipo') || '';
+		
+		// if (this._es_mesa_silla?.(this.data_tipo)) this._set_bloqueo_sidebar(true);
+		
+		const previousVisibility = objeto_drag.style.visibility;
+		objeto_drag.style.visibility = 'hidden';
+		this.touchState = { draggedElement: objeto_drag, 
+							activeDropTarget: null, 
+							startX: x, 
+							startY: y, 
+							lastX: x, 
+							lastY: y, 
+							offsetX, 
+							offsetY, 
+							dragPreview: preview, 
+							previousVisibility, 
+							rafId: null, 
+							pendingMove: null };
+	}
+
+	/** ### Maneja el evento de movimiento del toque (touch move) 	*/
+	handleTouch_movimiento(evento) {
+		if (!evento || !this.touchState.draggedElement) return;
+		if (evento.cancelable) evento.preventDefault();
+		const { x, y } = this.get_coordenadas_evento(evento);
+		this.touchState.lastX = x;
+		this.touchState.lastY = y;
+		this.touchState.pendingMove = { x, y };
+		if (!this.touchState.rafId) {
+			this.touchState.rafId = requestAnimationFrame(() => {
+				if (this.touchState.pendingMove) {
+					const { x: moveX, y: moveY } = this.touchState.pendingMove;
+					this._move_drag_preview(moveX, moveY);
+				}
+				this.touchState.rafId = null;
+			});
+		}
+		this.touchState.activeDropTarget = document.elementFromPoint(x, y);
+	}
+
+	/** ### Maneja el evento de finalización del toque (touch end) 	*/
+	handleTouch_end(evento) {
+		if (!this.touchState.draggedElement) return;
+		const el = this.touchState.draggedElement;
+		const coordenadas = this.get_coordenadas_evento(evento);
+		let x = coordenadas.x;
+		let y = coordenadas.y;
+		if (!x && !y) { x = this.touchState.lastX || 0; y = this.touchState.lastY || 0; }
+		const deltaX = x - this.touchState.startX;
+		const deltaY = y - this.touchState.startY;
+		const isTap = Math.hypot(deltaX, deltaY) <= this.tapThreshold;
+		if (this.touchState.dragPreview) this.touchState.dragPreview.style.display = 'none';
+		const elementoDetectado = document.elementFromPoint(x, y);
+		const targetReal = this._obtener_contenedor_drop_real(elementoDetectado);
+		if (this.touchState.dragPreview) this.touchState.dragPreview.style.display = 'block';
+		if (isTap) {
+			this._cleanup_touch_preview();
+			this._reset_touch_state();
+			queueMicrotask(() => el.click());
+			this._set_bloqueo_sidebar(false);
+			return;
+		}
+		const syntheticEvent = this._buildSyntheticDropEvent(targetReal, el, { x, y });
+		let dropExitoso = false;
+		if (targetReal) {
+			const isExit = targetReal.dataset && targetReal.dataset.tipo === 'exit';
+			if (isExit && this.drop_exit) {
+				syntheticEvent.target = targetReal;
+				dropExitoso = this.drop_exit(syntheticEvent);
+			} else {
+				const baldosaDestino = this._get_baldosa_from_point(x, y, targetReal) || targetReal;
+				if (this.drop_over_matriz) {
+					syntheticEvent.target = baldosaDestino;
+					dropExitoso = this.drop_over_matriz(syntheticEvent);
+				}
+			}
+		}
+		this._cleanup_touch_preview();
+		if (dropExitoso) el.style.visibility = 'visible';
+		this._reset_touch_state();
+		this._set_bloqueo_sidebar(false);
+	}
+
+	_reset_touch_state(){
+		this.touchState = { draggedElement: null, activeDropTarget: null, startX: 0, startY: 0, lastX: 0, lastY: 0, offsetX: 0, offsetY: 0, dragPreview: null, previousVisibility: '', rafId: null, pendingMove: null };
+	}
+
+	_cleanup_touch_preview(){
+		if (this.touchState.rafId) cancelAnimationFrame(this.touchState.rafId);
+		if (this.touchState.dragPreview) this.touchState.dragPreview.remove();
+		if (this.touchState.draggedElement) this.touchState.draggedElement.style.visibility = this.touchState.previousVisibility || '';
+	}
+
+	/** ### Construye un evento sintético de tipo 'drop' para simular el comportamiento de arrastrar y soltar en dispositivos táctiles.*/
+	_buildSyntheticDropEvent(target, draggedElement, coords = {}){
+		const dataTipo = (draggedElement && draggedElement.getAttribute('data-tipo')) || '';
+		const { x = 0, y = 0 } = coords;
+		return {
+			preventDefault: () => {},
+			target,
+			clientX: x,
+			clientY: y,
+			dataTransfer: {
+				getData: (key) => {
+					if (key === 'text') return draggedElement ? draggedElement.id : '';
+					if (key === 'tipo') return dataTipo;
+					return '';
+				}
+			}
+		};
+	}
+}
+
+// ████████████████████████████████████████████████████████████████████████████████████████████████████████████
 /** 
  * ### SOBREESCRIBE Metodos Tablero_Drop y hace el comportamiento de Salon: 
  * ##### • Los elementos que pasan a jugar al Salon se selccionan de un Menu Externo al Salón
  * ##### • Los elementos de un salon son: sillas (o clientes) y mesas (o reservas)
  * ##### • RESERVAS son asociaciones de mesas y sillas. Se pueden juntar varias mesas para formar 1 reserva
- * 	
 */
-class e_Salon extends Tablero_Drop {
+class e_Salon extends Tablero_Touch {
 	/** ### Imagen svg del elemento 'mesa'  ►  {@link Configuracion_Salon._asegurar_plantillas_menu}*/
 	static MESA = `
 		<div id="mesa_menu" class="menu_to_clone" data-tipo="mesa" draggable="true" title="Arrastra la Mesa hasta el Salón">
@@ -2190,6 +2415,7 @@ class e_Salon extends Tablero_Drop {
 			</svg>
 		</div>
 	`;
+	static SILLA_ = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="50" height="50"> <g fill="#8B4513"> <rect x="262.97" y="298.368" width="33.329" height="155.344"/> <path d="M243.216,23.156l-50.788,201.47h-42.233l-89.148,13.431v36.624l10.08,1.437h-10.08v177.595h33.329V279.441l55.819,7.952V512h41.146V287.392h158.98V512h41.137V259.523L450.953,0L243.216,23.156z M349.317,224.626H225.884l43.386-172.06l122.188-11.116L349.317,224.626z"/> </g> </svg>`;
 		
 	/** ### Clase que Se encarga de la configuracion incial del Salon y metodos asociadas al Funcionamiento */
 	CFG = null; 
@@ -2224,14 +2450,14 @@ class e_Salon extends Tablero_Drop {
 
 	/**
 	 * ### Gestiona Reservas ,Mensajes y posiciones de un Tablero ó Salon.
-	 * #### • Hereda de las clases Tablero_Drop y Div_x_Div q crean las Baldosas del Salon con Métodos DROP.
+	 * #### • Hereda de las clases Tablero_Touch y Div_x_Div q crean las Baldosas del Salon con Métodos DROP.
 	 * ####	• App Cliente Servidor: clases Login | Configuracion | CRUD
 	 * @param {object} dicc_config se encuentra en: {@link dicc_salon Salon.js} ► diccionario de configuración inicial que tiene que rellenar el usuario o dejar vacío {}.
 	 * ```javascript
 	 * let dicc_salon = {
 	 *   family:'Gran_Salon',columnas:12,filas:12,div_maestro:null,contenedor:'',
      *	 tipos: {mesa: 'mesa',silla:'silla'},  
-	 *   class_name:{contenedor: 'estiloSalon',baldosas:'estiloBaldosas'},
+	 *   clases_css:{contenedor: 'estiloSalon',baldosas:'estiloBaldosas'},
      *	 };
 	 * ```
 	 */
@@ -2276,11 +2502,36 @@ class e_Salon extends Tablero_Drop {
 		// Si quisiera poder controlar esto, hay que poner las columnas que desee el usuario + scroll 
 
 		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-		// LLAMADA AL PADRE Tablero_Drop
+		// LLAMADA AL PADRE Tablero_Touch ► Tablero_Drop ► Matriz_Div_x_Div ► Div_x_Div 
+		// ► Crea las Baldosas del Salon y toda la logica de Drag & Drop sobre el Salon.
 		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 		super(	dicc_config.family, dicc_config.contenedor, dicc_config.div_maestro, 
-				columnas_aplicadas, dicc_config.filas );			
+				columnas_aplicadas, dicc_config.filas );		
+				
+		// 💥💥💥💥💥💥💥💥
+		const z_catalogo = Catalogo.get();
+		const z_silla = Catalogo.get("silla");
+		const z_silla_id = Catalogo.get("silla", "id");
+		const z_silla_visual = Catalogo.get("silla", 'visual');
+		const z_silla_visual_css = Catalogo.get("silla", 'visual', "css");
+		const z_visual_css = Catalogo.get('visual', "css"); 	// NULL		
+
+		const z_grupo = Catalogo.get_distinto_s("grupo");
+		const z_visual = Catalogo.get_distinto_s('visual');
+		const z_visual_content = Catalogo.get_distinto_s('visual', 'content');		
+		const z_log_msg = Catalogo.get_distinto_s('logica', 'msg');
+		const z_log_msg_tipo = Catalogo.get_distinto_s('logica', 'msg', 'tipo');
+		const z_id_s = Catalogo.get_distinto_s('id');		
+		const z_mesa = Catalogo.get_distinto_s('mesa');	// NULL
+		const z_mesa_id = Catalogo.get_distinto_s('mesa' , 'id');	// NULL
 		
+		const z_keys = Catalogo.get_keys();
+		
+		const z_players = Catalogo.get_item_s("grupo", "player");
+		const z_logica_alergias = Catalogo.get_item_s("logica", "b_alergias", true);
+		const z_sub_grupos = Catalogo.get_item_s("sub_grupo", "agrupado");
+		// 💥💥💥💥💥💥💥💥
+
 		// ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ 
 		// ■■  🚫 SEGUN SUS COLUMNAS: 'limitado' / 'scrolado' / 'apilado'
 		// 	        • El modelo ya se ha hecho efectivo en 'super' con 'columnas_aplicadas'. 
@@ -2294,60 +2545,65 @@ class e_Salon extends Tablero_Drop {
 		else if(this.modelo_salon  === 'apilado'){}
 		else{}
 		
-		// ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ 
+		// ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ NO USADO. PREPARADO
+		// Botones de Accion sobre el NavBar (Login, Ver-Info, Guardar, Cargar, Re-iniciar Salon): 
+		// 🍏🍏
+		this.bi_nav = { cu:'[data-action-nav="save"]', 
+						rud:'[data-action-nav="load"]', 
+						ver_info:'[data-action-nav="info"]', 
+						reiniciar:'[data-action-nav="re-init"]', 
+						login:'[data-action-nav="conn"]', 
+						config:'data-tipo-bs="offcanvas-configuracion"',
+						boton_configuracion: '[data-bs-toggle="offcanvas"]' ,
+						elementos: '[data-action-nav="elementos"]',
+		};
+		this.$bi_nav = { cu:e_Salon._to_element( '[data-action-nav="save"]'), 
+						rud:e_Salon._to_element('[data-action-nav="load"]'), 
+						ver_info:e_Salon._to_element('[data-action-nav="info"]'), 
+						reiniciar:e_Salon._to_element('[data-action-nav="re-init"]'), 
+						login:e_Salon._to_element('[data-action-nav="conn"]'), 
+						config:e_Salon._to_element('data-tipo-bs="offcanvas-configuracion"'),
+						boton_configuracion: e_Salon._to_element('[data-bs-toggle="offcanvas"]') ,
+						elementos: e_Salon._to_element('[data-action-nav="elementos"]'),
+		};
+		
+		// ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ NO USADO
 		// ■■ 🚫 DISEÑO UI 🖼️ : 'original' / 'clasico' / 'moderno'
 		// UPDATE: hay que aplicar el estilo(en Configuracion_Salon) para poder tener distintos estilos de UI.... para la version2... ainsss
 		this.estilo_UI = estilo_UI;
 
 		// ┌•••••••••••••••••••••••••••••••••••
 		// ┌•• ENTORNO - DIMENSIONES - LIMITES
-		// ┌•••••••••••••••••••••••••••••••••••
 		this.entorno = entorno;
 		this.dimension = dimesion_inicial;
 		this.limites = limites;
 		
-		// Botones de Accion: 
-		this.bi_nav = { cu:'[data-action-nav="save"]', 
-						rud:'[data-action-nav="load"]', 
-						ver_info:'[data-action-nav="info"]', 
-						api_reiniciar_salon:'[data-action-nav="re-init"]', 
-						login:'[data-action-nav="conn"]', 
-						config:'data-tipo-bs="offcanvas-configuracion"',
-						elementos: '[data-action-nav="elementos"]',
-					};
-
-		this.objs = {
-			configuracion: '[data-bs-toggle="offcanvas"]',
-			log: '[data-action-nav="conn"]',
-		};
-		
-		// ■■ Sidebar persistente de elementos (mesa/silla) desacoplado del Salón (solo UI + callback drag)
+		// ┌••••••••••••••••••••••••••••
+		// ■■ Sidebar persistente de elementos (mesa/silla/...) 
 		const $icono_elementos = document.querySelector('[data-action-nav="elementos"]');
 		this.Side_Elementos = new Side_Elementos(
-			this.toouch_me.add_listeners_touchraton.bind(this.toouch_me),
-			null,
-			$icono_elementos
-		);
+											this.add_listeners_touchraton.bind(this),
+											z_catalogo,
+											$icono_elementos,
+											);
 
 		// ┌••••••••••••••••••••••••••••
 		// ┌• CONFIGURACION DEL SALON: 
-		// ┌••••••••••••••••••••••••••••
-		this.CFG = new Configuracion_Salon(this, dicc_config, '[data-bs-toggle="offcanvas"]');
+		const boton_configuracion = '[data-bs-toggle="offcanvas"]'
+		this.CFG = new Configuracion_Salon(this, dicc_config, boton_configuracion);
 		
 		// ■ ASEGURA QUE EL DICCIONARIO DE CONFIGURACION ESTA LIMPIO
 		this.dicc_config = this.CFG.diccionario;		
 		
 		// ┌••••••••••••••••••••••••
 		// ┌• LOGIN Y REGISTRO: 
-		// ┌••••••••••••••••••••••••
 		// 		• .botones_accion ► Busca elementos que tengan class="botones_accion".
 		// 		• data-action-nav="conn" ► selecciona el data-action-nav = "conn" en el dom html.
 		// 		• .botones_accion[data-action-nav="conn"] ► 1-Busca un elemento que tenga la clase botones_accion 2-Y que además tenga el atributo data-action-nav con el valor conn
         this.LoG = new Login_Modal('[data-action-nav="conn"]');
 		
 		// ┌••••••••••••••
-		// ┌•• C.R.U.D. •• 
-		// ┌••••••••••••••
+		// ┌• C.R.U.D. 
 		this.crud = new Foto_CRUD(this);
 		
 		// ┌••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
@@ -2464,7 +2720,6 @@ class e_Salon extends Tablero_Drop {
 		super.drop_exit(ev);		
 		
 		// ■■ Actualizo las Reservas:
-		// this._modulo_reservas(diccionario_configuracion.tipos.mesa);	
 		this.RegisteR();	
 		
 		// ■■ Elimino el mensaje del popover de clientes
@@ -2474,13 +2729,34 @@ class e_Salon extends Tablero_Drop {
 		this.  _set_exit_toast_bs(this.objeto_drag.id);
 		
 	}
+
+	elemento_onplay_handler(ev) {
+		ev.preventDefault();
+		const id = ev.currentTarget.id;
+		const data_tipo = ev.currentTarget.getAttribute('data-tipo');
+
+		// Calcula el indice de la reserva a la que pertenece el elemento clickado.
+		const index_reserva = this._get_indice_en_reserva_s(id);
+		if (index_reserva == -1) return null;
+		this.index_reserva = index_reserva;			
+	}
+
+	_get_indice_en_reserva_s(id_elemento){	
+		// ■■ BUSCA EN EL ARRAY DE RESERVAS el indice del elemento
+		const index_reserva = this.reservas.findIndex(dicc => {
+			return Object.values(dicc).flat().includes(id_elemento);
+		});		
+		return index_reserva;
+	}
 	
 	/**
-	 * ####  Maneja el evento click en una silla.
-	*/
+	 * ####  Maneja el evento click en una silla. */
 	silla_click_handler(ev) {
 		ev.preventDefault();
 		
+		//•••••••••••••••••••••••••••••••••••••••••••••••••••••
+		this.elemento_onplay_handler(ev);
+
 		const id = ev.currentTarget.id;               
 		
 		// ■■ BUSCA EN EL ARRAY DE RESERVAS el indice de la silla
@@ -2493,24 +2769,23 @@ class e_Salon extends Tablero_Drop {
 		// ► para accion__save()
 		this.index_reserva = index_reserva;   
 
-		const arr_mesas_reserva_flat = Object.values(this.reservas[index_reserva].mesas).flat();		
+		// const arr_mesas_reserva_flat = Object.values(this.reservas[index_reserva].mesas).flat();		
 
 		// ■■ Muestro el popover, tenga o no tenga datos.
-		this.MSG_S.api_mostrar(id ,  arr_mesas_reserva_flat);
+		this.MSG_S.api_mostrar(id);
 
 		// ■■■■■■ LOG 🖥️
 		// console.log(`Elemento ${id} clickada. Tipo: ${tipo} className: ${document.getElementById(id).className} `);
 	}
 	
 	/**
-	 * ####   Listener cuando se hace click sobre una mesa_onplay
+	 * #### Listener cuando se hace click sobre una mesa_onplay
 	 *  *  Quiero Seleccionar todos los objetos de una **reserva** y ponerlos de color distinto.
 	 *  *  Cuando se hace 2 veces click sobre una mesa, **muestra** un popOver bootstrap para escribir o hablar mensajes.
 	 * ```javascript
 	 * const mesas_onplay  = document.querySelectorAll(".mesa_onplay");
 	 * const sillas_onplay = document.querySelectorAll(".silla_onplay");
-	 * ```
-	*/
+	 * ``` 	*/
 	mesa_click_handler(ev) {
 		
 		ev.preventDefault();
@@ -2519,42 +2794,11 @@ class e_Salon extends Tablero_Drop {
 		// ■■ Siempre hace click el elemento con el listener(div contenedor), no la imagen 
 		const id_mesa = ev.currentTarget.id;                    
 		
-		// ■■ BUSCA EN EL ARRAY DE RESERVAS LA MESA CLICADA.
-		const index_reserva = this.reservas.findIndex(dicc => {
-			return dicc.mesas.includes(id_mesa);
-		});
-		// ► Si No está en ninguna reserva.	@
-		if (index_reserva == -1) return;        	
-		
-		// ► para accion__save()
-		this.index_reserva = index_reserva; 
-		
-		// ■■ LOG DE LA RESERVA CLICKADA. 🖥️
-		// console.log(`mesa ${id_mesa} está en la reserva ${index_reserva} con mesas: ${reservas[index_reserva].mesas} y sillas: ${reservas[index_reserva].sillas}`);    
-		
-		// ■■ APLANA LA RESERVA(Junta Mesas y Sillas en un array) 
-		const mesas_sillas_flat = Object.values(this.reservas[index_reserva]).flat();
+		// ■■ Busca en el array de diccionario de reserva el indice de la reserva que contiene la mesa clickada.
+		const index_reserva = this.reservas.findIndex(dicc => {	return dicc.mesas.includes(id_mesa); });
+		if (index_reserva == -1) return;       	
 
-		// ■■ TRANSFORMA LOS IDS DEL ARRAY mesas_sillas_flat EN OBJETOS 
-		const obj_mesas_sillas = mesas_sillas_flat.map(id => document.getElementById(id));
-		
-		// ■■■■■■■■ 🌈 🪑 CAMBIO DEL COLOR DE LOS ELEMENTOS DE LA RESERVA. 
-		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-		const color_random = Herramientas.randomColor();
-		obj_mesas_sillas.forEach(el => {       
-			const path = el.querySelector("svg path");
-			if (path) {
-				path.style.setProperty("fill", color_random, "important");
-			}
-			// en el svg, la pata de la silla no se pq va a su bola. De esta forma se arregla. es como un svg aparte
-			const path_pata_silla = el.querySelector("svg .st0");
-			if (path_pata_silla) {
-				path_pata_silla.style.setProperty("fill", color_random, "important");
-			}
-		});		
-		// ■■■■ LOG 🖥️
-		// console.log('► MODO RESERVA .... ON')
-		// console.log(`${id_mesa} clickada. ► data-tipo: ${this.data_tipo} ► className: ${document.getElementById(id_mesa).className}`);
+		this.index_reserva = index_reserva; 	
 
 		// ┌•••••••••••••••••••••••
 		// ┌•• Cambio de reserva			...Lo Reinicio en this.desactivar__modo_reserva()
@@ -2565,45 +2809,58 @@ class e_Salon extends Tablero_Drop {
 			return;
 		}
 
+		// ■■ LOG DE LA RESERVA CLICKADA. 🖥️
+		// console.log(`mesa ${id_mesa} está en la reserva ${index_reserva} con mesas: ${reservas[index_reserva].mesas} y sillas: ${reservas[index_reserva].sillas}`);    
+		
+		// ┌•••••••••••••••••••••••
+		// ■■ 🌈 🪑 CAMBIO DEL COLOR DE LOS ELEMENTOS DE LA RESERVA. 
+		this._set_color_reserva(this.index_reserva);
+
 		// ■■ APLANA las mesas de la reserva de cuya mesa está nuestra reserva.
-		const dicc_reserva = this.reservas[index_reserva];		
-		const dicc_reserva_flat = Object.values(this.reservas[index_reserva]).flat();		
-		const arr_mesas_reserva_flat = Object.values(this.reservas[index_reserva].mesas).flat();		
+		// const dicc_reserva_flat = Object.values(this.reservas[index_reserva]).flat();	
+		const d_reserva = this.reservas[index_reserva];		
+		const arr_mesas_reserva_flat = Object.values(d_reserva.mesas).flat();		
 
 		this.MSG_M.id = id_mesa;                					// mesa actual (clave para guardar)
 
-		// ■■ Recupera el diccionario de popover. (Recuerda que Las mesas son las keys de la propiedad diccionario_datos del popover)
-		const diccionario_mesas = this.MSG_M.diccionario_datos;
-		if (Object.keys(diccionario_mesas).length <= 0) console.warn('\t\tVACÍO ');
-		// console.log(JSON.stringify(diccionario_mesas));
-		
 		// ■■ Si is_single=true, no se pinta el sumatorio.
 		this.MSG_M.api_mostrar(id_mesa ,  arr_mesas_reserva_flat);
 
 		// ■■ SE ACTIVA EL MODO RESERVA CUAANDO SE HACE CLICK SOBRE UNA MESA.
 		this.is_mode_reserva = true;
 	}
-			
+	
+	_get_indice_en_reserva(id_elemento){
+
+		const index_reserva = this.reservas.findIndex(dicc => {
+			return dicc.mesas.includes(id_elemento) || dicc.sillas.includes(id_elemento);
+		});
+
+	}
+
 	/** ✒️✒️
-	 * #### SOBRE-ESCRIBE ✒️ EL MÉTODO elemento_navbar_to_Salon DE DRAG_X_DROP 
+	 * #### SOBRE-ESCRIBE ✒️ EL MÉTODO elemento_nuevo_to_Salon DE DRAG_X_DROP 
 	 * 	* Añade un CLASSNAME según el data-tipo(html) del elemento (silla o mesa)
 	 * 	* Añade un Event Listener ​👂​👂 para el click en el nuevo elemento.
 	 * ```javascript
-	 * this.elemento_navbar_to_Salon(objDrag, objDrop, data_tipo);			
+	 * this.elemento_nuevo_to_Salon(objDrag, objDrop, data_tipo);			
 	 * ```
 	 * @see {@link Tablero_Drop.drop_over_matriz}
 	*/
-	elemento_navbar_to_Salon(item_menu = null, baldosa_matriz = null, data_tipo = ''){
-		const new_div_onplay = super.elemento_navbar_to_Salon(item_menu , baldosa_matriz , data_tipo);
+	elemento_nuevo_to_Salon(item_menu = null, baldosa_matriz = null, data_tipo = ''){
 		const dc = this.dicc_config;
 		if (!dc) return;
+		
+		const new_div_onplay = super.elemento_nuevo_to_Salon(item_menu , baldosa_matriz , data_tipo);
 
 		if (new_div_onplay){			
 			if (data_tipo == dc.tipos.silla) {
+
 				new_div_onplay.classList.add('silla_onplay');
 				new_div_onplay.addEventListener('click', this.silla_click_handler.bind(this));   
 
 			}else if (data_tipo == dc.tipos.mesa) {
+
 				new_div_onplay.classList.add('mesa_onplay');
 				new_div_onplay.addEventListener('click', this.mesa_click_handler.bind(this));   
 			
@@ -2696,7 +2953,10 @@ class e_Salon extends Tablero_Drop {
 			if (!id_contenido || !id_baldosa)  {console.log('Error SCAN '); return [];}
 			
 			const indice_baldosa = this._get_indice_byId(id_baldosa);       // el indice en la matriz.
-			if (indice_baldosa < 0) {console.log('Error SCAN a'); return [];}
+			if (indice_baldosa < 0) {
+				console.log('Error SCAN a'); 
+				return [];
+			}
 
 			// ■■■■■■ Crea un objeto Map y le asigna los valores ( recuerda que luego se tienen que recuperar con .get() ). 
 			if (id_contenido && id_contenido.startsWith(data_tipo)) {
@@ -2755,8 +3015,8 @@ class e_Salon extends Tablero_Drop {
 		let array_retorno = [];
 		try {
 			this.reservas.forEach( (dicc, i) => {
-				const mesas_sillas_flat = Object.values(dicc).flat();    // Convierte los valores a un array plano. ('Mesa_0', 'Silla_1', 'Silla_2', 'Silla_3'....)
-				array_retorno.push(mesas_sillas_flat);
+				const elementos_flat = Object.values(dicc).flat();    // Convierte los valores a un array plano. ('Mesa_0', 'Silla_1', 'Silla_2', 'Silla_3'....)
+				array_retorno.push(elementos_flat);
 			});        
 		} catch (error) {
 			return false;
@@ -2776,9 +3036,6 @@ class e_Salon extends Tablero_Drop {
 	 */
 
 	_get_ids_onplay(tipo='todo'){		
-		// if (!Object.values(this.dicc__config.tipos).includes(tipo)) {
-		// 	return false;
-		// }
 		const dc = this.dicc_config;
 		if(!dc) return;
 
@@ -2804,7 +3061,7 @@ class e_Salon extends Tablero_Drop {
 		const getID = (el) => el.id || el.getAttribute('id') || 
 								  (el.dataset ? el.dataset.id_contenido : null) ||
 								   el.getAttribute('data-id_contenido') ||
-								   el.getAttribute('id_contenido'); 			// fallback legacy si existiera
+								   el.getAttribute('id_contenido'); 			
 
 		const arr_id_elemento = arr_onplay_nodes.map(getID).filter(Boolean); // quitamos null
 		return arr_id_elemento;
@@ -2933,24 +3190,11 @@ class e_Salon extends Tablero_Drop {
 			//     console.log('dicc_reservas:', ...dicc.mesas, ...dicc.sillas);
 			// });
 			
+		// ■■■■■■■■■■■■ Sillas Ronin
 		const sillas_ronin = this._get_sillas_ronin(set_sillas_visited);	
 		if (sillas_ronin && sillas_ronin.length > 0) {
 			arraydicc_rsrvs.push(...sillas_ronin);
 		}
-
-
-		// ■■■■■■■■■■■■ Sillas Ronin
-		// const arr_id_sillas = this._get_ids_onplay(this.dicc__config.tipos.silla);
-		// const sillas_no_asignadas = arr_id_sillas.filter(silla_id => !set_sillas_visited.has(silla_id));
-
-		// if (sillas_no_asignadas.length > 0) {
-		// 	// console.log('Sillas no asignadas a ninguna reserva:', sillas_no_asignadas);
-		// 	let dicc_reservas = {
-		// 		mesas: [],
-		// 		sillas: [...sillas_no_asignadas]  
-		// 	};
-		// 	arraydicc_rsrvs.push(dicc_reservas);
-		// }
 
 		return arraydicc_rsrvs;
 	}
@@ -3015,6 +3259,29 @@ class e_Salon extends Tablero_Drop {
 			}
 		});
 	}
+	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	/** ## 🌈 🪑 CAMBIO DEL COLOR DE LOS ELEMENTOS DE LA RESERVA.  */
+	_set_color_reserva(index_reserva){
+
+		// ┌•• APLANA LA RESERVA(Junta Mesas y Sillas en un array) 
+		const elementos_flat = Object.values(this.reservas[index_reserva]).flat();
+		// ┌•• TRANSFORMA LOS IDS DEL ARRAY elementos_flat EN OBJETOS 
+		const obj_elementos = elementos_flat.map(id => document.getElementById(id));		
+
+		const color_random = Herramientas.randomColor();
+		obj_elementos.forEach(el => {       
+			const path = el.querySelector("svg path");
+			if (path) {
+				path.style.setProperty("fill", color_random, "important");
+			}
+			// en el svg, la pata de la silla no se pq va a su bola. De esta forma se arregla. es como un svg aparte
+			const path_pata_silla = el.querySelector("svg .st0");
+			if (path_pata_silla) {
+				path_pata_silla.style.setProperty("fill", color_random, "important");
+			}
+		});		
+
+	}
 
 	/**
 	 * ## HACE UN SCANNER DEL SALON Y UN REGISTRO DE RESERVAS.
@@ -3026,6 +3293,7 @@ class e_Salon extends Tablero_Drop {
 		try {
 			// REGISTRO LOS CAMBIOS EN EL SALON.
 			this._onplay_scan_salon(); 		
+			
 			// LLAMO AL MODULO DE RESERVAS SOBRE LOS OBJETOS CUYO ID EMPIEZA POR 'mesa' 
 			const reservas = this._modulo_reservas(this.dicc_config.tipos.mesa);
 			return reservas;
@@ -3277,7 +3545,7 @@ class e_Salon extends Tablero_Drop {
 			contenedor: dc.contenedor ?? '',
 			// tag_baldosas: dc.tag_baldosas ?? '',
 			tipos: cloneSimple(dc.tipos) || {},
-			class_name: cloneSimple(dc.class_name) || {},
+			clases_css: cloneSimple(dc.clases_css) || {},
 			rutas: cloneSimple(dc.rutas) || {},
 		};
 		
@@ -3397,7 +3665,7 @@ class e_Salon extends Tablero_Drop {
 				const objDrop = this.get_objdiv_from_mydiv(value);
 				
 
-				// ■■ SIMILAR A this.elemento_navbar_to_Salon(mesa_o_silla, objDrop, data_tipo);pero con Id el que venga.
+				// ■■ SIMILAR A this.elemento_nuevo_to_Salon(mesa_o_silla, objDrop, data_tipo);pero con Id el que venga.
 				// ■■ Verificamos que la baldosa de destino esté vacía
 				if (this.is_baldosa_vacia(objDrop) == false) 
 					return;
@@ -3410,7 +3678,7 @@ class e_Salon extends Tablero_Drop {
 				//  ​👂​👂  Hace el clon del item del menu DRAGGABLE
 				// clon_item.draggable = true;
 				// clon_item.addEventListener('dragstart', this.dragStart.bind(this));
-				this.toouch_me.add_listeners_touchraton(clon_item);
+				this.add_listeners_touchraton(clon_item);
 
 				
 				// ■■ Añade el clon  a la baldosa.
@@ -3438,7 +3706,7 @@ class e_Salon extends Tablero_Drop {
 		}	
 	}
 	
-	/**
+	/** 
 	 * ### Carga los mensajes de las mesas y sillas 
 	 * @param {object} dicc_api_mensajes 
 	 * @see  {@link Foto_CRUD._load_mesas_sillas_en_Salon}
@@ -3453,25 +3721,14 @@ class e_Salon extends Tablero_Drop {
 			const elemento = arr_elementos.find(el => el.id === id);
 			if (elemento && elemento.id) {
 				// SOLUCIÓN: Discriminación de destino basada en el ID del elemento
-				// Normalizamos a minúsculas para evitar errores de typos (KISS)
 				const id_destino = elemento.id.toString().toLowerCase();
-
-				// Regla de Oro: Separación de Mensajes de Mesa y Silla
 				if (id_destino.includes('mesa')) {
-					// Es un mensaje para la Mesa
 					this.MSG_M.update_mensaje(elemento.id, mensaje);
-					
-				} else if (id_destino.includes('silla') || id_destino.includes('cli')) {
-					// Es un mensaje para la Silla/Cliente (MSG_S)
-					// Nota: Aceptamos 'silla' o 'cli' para ser más robustos con la nomenclatura
+				} else if (id_destino.includes('silla') ) {
 					this.MSG_S.update_mensaje(elemento.id, mensaje);
-					
 				} else {
-					// Opcional: Log para detectar IDs huérfanos o mal formados durante desarrollo
 					console.warn(`[Salon] ID no reconocido al cargar mensaje: ${elemento.id}`);
 				}
-				// this.MSG_M.update_mensaje(elemento.id,  mensaje);
-				// this.MSG_S.update_mensaje(elemento.id,  mensaje);
 			}
 		});
 	}
@@ -3494,18 +3751,6 @@ class e_Salon extends Tablero_Drop {
 
 			this.MSG_S.update_alergia(elemento.id, alergia_s);
 			this.MSG_S._actualizar_markador_elemento(elemento.id);
-			// ┌■ Recorre el array de alergias.
-			// alergia_s.forEach(alergia => {
-			// 	// Normalizamos a minúsculas para evitar errores de typos
-			// 	const id_destino = elemento.id.toString().toLowerCase();
-			// 	if (id_destino.includes('silla') ) {
-			// 		this.MSG_S.update_alergia(elemento.id, alergia);
-					
-			// 		// Pongo o quito la marca visual según mensaje/alergias
-			// 		this.MSG_S._actualizar_markador_elemento(elemento.id);
-					
-			// 	}
-			// });
 			
 		});
 	}
@@ -3596,6 +3841,9 @@ class e_Salon extends Tablero_Drop {
 		}
 	}
 
+	/** 
+	 * ### Crea y muestra un toast de notificación al eliminar un elemento del Salon.
+	 * @param {string} id_elemento - El ID del elemento eliminado. 	 */
 	_set_exit_toast_bs(id_elemento) {
 		// ┌• Cacho la Papelera
 		const $contenedor = e_Salon._to_element('navbar') || null;
@@ -3641,13 +3889,15 @@ class e_Salon extends Tablero_Drop {
 	*/
 	_saloniza_elemento(elemento){
 		const dc = this?.CFG?.configuracion;
+		if(!elemento || !dc) return;
 
+		// ???????????
 		const tipos_validos = this?.CFG?.configuracion?.tipos;
-		
 		// ┌┌•  el diccionario tipos{} es {mesa:'mesa', silla:'silla'}		
 		const tipo_players = Object.values(tipos_validos);
+		// ???????????
 
-		if(!elemento) return;
+
 		const id_elemento = elemento.id;
 		if(!id_elemento) return;
 		// ┌• Titulo
@@ -3658,8 +3908,7 @@ class e_Salon extends Tablero_Drop {
 		// ┌•  ​👂​👂 
 		elemento.removeEventListener('dragstart', this.dragStart);
 		elemento.addEventListener('dragstart', this.dragStart.bind(this));
-
-		this.toouch_me.add_listeners_touchraton(elemento);		
+		this.add_listeners_touchraton(elemento);		
 		
 		// ┌• CAMBIA DE CLASE PARA NO HEREDAR EL ESTILO DEL MENU....
 		elemento.className = "";
@@ -3720,10 +3969,11 @@ class e_Salon extends Tablero_Drop {
 		const data_tipo = e_Salon.__get_tipo_from_id(id_mesa_o_silla, el_menu_s);
 		// ┌■■ Check que es un tipo introducido en el 'diccionario de configuracion'
 		if ( e_Salon.__es_tipo_valido(data_tipo, this.dicc_config) ) {
-			
+
 			// ┌■■ Discrimina por tipo y devuelve el tipo del id introducido.
-			const mesa_o_silla = e_Salon.__get_elemento_by_dataset(data_tipo, el_menu_s);				
-			return mesa_o_silla ? {tipo:data_tipo, elemento: mesa_o_silla} : null;
+			const elemento = e_Salon.__get_elemento_by_dataset(data_tipo, el_menu_s);				
+
+			return elemento ? {tipo:data_tipo, elemento: elemento} : null;
 		}else{
 			return null;
 		}	
@@ -3739,10 +3989,10 @@ class e_Salon extends Tablero_Drop {
 	}	
 	/** ## Valida el tipo contra dicc_config (soporta dos formas comunes)
 	 * ### funcion subordinada exclusivamente de {@link _what_player_menu}	 */
-	static __es_tipo_valido(tipo_a_validar , diccionario_setup){
-		const d_setup = diccionario_setup;
-		if (!d_setup || typeof d_setup !== 'object') return false;
-		const arr_values_tipos = Object.values(d_setup.tipos)
+	static __es_tipo_valido(tipo_a_validar , diccionario_configuracion){
+		const dc = diccionario_configuracion;
+		if (!dc || typeof dc !== 'object') return false;
+		const arr_values_tipos = Object.values(dc.tipos)
 		return arr_values_tipos.includes(tipo_a_validar);				
 	}
 	/** ## Dada una clave "mesa_0" o "silla_12", retorna el tipo. se compara contra los tipos presentes en el menú.
@@ -3802,14 +4052,13 @@ class Configuracion_Salon {
 		}
 		// •••••••••••••••••••••••••••••••
 		//  DICCIONARIO DE CONFIGURACION
-		// •••••••••••••••••••••••••••••••
-		this.configuracion = this.api_diccionario_configuracion(dicc_config);  
+		this.configuracion = this.set_diccionario_configuracion(dicc_config);  
 
 		// •••••••••••••••
 		// ┌•• QUIEN SOY
-		// •••••••••••••••
 		/** ### Detección de Entorno ( Define la configuración ) */
 		this.entorno = Compatibilidad._detectar_entorno();
+		
 		
 		// ┌■ Determinar DIMENSIONES INICIALES dependiendo del tipo/ancho de la pantalla. 
 		// ┌• dimesion_inicial = {filas, columnas} 
@@ -3821,7 +4070,6 @@ class Configuracion_Salon {
 		
 		// •••••••••••••••••••••••••••••••••••••• 
 		// OFFCANVAS DE CONFIGURACION DE LA APP
-		// •••••••••••••••••••••••••••••••••••••• 		
 		// ┌•• Cacho el trigger que abre el offcanvas
 		this.$trigger = e_Salon._to_element(icono_trigger);
 		if(!this.$trigger) {
@@ -3835,27 +4083,24 @@ class Configuracion_Salon {
 		this.$formulario = e_Salon._to_element('form_config_salon'); 		// el formulario
 		this.$info_columnas = e_Salon._to_element('[data-config-info="columnas"]');
 		this.$info_filas = e_Salon._to_element('[data-config-info="filas"]');
-		this.$sidebar_posiciones = document.querySelectorAll('[data-config="sidebar-pos"] [data-side-position]');
-		const data_principal = document.querySelector('[data-tipo-bs="offcanvas-configuracion"]');		
+		this.$sidebar_posiciones = e_Salon._to_element('[data-side-position]');
+		// this.$sidebar_posiciones = document.querySelectorAll('[data-config="sidebar-pos"] [data-side-position]');
+		// const data_principal = document.querySelector('[data-tipo-bs="offcanvas-configuracion"]');		
+		
 		// ┌•• Cargo los txt's del formulario
-		this._load_offcanvas_configuracion(this.dimension, this.limites);		
+		this._load_offcanvas_configuracion(this.dimension_inicial, this.limites);		
 		Configuracion_Salon._asegurar_plantillas_menu();
 
-		// ••••••••••••••••••••••••••••••
 		// ■■ NUMERO COLUMNAS	
-		// ••••••••••••••••••••••••••••••
 		// ┌•• Fundamental para terminar de configuarar la cuadratura del Salon.
-		this.api_update_columnas('.' + this.configuracion.class_name.contenedor, this.Salon.columnas);
+		this.api_update_columnas('.' + this.configuracion.clases_css.contenedor, this.Salon.columnas);
 				
-		// ••••••••••••••••••••••
 		// ■■ Mensajes de la app	
 		this.UI = new Alertas_UI();
 
-		// •••••••••••••••••••••••••
 		// ■■ GAP de re-posicionar.
 		this.gap = 0;
 		
-		// •••••••••••••••••••••••••••••••••••••••••••
 		// ■■ Proporciones cuadradas de las Baldosas.
 		this.is_baldosa_cuadrada = true;
 
@@ -3868,27 +4113,41 @@ class Configuracion_Salon {
 	// }
 
 
-	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ VALIDACION DICCIONARIO CONFIGURACION
-	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	// ■■ VALIDACION DICCIONARIO CONFIGURACION
+	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	/** 
 	 * ### Valida y Completa el diccionario de configuración con los valores por defecto.
 	 * @param {Object} dicc_config  Diccionario de configuración proporcionado por el usuario.
 	 * @returns {Object} Diccionario de configuración validado y completado.
 	 */
-	api_diccionario_configuracion(dicc_config){
+	set_diccionario_configuracion(dicc_config){
+		// • Validación de existencia del catálogo (Principio NIST de integridad)
+        // if (typeof CATALOGO_ELEMENTOS === 'undefined') {
+        //     throw new Error("[Seguridad/Integridad]: CATALOGO_ELEMENTOS no está definido. La aplicación no puede iniciar.");
+        // }
+		// • Esquema de validación simple (Fail-Fast)
+        // Verificamos que los elementos esenciales existan para evitar errores de renderizado.
+        this._validar_contrato_catalogo(dicc_config.catalogo);
+
 		// ■■ Valores por defecto
 		const dicc_default = {
 			family: 'Salon',		// Nombre de la baldosa
 			contenedor:  '',		// Nombre del div contendor salon
 			div_maestro: '',		// donde ubicamos el contenedor salon
-			filas: 8,		// Numero de filas del salon
-			columnas: 8,		// numero de columnas de salon.
-			estilo: 'original',	// id del offcanvas de configuración del salon.			
+			filas: 8,				// Numero de filas del salon
+			columnas: 8,			// numero de columnas de salon.
+			estilo: 'original',		// 
+			
+			// ■ Nombres de las clases css que se van a asignar tanto al contendor como a cada baldosa.
+			clases_css: { contenedor: 'contenedor_salon' , baldosas: 'estiloBaldosas', },	
+			
 			// ■ Tipos de elementos que se pueden colocar en el salon.
 			tipos: { silla: 'silla', mesa:  'mesa', },
-			// ■ Nombres de las clases css que se van a asignar tanto al contendor como a cada baldosa.
-			class_name: { contenedor: 'contenedor_salon' , baldosas: 'estiloBaldosas', },	
+			
+			// ■ Diccionario de Elementos definido en la clase Catalogo de Catalogo_Elementos.js
+			catalogo: {}
+
 		};
 		
 		// Limpia y estructura la configuración
@@ -3928,7 +4187,8 @@ class Configuracion_Salon {
 			contenedor: dicc_config.contenedor 	|| dicc_default.contenedor,
 			estilo:	dicc_config.estilo || dicc_default.estilo,
 			tipos: cloneSimple(dicc_config.tipos) || dicc_default.tipos,
-			class_name: cloneSimple(dicc_config.class_name) || dicc_default.class_name,
+			clases_css: cloneSimple(dicc_config.clases_css) || dicc_default.clases_css,
+			catalogo: dicc_config.catalogo || dicc_default.catalogo,
 		};
 
 		return config_limpio;
@@ -3999,7 +4259,7 @@ class Configuracion_Salon {
 	 * @param {string} clase_contenedor_salon identificador de la clase del contenedor del salon
 	 * @param {number} new_numero_columnas numero de columnas que se quieren poner. en SALON, el min es 8
 	 * ```javascript
-	 * 1• const ok_updt = this.api_update_columnas('.' + this.configuracion.class_name.contenedor, 16);
+	 * 1• const ok_updt = this.api_update_columnas('.' + this.configuracion.clases_css.contenedor, 16);
 	 * 2• const ok_updt = this.api_update_columnas('.estiloSalon', 8);
 	 * ```
 	 */
@@ -4296,16 +4556,16 @@ class Configuracion_Salon {
 		if (this.$filas) {
 			// this.$filas.value = this.dimension_inicial.filas;
 			this.$filas.value = this.Salon.filas;
-			this.$filas.min = this.limites.filas.min;
-			this.$filas.max = this.limites.filas.max;
+			this.$filas.min = this.Salon.limites.filas.min;
+			this.$filas.max = this.Salon.limites.filas.max;
 
 			rescate.fils = this.$filas.value;
 		}
 		if (this.$columnas) {
 			// this.$columnas.value = this.dimension_inicial.columnas;
 			this.$columnas.value = this.Salon.columnas;
-			this.$columnas.min = this.limites.columnas.min;
-			this.$columnas.max = this.limites.columnas.max;
+			this.$columnas.min = this.Salon.limites.columnas.min;
+			this.$columnas.max = this.Salon.limites.columnas.max;
 
 			rescate.cols = this.$columnas.value;
 		}
@@ -4448,7 +4708,7 @@ class Configuracion_Salon {
 			const ok_total = this.Salon.set_total_baldosas( filas * columnas );
 
 			// ■ CAMBIA COLUMNAS             ... CAMBIANDO el GRID
-			const ok_updt = this.api_update_columnas('.' + this.configuracion.class_name.contenedor, columnas);		
+			const ok_updt = this.api_update_columnas('.' + this.configuracion.clases_css.contenedor, columnas);		
 
 			// ■ RE-POSICIONA LAS RESERVAS EN EL SALON
 			const ok_re = this.api_re_posicionar();
@@ -4638,8 +4898,8 @@ class Configuracion_Salon {
 				// Si el objeto de la reserva que quiero colocar es una mesa.....
 				if (item.id.toLowerCase().startsWith(tipo_mesa)) 
 					soy_mesa = true;
-				else  soy_mesa = false;
-				
+				else  
+					soy_mesa = false;
 				
 				// 1. Calculamos dónde caería esta mesa
 				const celda_destino = this.Salon.eRdS.suma_fc(celda_inicio_free, item.delta_y, item.delta_x);
@@ -4660,7 +4920,6 @@ class Configuracion_Salon {
 				// ...y eliminamos null/false
 				vecinos = vecinos.filter(x => x !== null && x !== false && x !== undefined && x.trim() !== '');	
 				if(vecinos.length === 0) continue; // No hay vecinos, no hay conflicto
-				
 				
 				// Recorremos los vecinos ya colocados antes de hacer scanner_nsew... si los tiene
 				for (const vecino_id of vecinos) {					
@@ -4884,6 +5143,39 @@ class Configuracion_Salon {
 			return false;
 		}
 	}
+	
+	/**
+     * ### Verifica que cada elemento tenga las propiedades físicas y lógicas mínimas.     */
+    _validar_contrato_catalogo(catalogo) {
+		// Fisica y Visual son obligatorias, la lógica es opcional
+        const campos_obligatorios = ['id', 'fisica', 'visual'];
+        
+        Object.entries(catalogo).forEach(([key, valor]) => {
+            campos_obligatorios.forEach(campo => {
+                if (!valor[campo]) {
+                    throw new Error(`[Error de Esquema]: El elemento '${key}' del catálogo carece del campo '${campo}'.`);
+                }
+            });
+
+            // Validación específica de física para el motor de colisiones
+            if (typeof valor.fisica.ancho !== 'number' || typeof valor.fisica.alto !== 'number') {
+                throw new Error(`[Error de Datos]: Propiedades físicas inválidas en '${key}'.`);
+            }
+        });
+    }
+	/**
+     * @private
+     * @method _deep_freeze
+     * @description Congela recursivamente un objeto para garantizar inmutabilidad absoluta.
+     */
+    _deep_freeze(obj) {
+        Object.keys(obj).forEach(prop => {
+            if (typeof obj[prop] === 'object' && obj[prop] !== null && !Object.isFrozen(obj[prop])) {
+                this._deep_freeze(obj[prop]);
+            }
+        });
+        return Object.freeze(obj);
+    }
 
 
 	get diccionario(){return this.configuracion;	}
@@ -7180,6 +7472,7 @@ class Foto_CRUD{
 		// ┌•• Le hace una foto al salón en este momento
 		const dicc_api_foto = this.Salon?.api_foto();
 		const dimension = this.Salon.dimesion;		
+		
 		// ┌•• Cacho los rangos de las reservas de la foto.
 		const rangos_reservas = RnG._reservas_a_rangos(dicc_api_foto.reservas || [], dicc_api_foto.indices, dimension || null);
 		// ┌•• Cacho el Rango Matriz.
@@ -7191,12 +7484,12 @@ class Foto_CRUD{
 		const cfg = dicc_api_foto.configuracion || this.dicc_config || {};
 		return {
 			salon: {
-				nombre: 		 this.Salon?.family,
+				nombre: this.Salon?.family,
 				columnas: this.Salon?.columnas,
 				filas: 	 this.Salon?.filas,
 				family: cfg.family,
 				configuracion_json: cfg,
-				clases_json: cfg.class_name || {},
+				clases_json: cfg.clases_css || {},
 				rutas_json:  cfg.rutas || {},
 				tipos_json:  cfg.tipos || {}
 			},
@@ -7941,21 +8234,36 @@ class Side_Elementos {
 	 * {@link e_Salon}
 	 */
 	constructor(dragCallback = null, diccionario_elementos = null, icono_disparador = null, opciones = {}) {
+		/** ### Es el enlace disparador del sidebar en el navbar(cubo). */
 		this.icono_disparador = icono_disparador;
+		/** ### Callback para manejar el arrastre de elementos. */
 		this.dragCallback = typeof dragCallback === 'function' ? dragCallback : null;
+		/** ### Diccionario de elementos del salón(mesa, silla, ... ). */
 		this.diccionario_elementos = this._normaliza_elementos(diccionario_elementos);
+		
+		/** sidebar del dom */
+		this.$sidebar = null;		
+		/** posicion del sidebar */
 		this.posicion = opciones.posicion ?? 'right';
-		this.modo_tamano = opciones.modo_tamano ?? 'content';
-		this.sidebar = null;
-		this._estado = 'closed';
+		/** */
+		this.modo_tamano = opciones.modo_tamano ?? 'content';		
+		/** Estados del sidebar */
+		this._estado = 'closed';		
+		/** Último tiempo de pointerdown, sirve para evitar eventos duplicados */
 		this._ultimo_pointerdown = 0;
+		/** Bandera para bloquear el movimiendo del sidebar */
 		this._bloqueo_movimiento = false;
+		
+		/** ### El botoncito de abajo del sidebar para moverlo */
 		this._drag_handle = null;
+		
+		/** Offset para el arrastre (por el desfase de los puntos del dedo)*/
 		this._offset = {
 			x: 0,
 			y: 0,
 		};
-		this._drag = {
+		/** diccionario de datos para el arrastre */
+		this.d_drag = {
 			activo: false,
 			inicio_x: 0,
 			inicio_y: 0,
@@ -8019,7 +8327,7 @@ class Side_Elementos {
 	_crear_sidebar() {
 		const sidebar_existente = document.querySelector('[data-side-elementos="sidebar"]');
 		if (sidebar_existente) {
-			this.sidebar = sidebar_existente;
+			this.$sidebar = sidebar_existente;
 			this._sincronizar_sidebar_existente();
 			return;
 		}
@@ -8032,13 +8340,14 @@ class Side_Elementos {
 		sidebar.dataset.sideDragging = 'false';
 		sidebar.dataset.sideLocked = 'false';
 
+		// contenido es un div donde voy a meter todos los elementos players.
 		const contenido = document.createElement('div');
 		contenido.dataset.sideContent = 'lista';
 
+		// Esto viene de _normaliza_elementos() 
 		Object.entries(this.diccionario_elementos).forEach(([key, config]) => {
 			const svg = config?.svg ?? '';
-			if (!svg) return;
-			
+			if (!svg) return;	// aquí return pasa al siguiente.
 			const item = document.createElement('div');
 			item.dataset.sideItem = key;
 			item.classList.add('menu_to_clone');
@@ -8052,7 +8361,7 @@ class Side_Elementos {
 		});
 
 		sidebar.appendChild(contenido);
-		this.sidebar = sidebar;
+		this.$sidebar = sidebar;
 		this._asegurar_handle();
 		document.body.appendChild(sidebar);
 	}
@@ -8062,16 +8371,16 @@ class Side_Elementos {
 	 * @link _crear_sidebar
 	 */
 	_sincronizar_sidebar_existente() {
-		if (!this.sidebar) return;
-		this.sidebar.dataset.sidePosition = this.posicion;
-		this.sidebar.dataset.sideState = this._estado;
-		this.sidebar.dataset.sideSizeMode = this.modo_tamano;
-		this.sidebar.dataset.sideDragging = 'false';
-		this.sidebar.dataset.sideLocked = this._bloqueo_movimiento ? 'true' : 'false';
+		if (!this.$sidebar) return;
+		this.$sidebar.dataset.sidePosition = this.posicion;
+		this.$sidebar.dataset.sideState = this._estado;
+		this.$sidebar.dataset.sideSizeMode = this.modo_tamano;
+		this.$sidebar.dataset.sideDragging = 'false';
+		this.$sidebar.dataset.sideLocked = this._bloqueo_movimiento ? 'true' : 'false';
 		this._aplicar_offset();
 		this._asegurar_handle();
 
-		const items = this.sidebar.querySelectorAll('[data-side-item]');
+		const items = this.$sidebar.querySelectorAll('[data-side-item]');
 		items.forEach(item => this._activar_drag(item));
 	}
 
@@ -8080,8 +8389,8 @@ class Side_Elementos {
 	 * @link _crear_sidebar
 	 */
 	_asegurar_handle() {
-		if (!this.sidebar) return;
-		let handle = this.sidebar.querySelector('[data-side-handle]');
+		if (!this.$sidebar) return;
+		let handle = this.$sidebar.querySelector('[data-side-handle]');
 		if (!handle) {
 			handle = document.createElement('button');
 			handle.type = 'button';
@@ -8089,7 +8398,7 @@ class Side_Elementos {
 			handle.setAttribute('aria-label', 'Mover sidebar');
 			handle.title = 'Arrastra para mover el sidebar';
 			handle.innerHTML = '<i class="bi bi-disc-fill"></i>';
-			this.sidebar.appendChild(handle);
+			this.$sidebar.appendChild(handle);
 		}
 		this._drag_handle = handle;
 	}
@@ -8099,11 +8408,11 @@ class Side_Elementos {
 	 */
 	set_bloqueo_movimiento(bloqueado = false) {
 		this._bloqueo_movimiento = Boolean(bloqueado);
-		if (!this.sidebar) return;
-		this.sidebar.dataset.sideLocked = this._bloqueo_movimiento ? 'true' : 'false';
+		if (!this.$sidebar) return;
+		this.$sidebar.dataset.sideLocked = this._bloqueo_movimiento ? 'true' : 'false';
 		if (this._bloqueo_movimiento) {
 			this._resetear_drag();
-			this.sidebar.dataset.sideDragging = 'false';
+			this.$sidebar.dataset.sideDragging = 'false';
 		}
 	}
 
@@ -8124,8 +8433,8 @@ class Side_Elementos {
 		const posiciones_validas = ['left', 'right', 'bottom'];
 		if (!posiciones_validas.includes(nueva_posicion)) return;
 		this.posicion = nueva_posicion;
-		if (!this.sidebar) return;
-		this.sidebar.dataset.sidePosition = this.posicion;
+		if (!this.$sidebar) return;
+		this.$sidebar.dataset.sidePosition = this.posicion;
 		this._offset = { x: 0, y: 0 };
 		this._resetear_drag();
 		this._aplicar_offset();
@@ -8177,7 +8486,7 @@ class Side_Elementos {
 	 */
 	abrir() {
 		this._estado = 'open';
-		this.sidebar.dataset.sideState = 'open';
+		this.$sidebar.dataset.sideState = 'open';
 		this.icono_disparador.dataset.sideActive = 'true';
 		this.icono_disparador.setAttribute('aria-pressed', 'true');
 	}
@@ -8188,7 +8497,7 @@ class Side_Elementos {
 	 */
 	cerrar() {
 		this._estado = 'closed';
-		this.sidebar.dataset.sideState = 'closed';
+		this.$sidebar.dataset.sideState = 'closed';
 		this.icono_disparador.dataset.sideActive = 'false';
 		this.icono_disparador.setAttribute('aria-pressed', 'false');
 		this._resetear_drag();
@@ -8201,12 +8510,12 @@ class Side_Elementos {
 	_on_pointer_down(event) {
 		if (this._estado !== 'open' || this._bloqueo_movimiento) return;
 		if (event?.preventDefault) event.preventDefault();
-		this._drag.activo = true;
-		this._drag.inicio_x = event.clientX;
-		this._drag.inicio_y = event.clientY;
-		this._drag.rect_inicio = this.sidebar?.getBoundingClientRect() ?? null;
-		this.sidebar.dataset.sideDragging = 'true';
-		this.sidebar.setPointerCapture(event.pointerId);
+		this.d_drag.activo = true;
+		this.d_drag.inicio_x = event.clientX;
+		this.d_drag.inicio_y = event.clientY;
+		this.d_drag.rect_inicio = this.$sidebar?.getBoundingClientRect() ?? null;
+		this.$sidebar.dataset.sideDragging = 'true';
+		this.$sidebar.setPointerCapture(event.pointerId);
 	}
 
 	/**
@@ -8214,29 +8523,29 @@ class Side_Elementos {
 	 * @link _vincular_eventos
 	 */
 	_on_pointer_move(event) {
-		if (!this._drag.activo) return;
-		const delta_x = event.clientX - this._drag.inicio_x;
-		const delta_y = event.clientY - this._drag.inicio_y;
+		if (!this.d_drag.activo) return;
+		const delta_x = event.clientX - this.d_drag.inicio_x;
+		const delta_y = event.clientY - this.d_drag.inicio_y;
 		const { deltaX, deltaY } = this._limitar_delta(delta_x, delta_y);
-		this._drag.delta_x = deltaX;
-		this._drag.delta_y = deltaY;
+		this.d_drag.delta_x = deltaX;
+		this.d_drag.delta_y = deltaY;
 
 		if (this.posicion === 'right') {
-			const delta = Math.max(0, this._drag.delta_x);
-			this.sidebar.style.setProperty('--side-drag-x', `${delta}px`);
-			this.sidebar.style.setProperty('--side-drag-y', `${this._drag.delta_y}px`);
+			const delta = Math.max(0, this.d_drag.delta_x);
+			this.$sidebar.style.setProperty('--side-drag-x', `${delta}px`);
+			this.$sidebar.style.setProperty('--side-drag-y', `${this.d_drag.delta_y}px`);
 		}
 
 		if (this.posicion === 'left') {
-			const delta = Math.min(0, this._drag.delta_x);
-			this.sidebar.style.setProperty('--side-drag-x', `${delta}px`);
-			this.sidebar.style.setProperty('--side-drag-y', `${this._drag.delta_y}px`);
+			const delta = Math.min(0, this.d_drag.delta_x);
+			this.$sidebar.style.setProperty('--side-drag-x', `${delta}px`);
+			this.$sidebar.style.setProperty('--side-drag-y', `${this.d_drag.delta_y}px`);
 		}
 
 		if (this.posicion === 'bottom') {
-			const delta = Math.max(0, this._drag.delta_y);
-			this.sidebar.style.setProperty('--side-drag-y', `${delta}px`);
-			this.sidebar.style.setProperty('--side-drag-x', `${this._drag.delta_x}px`);
+			const delta = Math.max(0, this.d_drag.delta_y);
+			this.$sidebar.style.setProperty('--side-drag-y', `${delta}px`);
+			this.$sidebar.style.setProperty('--side-drag-x', `${this.d_drag.delta_x}px`);
 		}
 	}
 
@@ -8245,17 +8554,17 @@ class Side_Elementos {
 	 * @link _vincular_eventos
 	 */
 	_on_pointer_up() {
-		if (!this._drag.activo) return;
-		const rect = this.sidebar?.getBoundingClientRect();
+		if (!this.d_drag.activo) return;
+		const rect = this.$sidebar?.getBoundingClientRect();
 		const umbral_x = rect ? Math.max(24, rect.width * 0.2) : 40;
 		const umbral_y = rect ? Math.max(24, rect.height * 0.2) : 40;
 		const debe_cerrar =
-			(this.posicion === 'right' && this._drag.delta_x > umbral_x) ||
-			(this.posicion === 'left' && this._drag.delta_x < -umbral_x) ||
-			(this.posicion === 'bottom' && this._drag.delta_y > umbral_y);
+			(this.posicion === 'right' && this.d_drag.delta_x > umbral_x) ||
+			(this.posicion === 'left' && this.d_drag.delta_x < -umbral_x) ||
+			(this.posicion === 'bottom' && this.d_drag.delta_y > umbral_y);
 
-		this._drag.activo = false;
-		this.sidebar.dataset.sideDragging = 'false';
+		this.d_drag.activo = false;
+		this.$sidebar.dataset.sideDragging = 'false';
 
 		if (debe_cerrar) {
 			this.cerrar();
@@ -8271,19 +8580,19 @@ class Side_Elementos {
 	 * @link _on_pointer_up
 	 */
 	_consolidar_offset() {
-		if (!this.sidebar || !this._drag.rect_inicio) return;
+		if (!this.$sidebar || !this.d_drag.rect_inicio) return;
 		const margen = 12;
-		const rect = this._drag.rect_inicio;
+		const rect = this.d_drag.rect_inicio;
 
 		if (this.posicion === 'bottom') {
 			const min_delta = -(rect.left - margen);
 			const max_delta = window.innerWidth - rect.right - margen;
-			const delta = this._clamp(this._drag.delta_x, min_delta, max_delta);
+			const delta = this._clamp(this.d_drag.delta_x, min_delta, max_delta);
 			this._offset.x += delta;
 		} else {
 			const min_delta = -(rect.top - margen);
 			const max_delta = window.innerHeight - rect.bottom - margen;
-			const delta = this._clamp(this._drag.delta_y, min_delta, max_delta);
+			const delta = this._clamp(this.d_drag.delta_y, min_delta, max_delta);
 			this._offset.y += delta;
 		}
 
@@ -8295,9 +8604,9 @@ class Side_Elementos {
 	 * @link _consolidar_offset
 	 */
 	_aplicar_offset() {
-		if (!this.sidebar) return;
-		this.sidebar.style.setProperty('--side-offset-x', `${this._offset.x}px`);
-		this.sidebar.style.setProperty('--side-offset-y', `${this._offset.y}px`);
+		if (!this.$sidebar) return;
+		this.$sidebar.style.setProperty('--side-offset-x', `${this._offset.x}px`);
+		this.$sidebar.style.setProperty('--side-offset-y', `${this._offset.y}px`);
 	}
 
 	/**
@@ -8305,9 +8614,9 @@ class Side_Elementos {
 	 * @link _on_pointer_move
 	 */
 	_limitar_delta(delta_x, delta_y) {
-		if (!this._drag.rect_inicio) return { deltaX: delta_x, deltaY: delta_y };
+		if (!this.d_drag.rect_inicio) return { deltaX: delta_x, deltaY: delta_y };
 		const margen = 12;
-		const rect = this._drag.rect_inicio;
+		const rect = this.d_drag.rect_inicio;
 
 		if (this.posicion === 'bottom') {
 			const min_delta_x = -(rect.left - margen);
@@ -8339,447 +8648,16 @@ class Side_Elementos {
 	 * @link cerrar
 	 */
 	_resetear_drag() {
-		this._drag.delta_x = 0;
-		this._drag.delta_y = 0;
-		this._drag.rect_inicio = null;
-		if (!this.sidebar) return;
-		this.sidebar.style.setProperty('--side-drag-x', '0px');
-		this.sidebar.style.setProperty('--side-drag-y', '0px');
+		this.d_drag.delta_x = 0;
+		this.d_drag.delta_y = 0;
+		this.d_drag.rect_inicio = null;
+		if (!this.$sidebar) return;
+		this.$sidebar.style.setProperty('--side-drag-x', '0px');
+		this.$sidebar.style.setProperty('--side-drag-y', '0px');
 	}
 }
+// La antigua clase Touch_aMe se integró en Tablero_Touch para simplificar la herencia.
 
-
-
-//  ◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘
-/** ◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘
- * ### Responsable de unificar el manejo de ratón y touch para drag and drop.  🧠
- *              Recibe una referencia al tablero y encapsula toda la lógica de eventos. 🧠
- *  ◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘
- */
-class Touch_aMe {
-
-	/**
-	 * ✨ SOLUCION KISS PARA TOUCH EN MOVIL + PAPELERA
-	 * 
-	 * 🎯 PROBLEMA ORIGINAL:
-	 *    • En móvil, document.elementFromPoint(x, y) devolvía el SVG dentro de la papelera,
-	 *    • No el contenedor con data-tipo="exit", causando que no se detectara correctamente.
-	 *    • Las baldosas sí funcionaban porque son elementos grandes sin SVGs internos.
-	 *
-	 * ✅ SOLUCIÓN IMPLEMENTADA (KISS):
-	 *    1. Nuevo método: _obtener_contenedor_drop_real(elemento)
-	 *       → Busca hacia arriba en el árbol DOM para encontrar el contenedor correcto
-	 *       → Maneja papeleras (data-tipo), baldosas (class estiloBaldosas)
-	 *       → Muy legible y mantenible por humanos
-	 *
-	 *    2. Simplificación en handleTouch_end():
-	 *       → Elimina lógica redundante _get_baldosa_from_point
-	 *       → Usa solo el nuevo método KISS unificado
-	 *       → Comentarios humanos claros y emojis descriptivos
-	 *
-	 * 📝 VENTAJAS:
-	 *    ✓ Funciona en móvil y escritorio
-	 *    ✓ Maneja SVGs, spans y otros elementos dentro de contenedores
-	 *    ✓ Código muy legible y fácil de mantener
-	 *    ✓ Solo 1 responsabilidad por función (KISS)
-	 */
-
-        constructor(tablero){
-                this.tablero = tablero;
-                this.touchState = { draggedElement: null, activeDropTarget: null };
-				this.tapThreshold = 10;
-        }
-
-        /**
-         * ### Extrae una posición {x, y} unificada para eventos de ratón o táctiles.
-         */
-        get_coordenadas_evento(evento){
-                if (!evento) return { x: 0, y: 0 };
-
-                const touch = (evento.touches && evento.touches[0]) || (evento.changedTouches && evento.changedTouches[0]);
-                if (touch) return { x: touch.clientX, y: touch.clientY };
-
-                return { x: evento.clientX || 0, y: evento.clientY || 0 };
-        }
-
-        /**
-         * ### Cachea el origen del drag para reutilizarlo en ratón o táctil.
-         */
-        get_origen_drag(elemento){
-			if (!elemento || !this.tablero) return;
-			this.tablero.objeto_drag = elemento;
-			this.tablero.data_tipo = elemento.getAttribute('data-tipo') || '';
-        }
-
-        /**
-         * ###  ​👂​👂 Añade manejadores de drag y touch al mismo elemento para escritorio y móvil.
-		 * • Amplia y sustituye este codigo:\
-		 * ```javascript
-		 * const items_html_to_matriz = document.querySelectorAll(".menu_to_clone");
-		 * ​​​​​​​if (items_html_to_matriz.length > 0) {
-		 * 		​items_html_to_matriz.forEach(el => el.addEventListener("dragstart", this.dragStart.bind(this)));
-		 * ​​​​​​​}
-		 * ``` */
-        add_listeners_touchraton(elemento){
-                if (!elemento || !this.tablero) return;
-                elemento.draggable = true;
-                elemento.style.touchAction = 'none';
-
-                elemento.removeEventListener('dragstart',  this.tablero.dragStart);
-                elemento.removeEventListener('touchstart', this.handleTouch_start);
-                elemento.removeEventListener('touchmove',  this.handleTouch_movimiento);
-                elemento.removeEventListener('touchend',   this.handleTouch_end);
-				window.removeEventListener('touchcancel', this.finalizarArrastre); // <--- ESTO SOLUCIONA EL BLOQUEO
-
-                elemento.addEventListener('dragstart',  this.tablero.dragStart.bind(this.tablero));
-                elemento.addEventListener('touchstart', this.handleTouch_start.bind(this), { passive: false });
-                elemento.addEventListener('touchmove',  this.handleTouch_movimiento.bind(this), { passive: false });
-                elemento.addEventListener('touchend',   this.handleTouch_end.bind(this) , { passive: false }  );
-				window.addEventListener('touchcancel', this.finalizarArrastre.bind(this)); // <--- ESTO SOLUCIONA EL BLOQUEO
-        }
-		// 1. Definimos una función de limpieza única para cumplir con KISS
-		finalizarArrastre() {
-			this._cleanup_touch_preview();
-			this._reset_touch_state();
-
-			// Si aplicas clases CSS durante el drag, quítalas aquí
-			// document.body.classList.remove('dragging-active');
-			// ■■ Desbloquea el sidebar por si quedó enganchado tras un touchcancel.
-			this.tablero?._set_bloqueo_sidebar(false);
-			
-			console.log("Drag finalizado o cancelado: Estado reseteado.");
-		}
-
-		/**
-		 * ### Crea un clon visual para seguir el dedo sin alterar el DOM original.
-		 */
-		_create_drag_preview(elemento, rect){
-			if (!elemento || !rect) return null;
-			const preview = elemento.cloneNode(true);
-			preview.removeAttribute('id');
-			preview.setAttribute('aria-hidden', 'true');
-			preview.style.position = 'fixed';
-			preview.style.left = '0px';
-			preview.style.top = '0px';
-			preview.style.width = `${rect.width}px`;
-			preview.style.height = `${rect.height}px`;
-			preview.style.margin = '0';
-			preview.style.zIndex = '9999';
-			preview.style.pointerEvents = 'none';
-			preview.style.boxSizing = 'border-box';
-			preview.style.transformOrigin = 'top left';
-			preview.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0)`;
-			preview.style.willChange = 'transform';
-			document.body.appendChild(preview);
-			return preview;
-		}
-
-		/**
-		 * ### Obtiene la baldosa real bajo el punto indicado (x, y).
-		 */
-		_get_baldosa_from_point(x, y, fallbackTarget = null){
-			const elements = document.elementsFromPoint ? document.elementsFromPoint(x, y) : [];
-			const baldosa = elements.find(elemento => elemento.classList && elemento.classList.contains('estiloBaldosas'));
-			if (baldosa) return baldosa;
-
-			if (fallbackTarget && fallbackTarget.closest) {
-				return fallbackTarget.closest('.estiloBaldosas');
-			}
-			return null;
-		}
-
-		/**
-		 * ### ✨ METODO KISS: Busca el contenedor drop correcto en la jerarquía
-		 * Maneja tanto papeleras (exit) como baldosas.
-		 * El SVG dentro de la papelera causa que elementFromPoint devuelva el SVG,
-		 * así que buscamos hacia arriba en el árbol para encontrar el contenedor real.
-		 * 
-		 * @param {HTMLElement} elementoDetectado - Elemento que devolvió elementFromPoint(x,y)
-		 * @returns {HTMLElement|null} - El contenedor drop correcto (papelera o baldosa)
-		 */
-		_obtener_contenedor_drop_real(elementoDetectado) {
-			if (!elementoDetectado) return null;
-
-			// ┌•••• 1️⃣ Primero: ¿Es un elemento con data-tipo (papelera)?
-			// Si el mismo elemento tiene data-tipo, ya es lo que buscamos
-			if (elementoDetectado.dataset && elementoDetectado.dataset.tipo) {
-				return elementoDetectado;
-			}
-
-			// ┌•••• 2️⃣ Segundo: ¿Está dentro de un elemento con data-tipo?
-			// Esto ocurre cuando SVG o un span está dentro de <div data-tipo="exit">
-			const contenedorExit = elementoDetectado.closest('[data-tipo]');
-			if (contenedorExit && contenedorExit.dataset.tipo) {
-				return contenedorExit;
-			}
-
-			// ┌•••• 3️⃣ Tercero: ¿Es una baldosa?
-			if (elementoDetectado.classList && elementoDetectado.classList.contains('estiloBaldosas')) {
-				return elementoDetectado;
-			}
-
-			// ┌•••• 4️⃣ Cuarto: ¿Está dentro de una baldosa?
-			const contenedorBaldosa = elementoDetectado.closest('.estiloBaldosas');
-			if (contenedorBaldosa) {
-				return contenedorBaldosa;
-			}
-
-			// ┌•••• Si nada de lo anterior, devolver null
-			return null;
-		}
-
-		/**
-		 * ### Mueve el clon visual siguiendo el dedo.
-		 */
-		_move_drag_preview(x, y){
-			const preview = this.touchState.dragPreview;
-			if (!preview) return;
-			const left = x - this.touchState.offsetX;
-			const top = y - this.touchState.offsetY;
-			preview.style.transform = `translate3d(${left}px, ${top}px, 0)`;
-		}
-
-        /**
-         * ### Gestiona el inicio de arrastre táctil.
-         */
-		handleTouch_start(evento){
-                if (!evento) return;
-                if (evento.cancelable) evento.preventDefault();
-                const objetivo = evento.currentTarget;
-				const { x, y } = this.get_coordenadas_evento(evento);
-				const rect = objetivo.getBoundingClientRect();
-				const offsetX = x - rect.left;
-				const offsetY = y - rect.top;
-				const preview = this._create_drag_preview(objetivo, rect);
-                this.get_origen_drag(objetivo);
-				// ■■ Bloquea el sidebar si estamos moviendo mesa/silla.
-				if (this.tablero?._es_mesa_silla?.(this.tablero.data_tipo)) {
-					this.tablero._set_bloqueo_sidebar(true);
-				}
-				const previousVisibility = objetivo.style.visibility;
-				objetivo.style.visibility = 'hidden';
-                this.touchState = {
-					draggedElement: objetivo,
-					activeDropTarget: null,
-					startX: x,
-					startY: y,
-					lastX: x,
-					lastY: y,
-					offsetX,
-					offsetY,
-					dragPreview: preview,
-					previousVisibility,
-					rafId: null,
-					pendingMove: null
-				};
-        }
-
-        /**
-         * ### Actualiza la zona potencial de drop durante el movimiento táctil.
-         */
-        handleTouch_movimiento(evento) {
-			if (!evento || !this.touchState.draggedElement) return;
-			
-			// 1. Prevenir scroll (ya lo tenías)
-			if (evento.cancelable) evento.preventDefault(); 
-
-			const { x, y } = this.get_coordenadas_evento(evento);
-			this.touchState.lastX = x;
-			this.touchState.lastY = y;
-
-			// Algoritmo de suavidad: hace que el elemento siga al dedo.🪑 ► 👈
-			this.touchState.pendingMove = { x, y };
-			if (!this.touchState.rafId) {
-				this.touchState.rafId = requestAnimationFrame(() => {
-					if (this.touchState.pendingMove) {
-						const { x: moveX, y: moveY } = this.touchState.pendingMove;
-						this._move_drag_preview(moveX, moveY);
-					}
-					this.touchState.rafId = null;
-				});
-			}
-			this.touchState.activeDropTarget = document.elementFromPoint(x, y);
-		}
-
-        /**
-         * ### Finaliza el arrastre táctil y ejecuta la misma lógica de drop que en escritorio.
-		 * 				• Si el Drop funciona:  La lógica de Salon.js mueve el elemento en el DOM (nuevoPadre.appendChild(silla)). 
-		 * 										Al limpiar los estilos, la silla se queda en la nueva casa.
-		 * 				• Si el Drop falla: Tu lógica de Salon.js no hace nada. 
-		 * 										La silla sigue siendo hija del Padre_Viejo. 
-		 * 										Al limpiar los estilos (position: fixed fuera), la silla "aparece" de golpe en el Padre_Viejo.
-         */
-        handleTouch_end(evento) {
-			// ┌•••• Si no estábamos arrastrando nada, salir.
-			if (!this.touchState.draggedElement) return;
-
-			// ┌•••• drag
-			const el = this.touchState.draggedElement;
-			
-			// ┌•••• Referencia al padre original (por seguridad, aunque el DOM lo mantiene)
-			const padreOriginal = el.parentElement;
-
-			// ┌•••• Determinar dónde estamos soltando (Target)
-			const coordenadas = this.get_coordenadas_evento(evento);
-			let x = coordenadas.x;
-			let y = coordenadas.y;
-			if (!x && !y) {
-				x = this.touchState.lastX || 0;
-				y = this.touchState.lastY || 0;
-			}
-			const deltaX = x - this.touchState.startX;
-			const deltaY = y - this.touchState.startY;
-			// ■ Math.hypot asegura que:
-			// 	 • No importa la dirección (el resultado siempre es positivo).
-			// 	 • Mide el desplazamiento real en cualquier ángulo.
-			const isTap = Math.hypot(deltaX, deltaY) <= this.tapThreshold;
-
-			// ┌•••• Identificar elemento bajo el dedo (Baldosa destino)
-			// ┌•••• •• Es vital •ocultar• temporalmente el elemento arrastrado para ver "qué hay debajo"
-			if (this.touchState.dragPreview) {
-				this.touchState.dragPreview.style.display = 'none';
-			}
-			// ┌••••
-			let elementoDetectado = document.elementFromPoint(x, y);
-			// ┌•••• Usar método KISS para obtener contenedor drop correcto
-			let targetReal = this._obtener_contenedor_drop_real(elementoDetectado);
-
-			if (this.touchState.dragPreview) {
-				this.touchState.dragPreview.style.display = 'block';
-			}
-			// ┌•••• Si fue un tapeo y no un arrastre:
-			if (isTap) {
-				/**
-				 * ┌•••• • ABORTAR ARRASTRE Y RESETEAR ESTADO
-				 * Si el movimiento no superó el umbral, limpiamos el rastro del drag
-				 * y disparamos un evento click nativo.
-				 */
-				this._cleanup_touch_preview();			
-				this._reset_touch_state();
-				/**
-				 * ┌•••• • queueMicrotask: Ejecuta el click inmediatamente después de que el ciclo actual
-				 * de JavaScript termine, pero antes de que el navegador vuelva a pintar la pantalla.
-				 * Se usa para asegurar que el estado de 'touchState' esté limpio antes de que
-				 * cualquier lógica externa del 'click' se ejecute.
-				 */
-				queueMicrotask(() => el.click());
-
-				// ┌•••• • Detiene la ejecución para que no se procese como un evento de "soltar" (drop)
-				this.tablero?._set_bloqueo_sidebar(false);
-				return;
-			}
-
-			// ┌•••• Crear el evento sintético (simulación de HTML5 DragDrop)
-			const syntheticEvent = this._buildSyntheticDropEvent(targetReal, el, { x, y });
-
-			// ┌•••• Intentar realizar el DROP en el tablero
-			let dropExitoso = false;
-
-			if (this.tablero && targetReal) {
-				// ■■ Detectar si el target es una papelera (exit)
-				const isExit = targetReal.dataset && targetReal.dataset.tipo === 'exit';
-				x
-				if (isExit && this.tablero.drop_exit) {
-					// ► Es una papelera, usar drop_exit
-					syntheticEvent.target = targetReal; 
-					dropExitoso = this.tablero.drop_exit(syntheticEvent);
-					console.log(`📍 detectado: PAPELERA (exit) en ${targetReal.id}`);
-				} else {
-					// ► Es una baldosa, usar drop__over_matriz
-					const baldosaDestino = this._get_baldosa_from_point(x, y, targetReal) || targetReal; 
-					
-					// Esta función debe devolver TRUE si movió la silla, FALSE si falló.
-					if (this.tablero.drop_over_matriz) {
-						// Inyectamos el target correcto en el evento sintético
-						syntheticEvent.target = baldosaDestino; 
-						dropExitoso = this.tablero.drop_over_matriz(syntheticEvent);
-
-					}
-				}
-			}
-			// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-			// ■■■ 🧠LOGICA DE RETORNO (CLEANUP)🧠 ■■■
-			// Indiferentemente de si fue éxito o fallo, debemos limpiar el desorden visual.
-			// Quitamos el clon visual y restauramos la visibilidad original
-			this._cleanup_touch_preview();
-
-			// b) Manejo del resultado
-			if (dropExitoso) {
-				// El método drop__over_matriz SE ENCARGÓ de hacer appendChild al nuevo padre.
-				console.log("✅ Movimiento táctil exitoso");
-				el.style.visibility = "visible";
-
-			} else {
-				// 🛑 FALLO (Baldosa llena, fuera de pantalla, etc.)
-				// Como NO se hizo un appendChild nuevo, el elemento 'el' sigue siendo hijo de 'padreOriginal'.
-				// Al quitarle el position: fixed (paso 5a), el navegador lo vuelve a pintar en su origen automáticamente.
-				console.warn("⚠️ Movimiento inválido: El elemento vuelve a su origen.");
-			}
-
-			// 6. Resetear estado global
-			this._reset_touch_state();
-			this.tablero?._set_bloqueo_sidebar(false);
-
-
-		}
-
-		/**
-		 * ## 
-		 */
-		_reset_touch_state(){
-			this.touchState = {
-					draggedElement: null, 		// ┌• Referencia al nodo DOM que se estaba intentando mover
-					activeDropTarget: null, 	// ┌•  Referencia a la zona donde se podría haber soltado el objeto
-					// ┌• Coordenadas originales donde se puso el dedo por primera vez 👉
-					startX: 0, startY: 0,
-					// ┌•  Últimas coordenadas registradas antes de soltar o cancelar
-					lastX: 0, lastY: 0, 
-					// ┌•  Distancia relativa entre el dedo y la esquina superior izquierda del elemento 👉↖️
-					offsetX: 0,	 offsetY: 0,
-					dragPreview: null,			// ┌• Referencia al nodo clonado/transparente que se muestra durante el arrastre
-					previousVisibility: '',  	// ┌• Almacena el estilo 'visibility' original para restaurar el elemento tras ocultarlo
-					rafId: null,				// ┌• ID del RequestAnimationFrame activo para poder cancelarlo y evitar fugas de memoria
-					pendingMove: null			// ┌• Almacena el último evento de movimiento pendiente de ser procesado por el siguiente frame
-				};
-
-		}
-		/**
-		 * ### Elimina el elemento visual (fantasma) que seguía al dedo durante el intento de drag
-		 * ### {@link handleTouch_end}
-		 */
-		_cleanup_touch_preview(){
-			if (this.touchState.rafId) {
-				cancelAnimationFrame(this.touchState.rafId);
-			}
-			if (this.touchState.dragPreview) {
-				this.touchState.dragPreview.remove();
-			}
-			if (this.touchState.draggedElement) {
-				this.touchState.draggedElement.style.visibility = this.touchState.previousVisibility || '';
-			}
-		}
-
-        /**
-         * ### Construye un objeto de evento mínimo para reutilizar la lógica de drop existente.
-         */
-        _buildSyntheticDropEvent(target, draggedElement, coords = {}){
-			const dataTipo = (draggedElement && draggedElement.getAttribute('data-tipo')) || '';
-			const { x = 0, y = 0 } = coords;
-			return {
-					preventDefault: () => {},
-					target,
-					clientX: x,
-					clientY: y,
-					dataTransfer: {
-							getData: (key) => {
-									if (key === 'text') return draggedElement ? draggedElement.id : '';
-									if (key === 'tipo') return dataTipo;
-									return '';
-							}
-					}
-			};
-        }
-}		// ◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘ FIN CLASE  Touch_aMe
 
 const Herramientas = {
 	/**
@@ -8886,7 +8764,7 @@ const Compatibilidad = {
 	
 	/**
 	 * ## Determinar DIMENSIONES INICIALES dependiendo del tipo/ancho de la pantalla. 
-	 * ### Columnas ►  Movil = 8 | Tablet = 14 | Destktop = 20
+	 * ### Columnas ►  Movil = 8 | Tablet = 16 | Destktop = 24
 	 */
 	_get_dimension_inicial(tipo){
 		const dimensiones_iniciales = {
