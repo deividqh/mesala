@@ -1,22 +1,15 @@
 {
   "name": "salon_div_x_div",
   "version": "1.0.0",
-  "description": "Sistema Visual de Gestión de Reservas y Distribución de Mesas.",
-  "main": "server/index.js",
+  "description": "Sistema Visual de Gestión de Reservas y Distribución de Mesas (Frontend).",
+  "main": "cliente_web/mesala.html",
   "scripts": {
-    "start": "node server/index.js",
+    "start": "npx http-server ./cliente_web -o /mesala.html -c-1",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "david quesada heredia",
   "license": "ISC",
-  "type": "commonjs",
-  "dependencies": {
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "jsonwebtoken": "^9.0.2",
-    "mysql2": "^3.11.4"
-  },
   "devDependencies": {
     "eslint": "^10.2.0"
   }

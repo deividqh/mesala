@@ -633,7 +633,7 @@ class Matriz_to_MyDiv extends Matriz_Plana {
 		// ■■■■■■■■■■■■■■■■■■■■■■■■
 		// ■ FAMILY: 
 		if (typeof (family) != 'string' || family.trim() === '' || document.getElementById(family) || document.getElementById(family+'_0')) 
-			this.family = Herramientas.get_dom_secuency(Matriz_to_MyDiv.FAMILY_NONAME);			
+			this.family = Herramientas._get_secuencial_dom(Matriz_to_MyDiv.FAMILY_NONAME);			
 		else		
 			this.family = family;
 		
@@ -641,7 +641,7 @@ class Matriz_to_MyDiv extends Matriz_Plana {
 		// ■ id_div_contenedor 	
 		if (id_div_contenedor == null || typeof (id_div_contenedor) != 'string' || id_div_contenedor.trim() == '') {			
 			this.contenedor_div_x_div = document.createElement('div');
-			this.contenedor_div_x_div.id = Herramientas.get_dom_secuency(Matriz_to_MyDiv.CONTENEDOR_NONAME);
+			this.contenedor_div_x_div.id = Herramientas._get_secuencial_dom(Matriz_to_MyDiv.CONTENEDOR_NONAME);
 		} else if (!document.getElementById(id_div_contenedor)) {			// •IF► el contenedor pasado NO EXISTE PREVIAMENTE en EL DOC Html.
 			this.contenedor_div_x_div = document.createElement('div');
 			this.contenedor_div_x_div.id = id_div_contenedor;					
@@ -1057,8 +1057,6 @@ class Matriz_to_MyDiv extends Matriz_Plana {
 		}
 	}
 
-
-
 	/**
 	 * ### Crea un objeto de la clase MyDiv() que son las baldosas del salon.
 	 * @returns 
@@ -1067,7 +1065,7 @@ class Matriz_to_MyDiv extends Matriz_Plana {
 		try {
 			const new_myDiv = new MyDiv();								// Instancia de la clase que voy a guardar en el array.
 			new_myDiv.elemento_div = document.createElement('div'); 				// Crea un div.
-			new_myDiv.elemento_div.id = Herramientas.get_dom_secuency(this.family);		// Le pongo un Id de la familia.
+			new_myDiv.elemento_div.id = Herramientas._get_secuencial_dom(this.family);		// Le pongo un Id de la familia.
 
 			//Estados:
 			new_myDiv.HOW.Tag = Matriz_to_MyDiv.PREFIJO_TAG;			// '#' Cargo como Tag Inicial el prefijo '#' (sin Tag)
@@ -1094,7 +1092,7 @@ class Matriz_to_MyDiv extends Matriz_Plana {
 			// let new_div_clon = this.my_div_one.elemento_div.cloneNode(true);			// Creacion del clon.
 			let new_div_clon = div_to_clone.cloneNode(true);						// Creacion del clon.
 			// creación de su id por la familia asociada cuando se crea la clase.
-			new_div_clon.id = Herramientas.get_dom_secuency(this.family);					
+			new_div_clon.id = Herramientas._get_secuencial_dom(this.family);					
 			if (!new_div_clon.id) throw ("Error crea_clon_myDiv() CLON");
 			
 			if ( b_title ) new_div_clon.title = new_div_clon.id;
@@ -1661,8 +1659,6 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		
 		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■		
 		// ■■  ​👂​👂 LISTENERS EXIT : Papeleras.... preparado para que haya varias salidas(todos los data-tipo='exit') a todas les doto el mismo handler. 
-		// • Si Hubiera solo un elemento de 'Exit'
-		// const exit = document.querySelectorAll('[data-tipo="exit"]');
 		const exit = Array.from(document.querySelectorAll("[data-tipo]")).filter(el => el.dataset.tipo === 'exit');
 		if (exit.length > 0) {	
 			exit.forEach(el => el.addEventListener("dragover", this.AllowDrop));
@@ -1695,7 +1691,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		if (items_html_to_matriz.length > 0) {
 			items_html_to_matriz.forEach(el => {
 				
-				this.add_listeners_touchraton(el);
+				this._add_listeners_movimiento(el);
 				el.addEventListener("dragstart", this.dragStart.bind(this));
 			});
 		}
@@ -1738,9 +1734,9 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 	// 	}
 	// }
 	/**
-	 * ### SE PRODUCE CUANDO EMPIEZA EL MOVIMIENTO DE UN OBJETO DRAG ( Movible )
-	 *              • Se trata de guardar el objeto que se mueve mediante ev.dataTransfer.setData("text", id_objeto_drag) 
-	 *              • Cuando este objeto_drag caiga en un objeto drop se tiene que recuperar con ev.dataTransfer.getData("text")
+	 * ### SE PRODUCE CUANDO EMPIEZA EL MOVIMIENTO DE UN OBJETO DRAG ( draggable = true )
+	 *              • Se trata de guardar el objeto que se mueve mediante ev.dataTransfer._setData("text", id_objeto_drag) 
+	 *              • Cuando este objeto_drag caiga en un objeto drop se tiene que recuperar con ev.dataTransfer.getData_("text")
 	 *              • "text" es cualquier cosa xEjemplo "id_objeto_mueve", y además se puede poner mas de uno.
 	 * @see 
 	 * @param {*} ev   evento de inicio de arrastre de un objeto.
@@ -1750,19 +1746,26 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		const new_obj_drag = ev.target;                         // ■ cacha el objeto que se mueve(drag).  
 		// const id = ev.currentTarget.id;
 		
-		// ■■ Guarda el objeto que se mueve en la clase.
+		// ■■ 
 		this.objeto_drag = new_obj_drag;
 		this.data_tipo = new_obj_drag.getAttribute('data-tipo') || '';
+		// this.data_grupo = new_obj_drag.getAttribute('data-grupo') || '';
+		// this.data_sub_grupo = new_obj_drag.getAttribute('data-rol') || '';
 
 		// ■■ Bloquea el movimiento del sidebar si movemos una mesa o silla.
 		// this._iniciar_bloqueo_sidebar(new_obj_drag);
 		
 		// ■■ ESTABLECE/GUARDA EL ID DEL OBJETO DRAG
-		ev.dataTransfer.setData("text", this.objeto_drag.id);      	// ■ dataTransfer guarda en la transacción d&d un dato tipo "text" con el id del drag.
+		// ev.dataTransfer.setData("text", this.objeto_drag.id);      	// ■ dataTransfer guarda en la transacción d&d un dato "text" con el id del drag.
+		ev.dataTransfer.setData("drag_id", this.objeto_drag.id);      	// ■ dataTransfer guarda en la transacción d&d un dato "text" con el id del drag.
 		
 		// ■■ GUARDA EL data-tipo (HTML)
 		// this.data_tipo = new_obj_drag.getAttribute('data-tipo');  // Cacha el data-tipo del objeto que se mueve.				
 		ev.dataTransfer.setData("tipo", this.data_tipo); 
+		
+		const ds_t = Catalogo.get(this.objeto_drag.dataset.tipo)
+		// ev.dataTransfer.setData("grupo", this.data_grupo); 
+		// ev.dataTransfer.setData("rol",this.data_sub_grupo); 
 
 		// ■■■■ LOG	🖥️															
 		// console.log(`▶️ drag_start ■ id ► ${new_obj_drag.id}  , tipo: ${this.data_tipo} , clase: ${new_obj_drag.className}`);  		
@@ -1784,9 +1787,10 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 	
 			// ■■■■■■■■■■■■■■■■■■■■■■■■ 
 			// CACHA DRAG
-			// • • • En DragStart tiene que haber un ev.dataTransfer.setData("text", id_drag) • • • "text" es cualquier cosa xEjemplo "prueba"
-			const id_obj_drag = ev.dataTransfer.getData("text");       // Cacha el id del objeto que se mueve(silla o mesa), que se ha arrastrado desde el menu o desde el salon.
+			// • • • En DragStart tiene que haber un ev.dataTransfer._setData("text", id_drag) • • • "text" es cualquier cosa xEjemplo "prueba"
+			const id_obj_drag = ev.dataTransfer.getData("drag_id");       // Cacha el id del objeto que se mueve(silla o mesa), que se ha arrastrado desde el menu o desde el salon.
 			const data_tipo   = ev.dataTransfer.getData("tipo");       // Cacha el id del objeto que se mueve(silla o mesa), que se ha arrastrado desde el menu o desde el salon.
+			// const dicc_menu   = ev.dataTransfer.getData("dicc");
 			
 			const objDrag = document.getElementById(id_obj_drag);   // ► CACHA el objDrag
 			if (!objDrag ) { console.log( `❌ ERROR ► drop_over_matriz ■ id-drag: No hay objeto Drag`); return false; }
@@ -1836,7 +1840,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 	* ##  • Maneja el evento de soltar un objeto en el elemento-exit (papelera).
 	*	• Quién llega a la  Papelera:
 	*	...Se tienen que soltar las sillas o mesas colocadas en el 'Menu Nav-Bar'
-	*	► ev.dataTransfer.getData("text") ,  Id del elemento drap(silla_menu, mesa_menu, o #SillaEnSalon, #MesaEnSalon ).
+	*	► ev.dataTransfer.getData_("text") ,  Id del elemento drap(silla_menu, mesa_menu, o #SillaEnSalon, #MesaEnSalon ).
 	*	► ev.target , es el objeto, 
 	* @param {*} ev 
 	*/
@@ -1848,7 +1852,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// ■■ Cacha el objeto que se mueve(objDrag) y el objeto donde cae(objDrop)(Papelera)
 		let id_obj_drag = null;
 		if (ev && ev.dataTransfer) {
-			id_obj_drag = ev.dataTransfer.getData("text");
+			id_obj_drag = ev.dataTransfer.getData("drag_id");
 		} else if (this.objeto_drag) {
 			id_obj_drag = this.objeto_drag.id;
 		}else{
@@ -1957,18 +1961,23 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 
 		// ■■ Verificamos que la baldosa de destino esté vacía
 		if (this.is_baldosa_vacia(baldosa_matriz) == false) return
-
+		
+		const char = item_menu.dataset.tipo;
+		const grupo = item_menu.dataset.grupo;
+		const sub = item_menu.dataset.rol;
+		
 		// ■■ Creamos un Clon del item del MENU. El id que se asigna es un secuencial del data-tipo(del <data_tipo>)
 		const clon_item = item_menu.cloneNode(true);                  
-		clon_item.id = Herramientas.get_dom_secuency(data_tipo);				
+		clon_item.id = Herramientas._get_secuencial_dom(data_tipo);				
 		clon_item.title = clon_item.id;
 		clon_item.style.visibility = 'visible';
+
+		clon_item.dataset.grupo = grupo;
+		clon_item.dataset.rol = sub;
+		clon_item.dataset.tipo = char;	// mesa, silla, taburete
 		
-		// ■■ Hace DRAGGABLE el clon del item del menu 
-		// clon_item.draggable = true;
-    	// clon_item.addEventListener('dragstart', this.dragStart.bind(this));
-		//  ​👂​👂  Hace el clon del item del menu DRAGGABLE para ratón y táctil
-		this.add_listeners_touchraton(clon_item);
+		// ■■ ​👂​👂 Hace DRAGGABLE el clon del item del menu  para ratón y táctil
+		this._add_listeners_movimiento(clon_item);
 		
 		// ■■ Añade el clon de la silla a la baldosa.
 		baldosa_matriz.appendChild(clon_item);           
@@ -2169,7 +2178,7 @@ class Tablero_Touch extends Tablero_Drop {
 	
 
 	/** ### Agrega los listeners para los eventos de toque y ratón 	*/
-	add_listeners_touchraton(elemento){
+	_add_listeners_movimiento(elemento){
 		if (!elemento) return;
 		// Usamos una propiedad en memoria (no dataset) para no contaminar el HTML
 		// ni copiar accidentalmente la marca al clonar nodos del menú.
@@ -2191,7 +2200,7 @@ class Tablero_Touch extends Tablero_Drop {
 	finalizarArrastre() {
 		this._cleanup_touch_preview();
 		this._reset_touch_state();
-		this._set_bloqueo_sidebar(false);
+		// this._set_bloqueo_sidebar(false);
 	}
 
 	/** ### Crea una vista previa del elemento arrastrado. */
@@ -2326,7 +2335,7 @@ class Tablero_Touch extends Tablero_Drop {
 			this._cleanup_touch_preview();
 			this._reset_touch_state();
 			queueMicrotask(() => el.click());
-			this._set_bloqueo_sidebar(false);
+			// this._set_bloqueo_sidebar(false);
 			return;
 		}
 		const syntheticEvent = this._buildSyntheticDropEvent(targetReal, el, { x, y });
@@ -2347,7 +2356,7 @@ class Tablero_Touch extends Tablero_Drop {
 		this._cleanup_touch_preview();
 		if (dropExitoso) el.style.visibility = 'visible';
 		this._reset_touch_state();
-		this._set_bloqueo_sidebar(false);
+		// this._set_bloqueo_sidebar(false);
 	}
 
 	_reset_touch_state(){
@@ -2371,7 +2380,7 @@ class Tablero_Touch extends Tablero_Drop {
 			clientY: y,
 			dataTransfer: {
 				getData: (key) => {
-					if (key === 'text') return draggedElement ? draggedElement.id : '';
+					if (key === 'drag_id') return draggedElement ? draggedElement.id : '';
 					if (key === 'tipo') return dataTipo;
 					return '';
 				}
@@ -2389,32 +2398,32 @@ class Tablero_Touch extends Tablero_Drop {
 */
 class e_Salon extends Tablero_Touch {
 	/** ### Imagen svg del elemento 'mesa'  ►  {@link Configuracion_Salon._asegurar_plantillas_menu}*/
-	static MESA = `
-		<div id="mesa_menu" class="menu_to_clone" data-tipo="mesa" draggable="true" title="Arrastra la Mesa hasta el Salón">
-			<svg class="imagen_menu imagen_menu--mesa"
-				fill="currentColor" viewBox="0 0 50 50" width="30" height="30"
-				xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
-				<path class="st0" d="M10.585938 11L0.38085938 21.205078 A 1.0001 1.0001 0 0 0 0.18945312 21.396484L0 21.585938L0 21.832031 A 1.0001 1.0001 0 0 0 0 22.158203L0 28L3 28L3 50L9 50L9 28L11 28L11 43L17 43L17 28L33 28L33 43L39 43L39 28L41 28L41 50L47 50L47 28L50 28L50 22.167969 A 1.0001 1.0001 0 0 0 50 21.841797L50 21.585938L49.806641 21.392578 A 1.0001 1.0001 0 0 0 49.623047 21.207031 A 1.0001 1.0001 0 0 0 49.617188 21.203125L39.414062 11L39 11L10.585938 11 z M 11.414062 13L38.585938 13L46.585938 21L3.4140625 21L11.414062 13 z M 2 23L48 23L48 26L46.167969 26 A 1.0001 1.0001 0 0 0 45.841797 26L42.154297 26 A 1.0001 1.0001 0 0 0 41.984375 25.986328 A 1.0001 1.0001 0 0 0 41.839844 26L38.167969 26 A 1.0001 1.0001 0 0 0 37.841797 26L34.154297 26 A 1.0001 1.0001 0 0 0 33.984375 25.986328 A 1.0001 1.0001 0 0 0 33.839844 26L16.167969 26 A 1.0001 1.0001 0 0 0 15.841797 26L12.154297 26 A 1.0001 1.0001 0 0 0 11.984375 25.986328 A 1.0001 1.0001 0 0 0 11.839844 26L8.1679688 26 A 1.0001 1.0001 0 0 0 7.8417969 26L4.1542969 26 A 1.0001 1.0001 0 0 0 3.984375 25.986328 A 1.0001 1.0001 0 0 0 3.8398438 26L2 26L2 23 z M 5 28L7 28L7 48L5 48L5 28 z M 13 28L15 28L15 41L13 41L13 28 z M 35 28L37 28L37 41L35 41L35 28 z M 43 28L45 28L45 48L43 48L43 28 z"/>
-			</svg>
-		</div>
-	`;
+	// static MESA = `
+	// 	<div id="mesa_menu" class="menu_to_clone" data-tipo="mesa" draggable="true" title="Arrastra la Mesa hasta el Salón">
+	// 		<svg class="imagen_menu imagen_menu--mesa"
+	// 			fill="currentColor" viewBox="0 0 50 50" width="30" height="30"
+	// 			xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
+	// 			<path class="st0" d="M10.585938 11L0.38085938 21.205078 A 1.0001 1.0001 0 0 0 0.18945312 21.396484L0 21.585938L0 21.832031 A 1.0001 1.0001 0 0 0 0 22.158203L0 28L3 28L3 50L9 50L9 28L11 28L11 43L17 43L17 28L33 28L33 43L39 43L39 28L41 28L41 50L47 50L47 28L50 28L50 22.167969 A 1.0001 1.0001 0 0 0 50 21.841797L50 21.585938L49.806641 21.392578 A 1.0001 1.0001 0 0 0 49.623047 21.207031 A 1.0001 1.0001 0 0 0 49.617188 21.203125L39.414062 11L39 11L10.585938 11 z M 11.414062 13L38.585938 13L46.585938 21L3.4140625 21L11.414062 13 z M 2 23L48 23L48 26L46.167969 26 A 1.0001 1.0001 0 0 0 45.841797 26L42.154297 26 A 1.0001 1.0001 0 0 0 41.984375 25.986328 A 1.0001 1.0001 0 0 0 41.839844 26L38.167969 26 A 1.0001 1.0001 0 0 0 37.841797 26L34.154297 26 A 1.0001 1.0001 0 0 0 33.984375 25.986328 A 1.0001 1.0001 0 0 0 33.839844 26L16.167969 26 A 1.0001 1.0001 0 0 0 15.841797 26L12.154297 26 A 1.0001 1.0001 0 0 0 11.984375 25.986328 A 1.0001 1.0001 0 0 0 11.839844 26L8.1679688 26 A 1.0001 1.0001 0 0 0 7.8417969 26L4.1542969 26 A 1.0001 1.0001 0 0 0 3.984375 25.986328 A 1.0001 1.0001 0 0 0 3.8398438 26L2 26L2 23 z M 5 28L7 28L7 48L5 48L5 28 z M 13 28L15 28L15 41L13 41L13 28 z M 35 28L37 28L37 41L35 41L35 28 z M 43 28L45 28L45 48L43 48L43 28 z"/>
+	// 		</svg>
+	// 	</div>
+	// `;
 	
-	/** ### Imagen svg del elemento 'silla'  ►  {@link Configuracion_Salon._asegurar_plantillas_menu}*/
-	static SILLA = `
-		<div id="silla_menu" class="menu_to_clone" data-tipo="silla" draggable="true" title="Arrastra la silla hasta el Salón">
-			<svg class="imagen_menu imagen_menu--silla st0"
-				fill="currentColor" viewBox="0 0 512 512" width="30" height="30"
-				xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
-				<g>
-					<rect x="262.97" y="298.368" class="st0" width="33.329" height="155.344"/>
-					<path class="st0" d="M243.216,23.156l-50.788,201.47h-42.233l-89.148,13.431v36.624l10.08,1.437h-10.08v177.595h33.329V279.441
-						l55.819,7.952V512h41.146V287.392h158.98V512h41.137V259.523L450.953,0L243.216,23.156z M349.317,224.626H225.884l43.386-172.06
-						l122.188-11.116L349.317,224.626z"/>
-				</g>
-			</svg>
-		</div>
-	`;
-	static SILLA_ = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="50" height="50"> <g fill="#8B4513"> <rect x="262.97" y="298.368" width="33.329" height="155.344"/> <path d="M243.216,23.156l-50.788,201.47h-42.233l-89.148,13.431v36.624l10.08,1.437h-10.08v177.595h33.329V279.441l55.819,7.952V512h41.146V287.392h158.98V512h41.137V259.523L450.953,0L243.216,23.156z M349.317,224.626H225.884l43.386-172.06l122.188-11.116L349.317,224.626z"/> </g> </svg>`;
+	// /** ### Imagen svg del elemento 'silla'  ►  {@link Configuracion_Salon._asegurar_plantillas_menu}*/
+	// static SILLA = `
+	// 	<div id="silla_menu" class="menu_to_clone" data-tipo="silla" draggable="true" title="Arrastra la silla hasta el Salón">
+	// 		<svg class="imagen_menu imagen_menu--silla st0"
+	// 			fill="currentColor" viewBox="0 0 512 512" width="30" height="30"
+	// 			xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
+	// 			<g>
+	// 				<rect x="262.97" y="298.368" class="st0" width="33.329" height="155.344"/>
+	// 				<path class="st0" d="M243.216,23.156l-50.788,201.47h-42.233l-89.148,13.431v36.624l10.08,1.437h-10.08v177.595h33.329V279.441
+	// 					l55.819,7.952V512h41.146V287.392h158.98V512h41.137V259.523L450.953,0L243.216,23.156z M349.317,224.626H225.884l43.386-172.06
+	// 					l122.188-11.116L349.317,224.626z"/>
+	// 			</g>
+	// 		</svg>
+	// 	</div>
+	// `;
+	// static SILLA_ = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="50" height="50"> <g fill="#8B4513"> <rect x="262.97" y="298.368" width="33.329" height="155.344"/> <path d="M243.216,23.156l-50.788,201.47h-42.233l-89.148,13.431v36.624l10.08,1.437h-10.08v177.595h33.329V279.441l55.819,7.952V512h41.146V287.392h158.98V512h41.137V259.523L450.953,0L243.216,23.156z M349.317,224.626H225.884l43.386-172.06l122.188-11.116L349.317,224.626z"/> </g> </svg>`;
 		
 	/** ### Clase que Se encarga de la configuracion incial del Salon y metodos asociadas al Funcionamiento */
 	CFG = null; 
@@ -2439,13 +2448,13 @@ class e_Salon extends Tablero_Touch {
 	/** ### Variable que me sirve para gestionar cuando ha habido un cambio de reserva: {@link mesa_click_handler} ■ {@link _desactivar_modo_reserva} */
 	last_reserva_clicked = -1;	// el ultimo click sobre que reserva.... indice en reservas
 
-	static MODELOS_SALON = ['limitado', 'scrolado', 'apilado'];
-	// limitado: Según el ancho del dispositivo se muestran 8,16,24 columnas. 
-	// 			 dicc_config no tiene que poner columnas...necesita re-posicionar.
-	//  		 ACTUAL MODELO EN DESARROLLO, POR ESO SE PONE POR DEFECTO EN EL CONSTRUCTOR.
+	// ### limitado: Según el ancho del dispositivo se muestran 8,16,24 columnas. 
+	// ###			 dicc_config no tiene que poner columnas...necesita re-posicionar.
+	// ### 		 ACTUAL MODELO EN DESARROLLO, POR ESO SE PONE POR DEFECTO EN EL CONSTRUCTOR.
 	//
-	// scrolado: Puedes poner tantas columnas como quieras pero según el ancho del dispositivoo, el contenedor scrolará al ancho especificado.
-	// apilado:  No tiene limite de columnas y no hace scroll, es el usuario quien tiene la responsabilidad.
+	// ### scrolado: Puedes poner tantas columnas como quieras pero según el ancho del dispositivoo, el contenedor scrolará al ancho especificado.
+	// ### apilado:  No tiene limite de columnas y no hace scroll, es el usuario quien tiene la responsabilidad.
+	static MODELOS_SALON = ['limitado', 'scrolado', 'apilado'];
 
 	/**
 	 * ### Gestiona Reservas ,Mensajes y posiciones de un Tablero ó Salon.
@@ -2458,8 +2467,7 @@ class e_Salon extends Tablero_Touch {
      *	 tipos: {mesa: 'mesa',silla:'silla'},  
 	 *   clases_css:{contenedor: 'estiloSalon',baldosas:'estiloBaldosas'},
      *	 };
-	 * ```
-	 */
+	 * ```  */
 	constructor(dicc_config = {}, modelo_salon='limitado'){
 
 		// Mensaje de entrada a Borrar :
@@ -2528,7 +2536,7 @@ class e_Salon extends Tablero_Touch {
 		
 		const z_players = Catalogo.get_item_s("grupo", "player");
 		const z_logica_alergias = Catalogo.get_item_s("logica", "motor_alerg", true);
-		const z_sub_grupos = Catalogo.get_item_s("sub_grupo", "agrupado");
+		const z_sub_grupos = Catalogo.get_item_s("rol", "cliente");
 		// 💥💥💥💥💥💥💥💥
 
 		// ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ 
@@ -2536,13 +2544,14 @@ class e_Salon extends Tablero_Touch {
 		// 	        • El modelo ya se ha hecho efectivo en 'super' con 'columnas_aplicadas'. 
 		// 			• AHORA LO REGISTRO Y Según el tipo de modelo..... para la version2....ainsss
 		if(e_Salon.MODELOS_SALON.includes(modelo_salon)){
-
+			this.modelo_salon = modelo_salon;
+			if(this.modelo_salon === 'limitado'){}
+			else if(this.modelo_salon === 'scrolado'){}
+			else if(this.modelo_salon  === 'apilado'){}
+			else{}
+		}else{
+			this.modelo_salon = 'limitado';
 		}
-		this.modelo_salon = modelo_salon;
-		if(this.modelo_salon === 'limitado'){}
-		else if(this.modelo_salon === 'scrolado'){}
-		else if(this.modelo_salon  === 'apilado'){}
-		else{}
 		
 		// ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ NO USADO. PREPARADO
 		// Botones de Accion sobre el NavBar (Login, Ver-Info, Guardar, Cargar, Re-iniciar Salon): 
@@ -2571,23 +2580,21 @@ class e_Salon extends Tablero_Touch {
 		this.entorno = entorno;
 		this.dimension = dimesion_inicial;
 		this.limites = limites;
+		// ┌••••••••••••••••••••••••••••
+		// ┌• CONFIGURACION DEL SALON: 
+		this.CFG = new Configuracion_Salon(this, dicc_config, '[data-bs-toggle="offcanvas"]');
+		
+		// ■ ASEGURA QUE EL DICCIONARIO DE CONFIGURACION ESTA LIMPIO
+		this.dicc_config = this.CFG.diccionario;		
 		
 		// ┌••••••••••••••••••••••••••••
 		// ■■ Sidebar persistente de elementos (mesa/silla/...) 
 		const $icono_elementos = document.querySelector('[data-action-nav="elementos"]');
 		this.Side_Elementos = new Side_Elementos(
-											this.add_listeners_touchraton.bind(this),
+											this._add_listeners_movimiento.bind(this),
 											z_catalogo,
 											$icono_elementos,
 											);
-
-		// ┌••••••••••••••••••••••••••••
-		// ┌• CONFIGURACION DEL SALON: 
-		const boton_configuracion = '[data-bs-toggle="offcanvas"]'
-		this.CFG = new Configuracion_Salon(this, dicc_config, boton_configuracion);
-		
-		// ■ ASEGURA QUE EL DICCIONARIO DE CONFIGURACION ESTA LIMPIO
-		this.dicc_config = this.CFG.diccionario;		
 		
 		// ┌••••••••••••••••••••••••
 		// ┌• LOGIN Y REGISTRO: 
@@ -2824,22 +2831,14 @@ class e_Salon extends Tablero_Touch {
 		this.is_mode_reserva = true;
 	}
 	
-	_get_indice_en_reserva(id_elemento){
-
-		const index_reserva = this.reservas.findIndex(dicc => {
-			return dicc.mesas.includes(id_elemento) || dicc.sillas.includes(id_elemento);
-		});
-
-	}
-
 	/** ✒️✒️
-	 * #### SOBRE-ESCRIBE ✒️ EL MÉTODO elemento_nuevo_to_Salon DE DRAG_X_DROP 
+	 * #### SOBRE-ESCRIBE ✒️ EL MÉTODO elemento_nuevo_to__Salon DE DRAG_X_DROP 
 	 * 	* Añade un CLASSNAME según el data-tipo(html) del elemento (silla o mesa)
 	 * 	* Añade un Event Listener ​👂​👂 para el click en el nuevo elemento.
-	 * ```javascript
-	 * this.elemento_nuevo_to_Salon(objDrag, objDrop, data_tipo);			
-	 * ```
 	 * @see {@link Tablero_Drop.drop_over_matriz}
+	 * ```javascript
+	 * this.elemento_nuevo_to_Salon_(objDrag, objDrop, data_tipo);			
+	 * ```
 	*/
 	elemento_nuevo_to_Salon(item_menu = null, baldosa_matriz = null, data_tipo = ''){
 		const dc = this.dicc_config;
@@ -3608,7 +3607,7 @@ class e_Salon extends Tablero_Touch {
 			// ■■ Selecciona TODOS los elementos a clonar (elementos del menu)
 			let items_menu = document.querySelectorAll('.menu_to_clone');
 			if (items_menu.length === 0) {
-				Configuracion_Salon._asegurar_plantillas_menu();
+				// Configuracion_Salon._asegurar_plantillas_menu();
 				items_menu = document.querySelectorAll('.menu_to_clone');
 				if (items_menu.length === 0) {
 					console.log('[_load_elementos_en_Salon] No hay plantillas .menu_to_clone en el DOM.');
@@ -3657,9 +3656,7 @@ class e_Salon extends Tablero_Touch {
 
 				// ◘
 				const objDrop = this.get_objdiv_from_mydiv(value);
-				
 
-				// ■■ SIMILAR A this.elemento_nuevo_to_Salon(mesa_o_silla, objDrop, data_tipo);pero con Id el que venga.
 				// ■■ Verificamos que la baldosa de destino esté vacía
 				if (this.is_baldosa_vacia(objDrop) == false) 
 					return;
@@ -3672,7 +3669,7 @@ class e_Salon extends Tablero_Touch {
 				//  ​👂​👂  Hace el clon del item del menu DRAGGABLE
 				// clon_item.draggable = true;
 				// clon_item.addEventListener('dragstart', this.dragStart.bind(this));
-				this.add_listeners_touchraton(clon_item);
+				this._add_listeners_movimiento(clon_item);
 
 				
 				// ■■ Añade el clon  a la baldosa.
@@ -3900,9 +3897,9 @@ class e_Salon extends Tablero_Touch {
 		elemento.draggable = true;
 		
 		// ┌•  ​👂​👂 
-		elemento.removeEventListener('dragstart', this.dragStart);
-		elemento.addEventListener('dragstart', this.dragStart.bind(this));
-		this.add_listeners_touchraton(elemento);		
+		// elemento.removeEventListener('dragstart', this.dragStart);
+		// elemento.addEventListener('dragstart', this.dragStart.bind(this));
+		this._add_listeners_movimiento(elemento);		
 		
 		// ┌• CAMBIA DE CLASE PARA NO HEREDAR EL ESTILO DEL MENU....
 		elemento.className = "";
@@ -3929,16 +3926,16 @@ class e_Salon extends Tablero_Touch {
 
 	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	/** ### Entra un id de mesa o silla pej: 'mesa_2' desde un rango y devuelve el elemento del menu equivalente (div mesa menu) 
-	 * ### _what_player_menu devuelve: { tipo:(str) , elemento: < object > }
+	 * ### __what_player_menu devuelve: { tipo:(str) , elemento: < object > }
 	 * 
 	 * ```javascript
-	 * const player_menu = this._what_player_menu(id_mesa_o_silla); 
+	 * const player_menu = this.__what_player_menu(id_mesa_o_silla); 
 	 * console.log(player_menu.tipo); 		► "silla"
 	 * console.log(player_menu.elemento); 	► <div class="menu_to_clone" ... >
 	 * ```
 	 * ### • PROCESO DE CREACIÓN DE UN ELEMENTO DEL SALON A PARTIR DE SU ID Y EL MENU:
 	 * ```javascript
-	 *	const menu_element = Salon?._what_player_menu(id_player);					
+	 *	const menu_element = Salon?.__what_player_menu(id_player);					
 	 *	if(!menu_element) return; 			
 	 *	const player = menu_element.elemento.cloneNode(true);
 	 *	if (player) {
@@ -4036,6 +4033,9 @@ class Configuracion_Salon {
 			console.error("❌ Configuracion__Salon: No se ha proporcionado una referencia válida al salón padre.");
 			return false;
 		}		
+		// if (!salon.dicc_config){
+		// 	console.log('❌ No existe dicc_config desde Salon')
+		// }
 		this.Salon = salon; 
 		this.dicc_config_inicial = dicc_config;
 		
@@ -4051,13 +4051,16 @@ class Configuracion_Salon {
 		// •••••••••••••••
 		// ┌•• QUIEN SOY
 		/** ### Detección de Entorno ( Define la configuración ) */
-		this.entorno = Compatibilidad._detectar_entorno();
+		// this.entorno = Compatibilidad._detectar_entorno();
 		// ┌■ Determinar DIMENSIONES INICIALES dependiendo del tipo/ancho de la pantalla. 
 		// ┌• dimesion_inicial = {filas, columnas} 
-		this.dimension_inicial = Compatibilidad._get_dimension_inicial(this.entorno.tipo);
+		
+		// this.dimension_inicial = Compatibilidad._get_dimension_inicial(this.entorno.tipo);
+		// this.dimension_inicial = this.Salon.dimension;
 		// ┌■ Determinar LIMITES MAX MIN de columnas y filas dependiendo del tipo/ancho de la pantalla. 
 		// ┌• limites = { columnas:{min:8, max:30}, filas: {min:8, max:100} }
-		this.limites = Compatibilidad._get_limites_max_min(this.entorno.tipo);
+		// this.limites = Compatibilidad._get_limites_max_min(this.entorno.tipo);
+		// console.log(`${this.Salon.entorno} + ${this.Salon.dimension} + ${this.Salon.limites}`);
 		
 		// •••••••••••••••••••••••••••••••••••••• 
 		// OFFCANVAS DE CONFIGURACION DE LA APP
@@ -4077,7 +4080,8 @@ class Configuracion_Salon {
 		this.$sidebar_posiciones = e_Salon._to_element('[data-side-position]');
 		
 		// ┌•• Cargo los txt's del formulario
-		this._load_offcanvas_configuracion(this.dimension_inicial, this.limites);		
+		// this._load_offcanvas_configuracion(this.dimension_inicial, this.limites);		
+		this._load_offcanvas_configuracion(this.Salon.dimension, this.Salon.limites);		
 		// Configuracion_Salon._asegurar_plantillas_menu();
 
 		// ■■ NUMERO COLUMNAS	
@@ -4502,21 +4506,21 @@ class Configuracion_Salon {
 			return false;
 		}
 	}
-
 	
 	/**
 	 * 🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱
-	 * @param {object} dimension {filas:(integer) , columnas:(integer)}
-	 */
+	 * @param {object} dimension {filas:(integer) , columnas:(integer)} 
+	 * */
 	_is_dimension_ok(dimension=null, limites=null){
 		if(!dimension) return;
 		const filas = dimension.filas;
 		const columnas = dimension.columnas;
+		const LMT = this.Salon.limites
 
-		const max_f = this.limites.filas.max;
-		const min_f = this.limites.filas.min;
-		const max_c = this.limites.columnas.max;
-		const min_c = this.limites.columnas.min;
+		const max_f = LMT.filas.max;
+		const min_f = LMT.filas.min;
+		const max_c = LMT.columnas.max;
+		const min_c = LMT.columnas.min;
 
 		if (filas > max_f || filas < min_f){
 			return false;
@@ -4525,7 +4529,6 @@ class Configuracion_Salon {
 		}
 		return true;
 	}
-
 	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ OFFCANVAS CONFIGURACION
 	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -4685,12 +4688,13 @@ class Configuracion_Salon {
 			// }
 			
 		// ■ SI PERMITE VULNERAR LOS LIMITES:
+		const LMT = this.Salon.limites;
 		if( permite_vulnerar_limites ){
 			// ■ PERMITE VULNERAR LOS LIMITES POR ARRIBA
 			if (isNaN(filas) || 
 				isNaN(columnas) || 
-				filas < this.limites.filas.min || 
-				columnas < this.limites.columnas.min ) {
+				filas < LMT.filas.min || 
+				columnas < LMT.columnas.min ) {
 					console.error(`Dimensiones inválidas o fuera de rango ${filas}x${columnas}`);
 					return false;
 			}
@@ -4769,7 +4773,7 @@ class Configuracion_Salon {
 			setTimeout(() => modal.remove(), 100);
 		});
 
-		const modal_id = Herramientas.get_dom_secuency('json_Modal');		
+		const modal_id = Herramientas._get_secuencial_dom('json_Modal');		
 		
 		// ■■ Crear modal dinámicamente
 		const modalHTML = `
@@ -5088,28 +5092,28 @@ class Configuracion_Salon {
 	}
 
 	/** ## Crea un div hidden y coloca la imagen de mesa y silla constantes de e-Salon */
-	static _asegurar_plantillas_menu() {
-		let contenedor = document.querySelector('.menu-templates');
-		if (!contenedor) {
-			contenedor = document.createElement('div');
-			contenedor.className = 'menu-templates d-none';
-			contenedor.setAttribute('aria-hidden', 'true');
-		}
+	// static _asegurar_plantillas_menu() {
+	// 	let contenedor = document.querySelector('.menu-templates');
+	// 	if (!contenedor) {
+	// 		contenedor = document.createElement('div');
+	// 		contenedor.className = 'menu-templates d-none';
+	// 		contenedor.setAttribute('aria-hidden', 'true');
+	// 	}
 
-		if (!contenedor.parentElement) {
-			document.body.appendChild(contenedor);
-		}
+	// 	if (!contenedor.parentElement) {
+	// 		document.body.appendChild(contenedor);
+	// 	}
 
-		if (!contenedor.querySelector('#mesa_menu')) {
-			contenedor.insertAdjacentHTML('beforeend', e_Salon.MESA);
-		}
+	// 	if (!contenedor.querySelector('#mesa_menu')) {
+	// 		contenedor.insertAdjacentHTML('beforeend', e_Salon.MESA);
+	// 	}
 
-		if (!contenedor.querySelector('#silla_menu')) {
-			contenedor.insertAdjacentHTML('beforeend', e_Salon.SILLA);
-		}
+	// 	if (!contenedor.querySelector('#silla_menu')) {
+	// 		contenedor.insertAdjacentHTML('beforeend', e_Salon.SILLA);
+	// 	}
 
-		return contenedor;
-	}
+	// 	return contenedor;
+	// }
 	
 	/**
 	 * Valida si un parámetro es un array (ya sea objeto o cadena JSON válida).
@@ -5139,7 +5143,7 @@ class Configuracion_Salon {
 	}
 	
 	/**
-     * ### Verifica que cada elemento tenga las propiedades físicas y lógicas mínimas.     */
+     * ### Verifica que cada elemento tenga las propiedades físicas y visual mínimas.     */
     _validar_contrato_catalogo(catalogo) {
 		// Fisica y Visual son obligatorias, la lógica es opcional
         const campos_obligatorios = ['id', 'fisica', 'visual'];
@@ -7026,7 +7030,7 @@ class Foto_CRUD{
 		console.log(`📐 Dimensiones desde BDD: { filas: '${dimension.filas}', columnas: '${dimension.columnas}' }`);
 			
 		// ┌•• Cacho el 'id' para generar el Html.
-		const modal_id = Herramientas.get_dom_secuency('json_Modal');				
+		const modal_id = Herramientas._get_secuencial_dom('json_Modal');				
 		// ┌•• Crear modal dinámicamente
 		const modalHTML = `
 		<div class="modal fade" id="${modal_id}" tabindex="-1"  data-updt="update">
@@ -8314,9 +8318,12 @@ class Side_Elementos {
 			div_item.id = `${key}_menu`;	//mesa_menu, silla_menu
 			div_item.title = `Arrastra hacia el Salón`;            
             div_item.className = 'menu_to_clone';             
-            div_item.dataset.tipo = key;       
+            
+			div_item.dataset.tipo = key;       
             div_item.dataset.grupo = el.grupo;   
-            // Asignar el contenido visual definido en el catálogo (el string SVG)
+            div_item.dataset.rol = el.rol;   
+            
+			// Asignar el contenido visual definido en el catálogo (el string SVG)
             if (el.visual && el.visual.content) {
                 div_item.innerHTML = el.visual.content;
             }
@@ -8631,7 +8638,7 @@ const Herramientas = {
 	 * @param {*} strAux 
 	 * @returns 
 	 */
-	get_dom_secuency(strAux = IDLINK_XDEF) {
+	_get_secuencial_dom(strAux = IDLINK_XDEF) {
 		//Validacion de los argumentos:.............>
 		if (!strAux || typeof (strAux) != 'string') return false;
 		//
@@ -8726,7 +8733,6 @@ const Compatibilidad = {
 			ancho_ventana: ancho
 		};
 	},
-	
 	
 	/**
 	 * ## Determinar DIMENSIONES INICIALES dependiendo del tipo/ancho de la pantalla. 

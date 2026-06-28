@@ -8,7 +8,7 @@ class Catalogo {
     mesa: {
         id: 'mesa',
         grupo: 'player',
-        sub_grupo: 'agrupador', // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc)
+        rol: 'agrupador', // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc)
         fisica: {
             ancho: 1, // Medida en celdas/baldosas
             alto: 1,
@@ -29,7 +29,7 @@ class Catalogo {
     silla: {
         id: 'silla',
         grupo: 'player',
-        sub_grupo: 'cliente',   // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc) 
+        rol: 'cliente',   // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc) 
         fisica: { ancho: 1, alto: 1, colision: true },
         visual: {
             content: `<svg class="imagen_menu imagen_menu--silla st0"fill="currentColor" viewBox="0 0 512 512" width="30" height="30"xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"><g><rect x="262.97" y="298.368" class="st0" width="33.329" height="155.344"/><path class="st0" d="M243.216,23.156l-50.788,201.47h-42.233l-89.148,13.431v36.624l10.08,1.437h-10.08v177.595h33.329V279.441l55.819,7.952V512h41.146V287.392h158.98V512h41.137V259.523L450.953,0L243.216,23.156z M349.317,224.626H225.884l43.386-172.06l122.188-11.116L349.317,224.626z"/></g></svg>`,
@@ -46,7 +46,7 @@ class Catalogo {
     taburete: {
         id: 'taburete',
         grupo: 'player',
-        sub_grupo: 'cliente',   // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc)
+        rol: 'cliente',   // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc)
         fisica: { ancho: 1, alto: 1, colision: true },
         visual: {
             content: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50"><g fill="#8B4513"><rect x="12" y="25" width="4" height="20" rx="1" /><rect x="34" y="25" width="4" height="20" rx="1" /><rect x="18" y="20" width="4" height="15" rx="1" opacity="0.8" /><rect x="28" y="20" width="4" height="15" rx="1" opacity="0.8" /><ellipse cx="25" cy="20" rx="18" ry="12" /><path d="M7,20 Q7,30 25,30 Q43,30 43,20 L43,22 Q43,32 25,32 Q7,32 7,22 Z" /></g></svg>',
@@ -60,7 +60,7 @@ class Catalogo {
     // planta: {
     //     id: 'planta',
     //     grupo: 'decoration',
-    //     sub_grupo: 'decoracion',   // Repito pq esto es futuro, no presente. pero quiero pensar ya en esto.
+    //     rol: 'decoracion',   // Repito pq esto es futuro, no presente. pero quiero pensar ya en esto.
     //     fisica: { ancho: 1, alto: 1, colision: true },
     //     visual: {
     //         html: '',
@@ -72,7 +72,7 @@ class Catalogo {
     // esquina_muro: {
     //     id: 'esquina_muro',
     //     grupo: 'structure',
-    //     sub_grupo: 'estructura',    // Repito pq esto es futuro, no presente. pero quiero pensar ya en esto.
+    //     rol: 'estructura',    // Repito pq esto es futuro, no presente. pero quiero pensar ya en esto.
     //     fisica: { ancho: 1, alto: 1, colision: true },
     //     visual: {
     //         html: '',
@@ -173,7 +173,32 @@ class Catalogo {
         });
     }
 
+    // ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
     // Exportación para Node.js o Navegador moderno
     // export default Catalogo;
-
 }
+
+// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+// 💥 EJEMPLOS DE LLAMADAS DESDE PROGRAMA:
+// const z_catalogo = Catalogo.get();
+// const z_silla = Catalogo.get("silla");
+// const z_silla_id = Catalogo.get("silla", "id");
+// const z_silla_visual = Catalogo.get("silla", 'visual');
+// const z_silla_visual_css = Catalogo.get("silla", 'visual', "css");
+// const z_visual_css = Catalogo.get('visual', "css"); 	// NULL		
+
+// const z_grupo = Catalogo.get_distinto_s("grupo");
+// const z_visual = Catalogo.get_distinto_s('visual');
+// const z_visual_content = Catalogo.get_distinto_s('visual', 'content');		
+// const z_log_msg = Catalogo.get_distinto_s('logica', 'motor_msg');
+// const z_log_msg_tipo = Catalogo.get_distinto_s('logica', 'motor_msg', 'tipo');
+// const z_id_s = Catalogo.get_distinto_s('id');		
+// const z_mesa = Catalogo.get_distinto_s('mesa');	// NULL
+// const z_mesa_id = Catalogo.get_distinto_s('mesa' , 'id');	// NULL
+
+// const z_keys = Catalogo.get_keys();
+
+// const z_players = Catalogo.get_item_s("grupo", "player");
+// const z_logica_alergias = Catalogo.get_item_s("logica", "motor_alerg", true);
+// const z_sub_grupos = Catalogo.get_item_s("rol", "cliente");
+// 💥💥💥💥💥💥💥💥
