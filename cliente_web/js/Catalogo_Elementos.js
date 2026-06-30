@@ -19,8 +19,8 @@ class Catalogo {
             css: 'style_visual_agrupador'
         },
         logica: {
-            motor_alerg: false,
-            motor_msg: {
+            motor_alergias: false,
+            motor_mensajes: {
                 tipo: 'sumatorio',              // Motor de mensajes: acumula valores por reserva.
                 css: 'estyle_msg_agrupador'
             }
@@ -36,8 +36,8 @@ class Catalogo {
             css: 'style_visual_cliente'
         },
         logica: {
-            motor_alerg: true,
-            motor_msg: {
+            motor_alergias: true,
+            motor_mensajes: {
                 tipo: 'single', // Motor de mensajes: individual
                 css: 'estyle_msg_cliente'
             }
@@ -53,33 +53,30 @@ class Catalogo {
             css: 'style_visual_cliente'
         },
         logica: {
-            motor_alerg: true,
-            motor_msg: { tipo: 'single', css: 'estyle_msg_cliente' }
+            motor_alergias: true,
+            motor_mensajes: { tipo: 'single', css: 'estyle_msg_cliente' }
         }
     },
     // planta: {
     //     id: 'planta',
     //     grupo: 'decoration',
-    //     rol: 'decoracion',   // Repito pq esto es futuro, no presente. pero quiero pensar ya en esto.
+    //     rol: 'decoracion',   
     //     fisica: { ancho: 1, alto: 1, colision: true },
     //     visual: {
-    //         html: '',
-    //         url: '',
+    //         content: '',
     //         css: 'estiloPlanta'
     //     },
-    //     logica: { b_alergias: false, msg: null }
     // },
     // esquina_muro: {
     //     id: 'esquina_muro',
     //     grupo: 'structure',
-    //     rol: 'estructura',    // Repito pq esto es futuro, no presente. pero quiero pensar ya en esto.
+    //     rol: 'estructura',    
     //     fisica: { ancho: 1, alto: 1, colision: true },
-    //     visual: {
-    //         html: '',
-    //         url: '',
+    //     visual: { 
+    //         content: '',
     //         css: 'estiloEsquinaMuro'
     //     },
-    //     logica: { b_alergias: false, msg: null }
+    //     logica: { motor_alergias: false, motor_mensajes: null }
     // }
     });
 
@@ -190,8 +187,8 @@ class Catalogo {
 // const z_grupo = Catalogo.get_distinto_s("grupo");
 // const z_visual = Catalogo.get_distinto_s('visual');
 // const z_visual_content = Catalogo.get_distinto_s('visual', 'content');		
-// const z_log_msg = Catalogo.get_distinto_s('logica', 'motor_msg');
-// const z_log_msg_tipo = Catalogo.get_distinto_s('logica', 'motor_msg', 'tipo');
+// const z_log_msg = Catalogo.get_distinto_s('logica', 'motor_mensajes');
+// const z_log_msg_tipo = Catalogo.get_distinto_s('logica', 'motor_mensajes', 'tipo');
 // const z_id_s = Catalogo.get_distinto_s('id');		
 // const z_mesa = Catalogo.get_distinto_s('mesa');	// NULL
 // const z_mesa_id = Catalogo.get_distinto_s('mesa' , 'id');	// NULL
@@ -199,6 +196,6 @@ class Catalogo {
 // const z_keys = Catalogo.get_keys();
 
 // const z_players = Catalogo.get_item_s("grupo", "player");
-// const z_logica_alergias = Catalogo.get_item_s("logica", "motor_alerg", true);
+// const z_logica_alergias = Catalogo.get_item_s("logica", "motor_alergias", true);
 // const z_sub_grupos = Catalogo.get_item_s("rol", "cliente");
 // 💥💥💥💥💥💥💥💥
