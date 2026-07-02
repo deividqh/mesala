@@ -1113,3 +1113,121 @@ class Motor_Alergias {
         return this.d_alergenos;
     }
 }
+
+
+class Logica_Salon {
+  // Propiedades privadas de estado
+  #offcanvasElement = null;
+  #offcanvasInstance = null;
+  #catalogoData = null;
+  #currentElement = null;
+
+  constructor(catalogoData) {
+    this.#catalogoData = catalogoData;
+    // Captura del contenedor estático del DOM
+    this.#offcanvasElement = document.getElementById('offcanvasSalon');
+    
+    if (!this.#offcanvasElement) {
+      console.error("Error crítico: No se encontró '#offcanvasSalon' en el HTML.");
+    }
+  }
+
+  /**
+   * Método principal para invocar o refrescar el Offcanvas
+   * @param {string} idElemento - Llave del diccionario (ej: 'mesa', 'silla', 'taburete')
+   */
+  abrirElemento(idElemento) {
+    // 1. Recuperar datos desde el estado interno de la clase
+    this.#currentElement = this.#catalogoData[idElemento];
+    
+    if (!this.#currentElement) {
+      console.error(`El elemento '${idElemento}' no existe en el catálogo.`);
+      return;
+    }
+
+    // 2. Control de persistencia: Se crea una sola vez y no se destruye
+    if (!this.#offcanvasInstance) {
+      this.#offcanvasInstance = new bootstrap.Offcanvas(this.#offcanvasElement);
+    }
+
+    // 3. Gestionar visibilidad de pestañas según su rol único
+    this.#gestionarPestañas(this.#currentElement.rol);
+
+    // 4. Cargar las variables del objeto en el contenedor
+    this.#llenarContenido(this.#currentElement);
+
+    // 5. Mostrar/Abrir el Offcanvas
+    this.#offcanvasInstance.show();
+  }
+
+  /**
+   * Conmuta de forma limpia y exclusiva las pestañas del DOM
+   * @param {string} rolActivo - Rol del elemento ('agrupador' o 'cliente')
+   */
+  #gestionarPestañas(rolActivo) {
+    const liAgrupador = document.getElementById('li-tab-agrupador');
+    const liCliente = document.getElementById('li-tab-cliente');
+
+    // 1. Ocultamos todas por defecto usando la clase utilitaria de Bootstrap
+    liAgrupador.classList.add('d-none');
+    liCliente.classList.add('d-none');
+
+    // 2. Activamos visualmente solo la pestaña correspondiente al rol del objeto
+    if (rolActivo === 'agrupador') {
+      liAgrupador.classList.remove('d-none');
+      
+      // Forzamos a Bootstrap a seleccionar y pintar el panel del agrupador
+      const tabBtn = bootstrap.Tab.getOrCreateInstance(document.getElementById('agrupador-tab'));
+      tabBtn.show();
+    } 
+    else if (rolActivo === 'cliente') {
+      liCliente.classList.remove('d-none');
+      
+      // Forzamos a Bootstrap a seleccionar y pintar el panel del cliente
+      const tabBtn = bootstrap.Tab.getOrCreateInstance(document.getElementById('cliente-tab'));
+      tabBtn.show();
+    }
+  }
+
+  /**
+   * Vuelca la información lógica y los SVG del objeto en los paneles correspondientes
+   * @param {Object} elemento - Datos del catálogo
+   */
+  #llenarContenido(elemento) {
+    if (elemento.rol === 'agrupador') {
+      const pane = document.getElementById('content-agrupador');
+      pane.innerHTML = `
+        <div class="text-center my-3 ${elemento.visual.css}">
+          ${elemento.visual.content}
+          <h5 class="mt-2 text-capitalize">${elemento.id}</h5>
+        </div>
+        <div class="card p-3 bg-light">
+          <p class="mb-1"><strong>Grupo:</strong> ${elemento.grupo}</p>
+          <p class="mb-1"><strong>Dimensiones:</strong> ${elemento.fisica.ancho}x${elemento.fisica.alto}</p>
+          <p class="mb-0"><strong>Mensajes:</strong> ${elemento.logica.motor_mensajes.tipo}</p>
+        </div>
+      `;
+    } 
+    else if (elemento.rol === 'cliente') {
+      const pane = document.getElementById('content-cliente');
+      pane.innerHTML = `
+        <div class="text-center my-3 ${elemento.visual.css}">
+          ${elemento.visual.content}
+          <h5 class="mt-2 text-capitalize">${elemento.id}</h5>
+        </div>
+        <div class="card p-3 bg-light">
+          <p class="mb-1"><strong>Grupo:</strong> ${elemento.grupo}</p>
+          <p class="mb-1"><strong>Control Alergias:</strong> ${elemento.logica.motor_alergias ? 'Activado' : 'Desactivado'}</p>
+          <p class="mb-0"><strong>Estilo Mensajes:</strong> <code class="small">${elemento.logica.motor_mensajes.css}</code></p>
+        </div>
+      `;
+    }
+  }
+
+  // Método de cierre programático por si necesitas control externo
+  cerrarElemento() {
+    if (this.#offcanvasInstance) {
+      this.#offcanvasInstance.hide();
+    }
+  }
+}
