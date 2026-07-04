@@ -2574,7 +2574,7 @@ class e_Salon extends Tablero_Touch {
 		this.CFG = new Configuracion_Salon(this, dicc_config, '[data-bs-toggle="offcanvas"]');
 		
 		// ■ ASEGURA QUE EL DICCIONARIO DE CONFIGURACION ESTA LIMPIO
-		this.dicc_config = this.CFG.diccionario;		
+		this.dicc_config = this.CFG.configuracion;		
 		
 		// ┌•••••••••••••••••••••••••••••••••••
 		// ■■ Sidebar persistente de elementos (mesa/silla/...) 
@@ -2742,10 +2742,10 @@ class e_Salon extends Tablero_Touch {
 			this._abrir_offcanvas_logica(elemento_clickado, ctlg);
 			
 			if(logica?.motor_alergias){
-				console.log(`${logica.motor_alergias}`);
+				// console.log(`${logica.motor_alergias}`);
 			}
 			if(logica?.motor_mensajes){
-				console.log(`${logica.motor_mensajes}`);
+				// console.log(`${logica.motor_mensajes}`);
 			}
 		}
 
@@ -2849,22 +2849,25 @@ class e_Salon extends Tablero_Touch {
 	 * ```
 	*/
 	elemento_nuevo_to_Salon(item_menu = null, baldosa_matriz = null){
-		const dc = this.dicc_config;
-		if (!dc) return;
-		
+		const CFG = this.dicc_config;
+		if (!CFG) return;
+
 		const new_div_onplay = super.elemento_nuevo_to_Salon(item_menu , baldosa_matriz );
 
 		if (new_div_onplay){	
 
 			const idkey = new_div_onplay.dataset.tipo;
 			const class_new_div = idkey+'_onplay';
+			new_div_onplay.classList.add(idkey);
+			new_div_onplay.classList.add(class_new_div);
+			// new_div_onplay.addEventListener('click', this._elemento_onplay_click.bind(this));   
 
-			if (idkey == dc.tipos.silla) {
+			if (idkey == CFG.salon.tipos.silla) {
 
 				new_div_onplay.classList.add('silla_onplay');
 				new_div_onplay.addEventListener('click', this.silla_click_handler.bind(this));   
 
-			}else if (idkey == dc.tipos.mesa) {
+			}else if (idkey == CFG.salon.tipos.mesa) {
 
 				new_div_onplay.classList.add('mesa_onplay');
 				new_div_onplay.addEventListener('click', this.mesa_click_handler.bind(this));   
@@ -3127,60 +3130,58 @@ class e_Salon extends Tablero_Touch {
 	 * @param {string} [tipo] 'todo' 'all' | 'mesa' | 'silla' ► definidos en this.dicc__config.tipos
 	 * @return {array} 
 	 * ```javascript
-	 *  _get_ids_onplay_(this.dicc__config.tipos.silla) ► ['silla_0', 'silla_1', ... ]
-	 *  _get_ids_onplay_(this.dicc__config.tipos.mesa)  ► ['mesa_0', 'mesa_1', ... ]	
+	 *  _get_ids_onplay_('cliente') ► ['silla_0', 'silla_1', 'taburete_0', ... ]
+	 *  _get_ids_onplay_('agrupador')  ► ['mesa_0', 'mesa_1', ... ]	
 	 * ```
 	 */
 
-	_get_ids_onplay(tipo='todo'){		
-		const dc = this.dicc_config;
-		if(!dc) return;
+	_get_ids_onplay(rol_busca='todo'){		
+		const CFG = this.dicc_config;
+		if(!CFG) return;
 
-		const ctlg = dc.catalogo;
+		const ctlg = CFG.catalogo;
 		if(!ctlg) return;
 		const idkeys = Object.keys(ctlg);
 		if(!idkeys || idkeys.length === 0) return;
-
-		switch (tipo) {
-        case 'agrupador':
-			
-			break;
-		case 'cliente':
-
-			break;			
-		case 'todo':
-		case 'all':
-			arr_onplay_nodes = Array.from(document.querySelectorAll('.class_onplay'));
-			break;
-		default:
-			// return false;
-			console.log(`_get_ids_onplay() - Tipo desconocido: ${tipo}`);
-        }
 		
-
 		let arr_onplay_nodes = [];
-		switch (tipo) {
-        case dc.tipos.mesa:
-			arr_onplay_nodes = Array.from(document.querySelectorAll('.mesa_onplay'));
-			break;
-		case dc.tipos.silla:
-			arr_onplay_nodes = Array.from(document.querySelectorAll('.silla_onplay'));
-			break;			
-		case 'todo':
-		case 'all':
-			arr_onplay_nodes = Array.from(document.querySelectorAll('.mesa_onplay, .silla_onplay'));
-			break;
-		default:
-			return false;
-        }
+		arr_onplay_nodes = Array.from(document.querySelectorAll('.class_onplay'));
 
-		// const sillas_onplay_nodes = Array.from(document.querySelectorAll('.silla_onplay'));
+		if(rol_busca === 'todo' || rol_busca === 'all'){
+			return arr_onplay_nodes.map(el => el.id).filter(Boolean); 	
+		}
+		let arr_retorno = [];
+		for(const el of arr_onplay_nodes){
+			const idkey = el.dataset.tipo;
+			const rol_el = Catalogo.get(idkey)?.rol;
+			if (rol_el === rol_busca) {
+				arr_retorno.push(el?.id);
+			}
+		}
+		return arr_retorno.filter(Boolean);
 
-		// ■ mesa_3, silla_2
-		const getID = (el) => el.id || el.getAttribute('id') || (el.dataset ? el.dataset.drag_id : null); 			
+		// switch (rol_busca) {
+        // case CFG.salon.tipos.mesa:
+		// 	arr_onplay_nodes = Array.from(document.querySelectorAll('.mesa_onplay'));
+		// 	break;
+		// case CFG.salon.tipos.silla:
+		// 	arr_onplay_nodes = Array.from(document.querySelectorAll('.silla_onplay'));
+		// 	break;			
+		// case 'todo':
+		// case 'all':
+		// 	arr_onplay_nodes = Array.from(document.querySelectorAll('.mesa_onplay, .silla_onplay'));
+		// 	break;
+		// default:
+		// 	return false;
+        // }
 
-		const arr_id_elemento = arr_onplay_nodes.map(getID).filter(Boolean); // quitamos null
-		return arr_id_elemento;
+		// // const sillas_onplay_nodes = Array.from(document.querySelectorAll('.silla_onplay'));
+
+		// // ■ mesa_3, silla_2
+		// const getID = (el) => el.id || el.getAttribute('id') || (el.dataset ? el.dataset.drag_id : null); 			
+
+		// const arr_id_elemento = arr_onplay_nodes.map(getID).filter(Boolean); // quitamos null
+		// return arr_id_elemento;
 	}
 
 	/** ■■■■■■■■■■■■■■■■■ MESAS
@@ -3200,7 +3201,11 @@ class e_Salon extends Tablero_Touch {
 			
 			if (!visitadas.has(id_mesa)) {
 				// Encontramos un nuevo grupo (reserva)
-				const array_reserva = this._buscar_elementos_conectados(id_mesa, lista_mapdata, visitadas, data_tipo_busca);
+				const array_reserva = this._buscar_elementos_conectados(id_mesa, 
+																		lista_mapdata, 
+																		visitadas, 
+																		data_tipo_busca
+				);
 				matriz_reservas.push(array_reserva);
 			}
 		});
@@ -3324,7 +3329,8 @@ class e_Salon extends Tablero_Touch {
 	_get_sillas_ronin(set_sillas_visited=null){
 		let sillas_ronin = [];
 		// ■■■■■■■■■■■■ Sillas Ronin
-		const arr_id_sillas = this._get_ids_onplay(this.dicc_config.tipos.silla);
+		// const arr_id_sillas = this._get_ids_onplay(this.dicc_config.salon.tipos.silla);
+		const arr_id_sillas = this._get_ids_onplay('cliente');
 		const sillas_no_asignadas = arr_id_sillas.filter(silla_id => !set_sillas_visited?.has(silla_id));
 
 		if (sillas_no_asignadas.length > 0) {
@@ -3334,7 +3340,6 @@ class e_Salon extends Tablero_Touch {
 				sillas: [...sillas_no_asignadas]  
 			};
 			sillas_ronin.push(ficha_reservas);
-
 		}
 		return sillas_ronin;
 	}
@@ -3411,7 +3416,7 @@ class e_Salon extends Tablero_Touch {
 			this._onplay_scan_salon(); 		
 			
 			// LLAMO AL MODULO DE RESERVAS SOBRE LOS OBJETOS CUYO ID EMPIEZA POR 'mesa' 
-			const reservas = this._modulo_reservas(this.dicc_config.tipos.mesa);
+			const reservas = this._modulo_reservas(this.dicc_config.salon.tipos.mesa);
 			return reservas;
 		} catch (error) {
 			console.log(`Error :::  e-Salon ::: Register ::: msg: ${error}`)
@@ -3631,7 +3636,7 @@ class e_Salon extends Tablero_Touch {
 		// ■■■■■■ CONFIGURACION
 		
 		// Limpia y estructura la configuración
-		const dc = this.dicc_config || {};
+		const CFG = this.dicc_config || {};
 		const sanitizeDomRef = (valor) => {
 			if (!valor) return null;
 			if (typeof valor === 'string') return valor;
@@ -3654,15 +3659,14 @@ class e_Salon extends Tablero_Touch {
 
 		// Limpia y estructura la configuración
 		const config_limpio = {
-			family: dc.family ?? '',
-			columnas: dc.columnas ?? this.columnas ?? null,
-			filas: dc.filas ?? this.filas ?? null,
-			div_maestro: sanitizeDomRef(dc.div_maestro),
-			contenedor: dc.contenedor ?? '',
-			// tag_baldosas: dc.tag_baldosas ?? '',
-			tipos: cloneSimple(dc.tipos) || {},
-			clases_css: cloneSimple(dc.clases_css) || {},
-			rutas: cloneSimple(dc.rutas) || {},
+			family: CFG.salon.family ?? '',
+			columnas: CFG.salon.columnas ?? this.columnas ?? null,
+			filas: CFG.salon.filas ?? this.filas ?? null,
+			div_maestro: sanitizeDomRef(CFG.salon.div_maestro),
+			contenedor: CFG.salon.contenedor ?? '',
+			tipos: cloneSimple(CFG.salon.tipos) || {},
+			clases_css: cloneSimple(CFG.salon.clases_css) || {},
+			rutas: cloneSimple(CFG.salon.rutas) || {},
 		};
 		
 		// ■■■■■■ RETORNO FINAL
@@ -3686,7 +3690,7 @@ class e_Salon extends Tablero_Touch {
 	api_foto(){
 
 		// ■■■■■■ DATOS DE ENTRADA
-		const dicc_configuracion = this.dicc_config || {};
+		const CFG = this.dicc_config || {};
 		const arr_reservas 		 = this.reservas || [];
 
 		const dicc_api_indices   = this.api_indices() || {};
@@ -3695,7 +3699,7 @@ class e_Salon extends Tablero_Touch {
 
 		// ■■■■■■ RETORNO FINAL
 		return {
-			configuracion: dicc_configuracion,
+			configuracion: CFG,
 			reservas: arr_reservas,			//ESTOY PENSANDO QUE LAS RESERVAS NO HACEN FALTA SI CUANDO SE POSICIONAN SE HACE UN SCAN.
 			indices: dicc_api_indices,
 			mensajes: dicc_api_mensajes,
@@ -3717,8 +3721,8 @@ class e_Salon extends Tablero_Touch {
 	 * hay que llamar a {@link RegisteR} para completar el ciclo.
 	 */
 	_load_elementos_en_Salon(dicc_api_indices){
-		const dc = this.dicc_config;
-		if(!dc) return;
+		const CFG = this.dicc_config;
+		if(!CFG) return;
 		try {
 			// ■■ Validación básica de diccionario.
 			if (!dicc_api_indices || typeof dicc_api_indices !== 'object') {
@@ -3739,8 +3743,8 @@ class e_Salon extends Tablero_Touch {
 
 			// ■■ Valida el tipo contra dicc_config (soporta dos formas comunes)
 			const es_tipo_valido = (tipo) => {
-				if (!dc || typeof dc !== 'object') return false;
-				const arr_values_tipos = Object.values(dc.tipos)
+				if (!CFG || typeof CFG !== 'object') return false;
+				const arr_values_tipos = Object.values(CFG.salon.tipos)
 				return arr_values_tipos.includes(tipo);				
 			};
 
@@ -3802,11 +3806,11 @@ class e_Salon extends Tablero_Touch {
 				clon_item.classList.add('class_onplay');
 				
 				// ​👂​👂 Listeners y clases según el tipo (silla o mesa)
-				if (data_tipo == dc.tipos.silla) {
+				if (data_tipo == CFG.salon.tipos.silla) {
 					clon_item.classList.add('silla_onplay');
 					clon_item.addEventListener('click', this.silla_click_handler.bind(this));   
 
-				}else if (data_tipo == dc.tipos.mesa) {
+				}else if (data_tipo == CFG.salon.tipos.mesa) {
 					clon_item.classList.add('mesa_onplay');
 					clon_item.addEventListener('click', this.mesa_click_handler.bind(this));   
 				
@@ -4001,11 +4005,11 @@ class e_Salon extends Tablero_Touch {
 	 * elemento(div_html): es un div clonado del menu de elementos.
 	*/
 	_saloniza_elemento(elemento){
-		const dc = this?.CFG?.configuracion;
-		if(!elemento || !dc) return;
+		const CFG = this?.CFG?.configuracion;
+		if(!elemento || !CFG) return;
 
 		// ???????????
-		const tipos_validos = this?.CFG?.configuracion?.tipos;
+		const tipos_validos = this?.CFG?.configuracion?.salon?.tipos;
 		// ┌┌•  el diccionario tipos{} es {mesa:'mesa', silla:'silla'}		
 		const tipo_players = Object.values(tipos_validos);
 		// ???????????
@@ -4031,11 +4035,11 @@ class e_Salon extends Tablero_Touch {
 		const player = this._what_player_menu(id_elemento);
 		if(!player) return;
 
-		if (player.tipo == dc.tipos.silla) {
+		if (player.tipo == CFG.salon.tipos.silla) {
 			elemento.classList.add('silla_onplay');
 			elemento.removeEventListener('click', this.silla_click_handler);
 			elemento.addEventListener('click', this.silla_click_handler.bind(this));   
-		}else if (player.tipo == dc.tipos.mesa) {
+		}else if (player.tipo == CFG.salon.tipos.mesa) {
 			elemento.classList.add('mesa_onplay');
 			elemento.removeEventListener('click', this.mesa_click_handler);
 			elemento.addEventListener('click', this.mesa_click_handler.bind(this));   
@@ -4103,9 +4107,9 @@ class e_Salon extends Tablero_Touch {
 	/** ## Valida el tipo contra dicc_config (soporta dos formas comunes)
 	 * ### funcion subordinada exclusivamente de {@link _what_player_menu}	 */
 	static __es_tipo_valido(tipo_a_validar , diccionario_configuracion){
-		const dc = diccionario_configuracion;
-		if (!dc || typeof dc !== 'object') return false;
-		const arr_values_tipos = Object.values(dc.tipos)
+		const CFG = diccionario_configuracion;
+		if (!CFG || typeof CFG !== 'object') return false;
+		const arr_values_tipos = Object.values(CFG.salon.tipos)
 		return arr_values_tipos.includes(tipo_a_validar);				
 	}
 	/** ## Dada una clave "mesa_0" o "silla_12", retorna el tipo. se compara contra los tipos presentes en el menú.
@@ -4208,7 +4212,7 @@ class Configuracion_Salon {
 
 		// ■■ NUMERO COLUMNAS	
 		// ┌•• Fundamental para terminar de configuarar la cuadratura del Salon.
-		this.api_update_columnas('.' + this.configuracion.clases_css.contenedor, this.Salon.columnas);
+		this.api_update_columnas('.' + this.configuracion.salon.clases_css.contenedor, this.Salon.columnas);
 				
 		// ■■ Mensajes de la app	
 		this.UI = new Alertas_UI();
@@ -4257,12 +4261,12 @@ class Configuracion_Salon {
 			tipos: { silla: 'silla', mesa:  'mesa', },
 			
 			// ■ Diccionario de Elementos definido en la clase Catalogo de Catalogo_Elementos.js
-			catalogo: {}
+			catalogo: {},
 
 		};
 		// ■■■■■■■■■ la alternativa limpia
 		const dicc_new_default = {
-			salon: {family:'Salon',contenedor:'',div_maestro:'', filas:8, columnas:8,estilo:'originbal', clases_css:{contenedor: 'contenedor_salon' , baldosas: 'estiloBaldosas',}}, 
+			salon: {family:'Salon',contenedor:'',div_maestro:'', filas:8, columnas:8,estilo:'original', clases_css:{contenedor: 'contenedor_salon' , baldosas: 'estiloBaldosas',}, tipos: { silla: 'silla', mesa:  'mesa', },}, 
 			catalogo:{},
 		}
 		// Limpia y estructura la configuración
@@ -4305,18 +4309,22 @@ class Configuracion_Salon {
 			clases_css: cloneSimple(dicc_config.clases_css) || dicc_default.clases_css,
 			catalogo: dicc_config.catalogo || dicc_default.catalogo,
 		};
+		const salon = {
+			family: dicc_config.family || dicc_default.family,
+			contenedor: dicc_config.contenedor 	|| dicc_default.contenedor,
+			div_maestro:sanitizeDomRef(dicc_config.div_maestro) || dicc_default.div_maestro,
+			filas:dicc_config.filas || dicc_default.filas,
+			columnas:dicc_config.columnas || dicc_default.columnas,
+			estilo:dicc_config.estilo || dicc_default.estilo, 
+			clases_css:cloneSimple(dicc_config.clases_css) || dicc_default.clases_css,
+			tipos: cloneSimple(dicc_config.tipos) || dicc_default.tipos,
+		};
 		const new_config_limpio = {
-			salon:{family: dicc_config.family || dicc_default.family,
-					contenedor: dicc_config.contenedor 	|| dicc_default.contenedor,
-					div_maestro:sanitizeDomRef(dicc_config.div_maestro) || dicc_default.div_maestro,
-					filas:dicc_config.filas || dicc_default.filas,
-					columnas:dicc_config.columnas || dicc_default.columnas,
-					estilo:dicc_config.estilo || dicc_default.estilo, 
-					clases_css:cloneSimple(dicc_config.clases_css) || dicc_default.clases_css,
-				},
+			salon:salon || {},
 			catalogo: dicc_config.catalogo || dicc_default.catalogo,
 		};
-		return config_limpio;
+		// return config_limpio;
+		return new_config_limpio;
 	}
 
 	/** 
@@ -4516,12 +4524,10 @@ class Configuracion_Salon {
 			// ┌••••••••••••
 			// ┌•• LIMPIEZA: Limpiamos la matriz y el DOM 
 			Salon.clean_elementos_Salon('todo');
-			// ┌••••••••••••
 			/** ### (string) Marca el inicio del rango a buscar. Celda : 'A0', 'B2'... */
 			let cursor = 'A0'; 
 			// ┌••••••••••••••••••••••••••••••••••••••••••••••••
 			// ┌•• MONTAJE (Fase CURSOR con BUCLE DE CONFLICTO)
-			// ┌••••••••••••••••••••••••••••••••••••••••••••••••
 			for (const ficha of fichas_x_reserva) {
 				// ┌•• dimension de la ficha actual, . . .parametros de  _busca_dimension_free()
 				const dim_ficha = `${ficha.num_rows}x${ficha.num_cols}`;
@@ -4530,7 +4536,6 @@ class Configuracion_Salon {
 
 				// ┌•••••••••••••••••••••••••••••••• 
 				// ┌•• Buscamos hueco físico libre 
-				// ┌•••••••••••••••••••••••••••••••• 
 				
 				// ┌• Variables de control del bucle:
 				let is_colocado = false;
@@ -4551,7 +4556,6 @@ class Configuracion_Salon {
 					}					
 					// ┌•••••••••••••••••••••••••••••••• 
 					// ┌•• Validacion de Vecinos / Politica del Posicionamiento.
-					// ┌•••••••••••••••••••••••••••••••• 
 					if (this._es_posicion_conflictiva(rango_free, ficha, ids_reserva)) { 
 						// ◘◘◘ CONFLICTO: Avanzamos el cursor 1 posición y reintentamos(continue)
 						const siguiente_celda = Ranget.plus(rango_free.celda_inicio, 1); 
@@ -4564,7 +4568,6 @@ class Configuracion_Salon {
 					}					
 					// ┌••                   ••••••••••••••••••••••••••   ••••••••• 
 					// ┌•• Si llegamos aquí: No es posicion-conflictiva y Colocamos Fisicamente.
-					// ┌•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••• 
 					const celda_base_destino = rango_free.celda_inicio;
 					ficha.items.forEach(item => {
 						const celda_destino = Ranget.suma_fc(celda_base_destino, item.delta_y, item.delta_x);
@@ -4585,7 +4588,6 @@ class Configuracion_Salon {
 					
 					// ┌••          ••••••••               ••••••           ••••••    
 					// ┌•• Preparar -Cursor- para La Siguiente Reserva con  margin = 0 (byDef)
-					// ┌•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••• 
 					const ini_fc = Ranget.X_to_fc(rango_free.celda_inicio);
 					const fin_fc = Ranget.X_to_fc(rango_free.celda_fin); 
 					
@@ -4618,7 +4620,7 @@ class Configuracion_Salon {
 			
 			// ┌••             •••      •••   
 			// ┌•• Validación Antes y despues de registrar
-			const val_api_reservas_aft = Salon._modulo_reservas(this.configuracion.tipos.mesa, false);
+			const val_api_reservas_aft = Salon._modulo_reservas(this.configuracion.salon.tipos.mesa, false);
 			if(val_api_reservas_aft.length !== val_api_reservas_bef.length) {
 				console.log(`⚠️​ Advertencia: El número de reservas antes (${val_api_reservas_bef.length}) y después (${val_api_reservas_aft.length}) de re-posicionar no coincide.`);
 			}
@@ -4834,7 +4836,7 @@ class Configuracion_Salon {
 			const ok_total = this.Salon.set_total_baldosas( filas * columnas );
 
 			// ■ CAMBIA COLUMNAS             ... CAMBIANDO el GRID
-			const ok_updt = this.api_update_columnas('.' + this.configuracion.clases_css.contenedor, columnas);		
+			const ok_updt = this.api_update_columnas('.' + this.configuracion.salon.clases_css.contenedor, columnas);		
 
 			// ■ RE-POSICIONA LAS RESERVAS EN EL SALON
 			const ok_re = this.api_re_posicionar();
@@ -5016,7 +5018,7 @@ class Configuracion_Salon {
 	 */
 	_es_posicion_conflictiva(rango_free, ficha, ids_reserva = []) {
 		const celda_inicio_free = rango_free.celda_inicio;
-		const tipo_mesa = this.configuracion.tipos.mesa || 'mesa';
+		const tipo_mesa = this.configuracion.salon.tipos.mesa || 'mesa';
 		let soy_mesa = false;
 
 		// Recorremos solo los elementos que vamos a colocar
@@ -5303,7 +5305,10 @@ class Configuracion_Salon {
         return Object.freeze(obj);
     }
 
-
+	get configuracion() { return this._configuracion; }
+	set configuracion(valor) {
+		this._configuracion = valor;
+	}
 	get diccionario(){return this.configuracion;	}
 	set diccionario(valor){ 
 		this.configuracion = valor; 
@@ -7056,8 +7061,8 @@ class Foto_CRUD{
 	 */
 	_abrir_ventana_CU(){
 		this._feedback_CU('👍 Preparado para Guardar la Foto!! ');
-		const filas_Salon = this.Salon.CFG.configuracion.filas;
-		const columnas_Salon = this.Salon.CFG.configuracion.columnas;
+		const filas_Salon = this.Salon.CFG.configuracion.salon.filas;
+		const columnas_Salon = this.Salon.CFG.configuracion.salon.columnas;
 
 		
 		// ┌•• Primero muestra la ventana, luego cargala de datos
@@ -7608,17 +7613,17 @@ class Foto_CRUD{
 
 		const rango_tot = {reservas: rangos_reservas , matriz: rango_matriz};
 		
-		const cfg = dicc_api_foto.configuracion || this.dicc_config || {};
+		const CFG = dicc_api_foto.configuracion || this.dicc_config || {};
 		return {
 			salon: {
 				nombre: this.Salon?.family,
 				columnas: this.Salon?.columnas,
 				filas: 	 this.Salon?.filas,
-				family: cfg.family,
-				configuracion_json: cfg,
-				clases_json: cfg.clases_css || {},
-				rutas_json:  cfg.rutas || {},
-				tipos_json:  cfg.tipos || {}
+				family: CFG.salon.family || '',
+				configuracion_json: CFG,
+				clases_json: CFG.salon.clases_css || {},
+				rutas_json:  CFG.salon.rutas || {},
+				tipos_json:  CFG.salon.tipos || {}
 			},
 			foto: {
 				titulo: valores_offcanvas.titulo,
