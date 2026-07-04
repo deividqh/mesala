@@ -199,3 +199,218 @@ class Catalogo {
 // const z_logica_alergias = Catalogo.get_item_s("logica", "motor_alergias", true);
 // const z_sub_grupos = Catalogo.get_item_s("rol", "cliente");
 // 💥💥💥💥💥💥💥💥
+
+/**
+ * @class Logica_Catalogo
+ * @extends Catalogo
+ * @description Gestiona de forma centralizada y dinámica el Offcanvas inferior del salón,
+ * creando pestañas dinámicas por cada tipo de lógica detectada en el catálogo.
+ */
+class Logica_Catalogo  {
+    
+    constructor() {
+        
+        // Creamos el offcanvas en el DOM inmediatamente al instanciar la clase
+        this.#crear_offcanvas_logica();
+    }
+
+    /**
+     * @description Crea la estructura DOM del offcanvas y sus pestañas globales si no existe.
+     */
+    #crear_offcanvas_logica() {
+        let offcanvas_logica = document.getElementById('offcanvas_logica');
+        
+        if (offcanvas_logica) {
+            return offcanvas_logica;
+        }
+
+        // 1. Contenedor principal del offcanvas
+        offcanvas_logica = document.createElement('div');
+        offcanvas_logica.id = 'offcanvas_logica';
+        offcanvas_logica.className = 'offcanvas offcanvas-bottom'; 
+        offcanvas_logica.tabIndex = -1;
+        
+        offcanvas_logica.dataset.logica = 'true'; 
+        offcanvas_logica.style.backgroundColor = 'var(--color-egg-white)'; 
+        offcanvas_logica.style.height = 'auto'; 
+        offcanvas_logica.style.minHeight = '35vh'; 
+
+        // 2. Header del offcanvas
+        const header = document.createElement('div');
+        header.className = 'offcanvas-header';
+        
+        const title = document.createElement('h6');
+        title.className = 'offcanvas-title';
+        title.id = 'offcanvas_logica_label';
+        title.innerText = 'Lógica del Elemento'; 
+
+        const btn_close = document.createElement('button');
+        btn_close.type = 'button';
+        btn_close.className = 'btn-close text-reset';
+        btn_close.setAttribute('data-bs-dismiss', 'offcanvas');
+        btn_close.setAttribute('aria-label', 'Close');
+
+        header.appendChild(title);
+        header.appendChild(btn_close);
+
+        // 3. Body del offcanvas
+        const body = document.createElement('div');
+        body.className = 'offcanvas-body';
+        body.id = 'offcanvas_logica_body';
+
+        // 4. DETECTAR LÓGICAS DISTINTAS Y GENERAR WIDGET DE PESTAÑAS (BOOTSTRAP TABS)
+        // Extraemos todos los objetos 'logica' del catálogo
+        const objetos_logica = Catalogo.get_distinto_s('logica');
+        
+        // Recopilamos todas las llaves de lógica únicas existentes (ej: ['motor_alergias', 'motor_mensajes'])
+        const claves_logica_unicas = new Set();
+        objetos_logica.forEach(obj => {
+            if (obj && typeof obj === 'object') {
+                Object.keys(obj).forEach(key => claves_logica_unicas.add(key));
+            }
+        });
+
+        // Contenedor de la lista de pestañas (<ul class="nav nav-tabs">)
+        const tabList = document.createElement('ul');
+        tabList.className = 'nav nav-tabs mb-3';
+        tabList.id = 'logicaTab';
+        tabList.role = 'tablist';
+
+        // Contenedor de los paneles de contenido (<div class="tab-content">)
+        const tabContent = document.createElement('div');
+        tabContent.className = 'tab-content';
+        tabContent.id = 'logicaTabContent';
+
+        // Generamos dinámicamente cada pestaña y su contenedor basado en las lógicas del catálogo
+        claves_logica_unicas.forEach(clave => {
+            // Formateamos un nombre amigable quitando el prefijo 'motor_'
+            const nombrePestana = clave.replace('motor_', '').toUpperCase(); 
+
+            // --- Estructura del Botón/Pestaña (LI > BUTTON) ---
+            const navItem = document.createElement('li');
+            navItem.className = 'nav-item';
+            navItem.role = 'presentation';
+            navItem.dataset.tipoLogica = clave; // Guardamos la llave para filtrado posterior
+
+            const tabButton = document.createElement('button');
+            tabButton.className = 'nav-link';
+            tabButton.id = `tab-${clave}`;
+            tabButton.setAttribute('data-bs-toggle', 'tab');
+            tabButton.setAttribute('data-bs-target', `#panel-${clave}`);
+            tabButton.type = 'button';
+            tabButton.role = 'tab';
+            tabButton.setAttribute('aria-controls', `panel-${clave}`);
+            tabButton.setAttribute('aria-selected', 'false');
+            tabButton.innerText = nombrePestana;
+
+            navItem.appendChild(tabButton);
+            tabList.appendChild(navItem);
+
+            // --- Estructura del Panel de Contenido ---
+            const panel = document.createElement('div');
+            panel.className = 'tab-pane fade';
+            panel.id = `panel-${clave}`;
+            panel.role = 'tabpanel';
+            panel.setAttribute('aria-labelledby', `tab-${clave}`);
+            
+            // Contenedor interno específico para inyectar los datos en el futuro
+            panel.innerHTML = `<div class="p-3 border border-top-0 content-area">Cargando datos de ${nombrePestana}...</div>`;
+
+            tabContent.appendChild(panel);
+        });
+
+        // Inyectamos el widget de pestañas en el cuerpo del offcanvas
+        body.appendChild(tabList);
+        body.appendChild(tabContent);
+
+        // Ensamble final del componente
+        offcanvas_logica.appendChild(header);
+        offcanvas_logica.appendChild(body);
+        document.body.appendChild(offcanvas_logica);
+
+        return offcanvas_logica;
+    }
+
+    /**
+     * @description Abre el offcanvas inferior visualizando y activando únicamente 
+     * las lógicas válidas que posea el elemento cliqueado.
+     * @param {HTMLElement} elemento_dom - Elemento del salón sobre el que se hace clic.
+     */
+    abrir_offcanvas(elemento_dom) {
+        const grupo_el = elemento_dom.dataset.tipo;
+        const ctlg_el = Catalogo.get(grupo_el);
+        if (!ctlg_el || !ctlg_el.logica) return null;
+        
+        // Recuperamos el Offcanvas ya creado en el DOM
+        const offcanvas_dom = document.getElementById('offcanvas_logica');
+        if (!offcanvas_dom) return null;
+
+        // Actualizamos el título principal
+        const title = offcanvas_dom.querySelector('#offcanvas_logica_label');
+        title.innerText = `Opciones de ${elemento_dom.id || 'Elemento'} - (${ctlg_el.grupo}) - (${ctlg_el.rol})`;
+
+        const logica_el = ctlg_el.logica;
+        const navItems = offcanvas_dom.querySelectorAll('#logicaTab .nav-item');
+        
+        let primerTabVisible = null;
+
+        // Evaluamos cada pestaña global contra las lógicas del elemento clickeado
+        navItems.forEach(item => {
+            const tipoLogica = item.dataset.tipoLogica;
+            const valorLogica = logica_el[tipoLogica];
+            
+            // Localizamos el botón interno y su panel asociado
+            const botonTab = item.querySelector('.nav-link');
+            const idPanel = botonTab.getAttribute('data-bs-target');
+            const panelDOM = offcanvas_dom.querySelector(idPanel);
+
+            // Reseteamos estados activos previos de Bootstrap
+            botonTab.classList.remove('active');
+            botonTab.setAttribute('aria-selected', 'false');
+            if (panelDOM) panelDOM.classList.remove('show', 'active');
+
+            // CRITERIO DE VISIBILIDAD:
+            // Se muestra la pestaña si la propiedad existe, y no es false ni null.
+            if (valorLogica !== undefined && valorLogica !== false && valorLogica !== null) {
+                item.classList.remove('d-none'); // Hacemos visible la pestaña
+                
+                // Guardamos la referencia de la primera pestaña que sea visible
+                if (!primerTabVisible) {
+                    primerTabVisible = { boton: botonTab, panel: panelDOM };
+                }
+
+                // --- AQUÍ PUEDES INYECTAR LA LÓGICA ESPECÍFICA SEGÚN EL TIPO ---
+                const areaContenido = panelDOM.querySelector('.content-area');
+                if (tipoLogica === 'motor_mensajes') {
+                    areaContenido.innerHTML = `
+                        <h6>Configuración de Mensajería</h6>
+                        <p>Tipo de motor: <strong>${valorLogica.tipo}</strong></p>
+                        <p>Clase CSS asociada: <code>${valorLogica.css}</code></p>
+                    `;
+                } else if (tipoLogica === 'motor_alergias') {
+                    areaContenido.innerHTML = `
+                        <h6>Control de Alérgenos</h6>
+                        <p>El motor de alergias se encuentra actualmente: <span class="badge bg-success">Activado</span></p>
+                    `;
+                }
+            } else {
+                // Si el elemento no tiene esta lógica activa, ocultamos la pestaña por completo
+                item.classList.add('d-none');
+            }
+        });
+
+        // Si el elemento tiene al menos una lógica activa, la seleccionamos por defecto
+        if (primerTabVisible) {
+            primerTabVisible.boton.classList.add('active');
+            primerTabVisible.boton.setAttribute('aria-selected', 'true');
+            if (primerTabVisible.panel) {
+                primerTabVisible.panel.classList.add('show', 'active');
+            }
+        }
+
+        // Desplegamos el offcanvas usando Bootstrap
+        const bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(offcanvas_dom);
+        bsOffcanvas.show();
+        return offcanvas_dom;
+    }
+}

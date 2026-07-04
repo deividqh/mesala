@@ -2414,7 +2414,7 @@ class e_Salon extends Tablero_Touch {
 	/** ### Clase que Se encarga de la configuracion incial del Salon y metodos asociadas al Funcionamiento */
 	CFG = null; 
 	/** ### Clase que se encarga del Registro y Log.  */
-	LoG = null;	
+	LogIn = null;	
 	/** ### Clase que Hace el CRUD sobre la Base de Datos. */
 	crud = null; 
 	/** ### Clase Se encarga de gestionar los mensajes de las sillas */
@@ -2506,13 +2506,15 @@ class e_Salon extends Tablero_Touch {
 		const z_silla_id = Catalogo.get("silla", "id");
 		const z_silla_visual = Catalogo.get("silla", 'visual');
 		const z_silla_visual_css = Catalogo.get("silla", 'visual', "css");
-		const z_visual_css = Catalogo.get('visual', "css"); 	// NULL		
+		const z_visual_css = Catalogo.get('visual', "css"); 	 // NULL		
+		const z_get_logica = Catalogo.get('logica'); 			// NULL		
 
 		const z_grupo = Catalogo.get_distinto_s("grupo");
 		const z_visual = Catalogo.get_distinto_s('visual');
 		const z_visual_content = Catalogo.get_distinto_s('visual', 'content');		
 		const z_log_msg = Catalogo.get_distinto_s('logica', 'motor_mensajes');
 		const z_log_msg_tipo = Catalogo.get_distinto_s('logica', 'motor_mensajes', 'tipo');
+		const z_distintas_logicas = Catalogo.get_distinto_s('logica');
 		const z_id_s = Catalogo.get_distinto_s('id');		
 		const z_mesa = Catalogo.get_distinto_s('mesa');	// NULL
 		const z_mesa_id = Catalogo.get_distinto_s('mesa' , 'id');	// NULL
@@ -2521,6 +2523,7 @@ class e_Salon extends Tablero_Touch {
 		
 		const z_players = Catalogo.get_item_s("grupo", "player");
 		const z_logica_alergias = Catalogo.get_item_s("logica", "motor_alergias", true);
+		const z_logicas = Catalogo.get_item_s("logica"); // NULL
 		const z_sub_grupos = Catalogo.get_item_s("rol", "cliente");
 		// 💥💥💥💥💥💥💥💥
 
@@ -2578,16 +2581,18 @@ class e_Salon extends Tablero_Touch {
 		
 		// ┌•••••••••••••••••••••••••••••••••••
 		// ■■ Sidebar persistente de elementos (mesa/silla/...) 
-		const $icono_elementos = document.querySelector('[data-action-nav="elementos"]');
+		const $ico_trigger_elementos = document.querySelector('[data-action-nav="elementos"]');
 		this.Side_Elementos = new Side_Elementos(
 			this._add_listeners_movimiento.bind(this),
 			z_catalogo,
-			$icono_elementos,
+			this.$bi_nav.elementos,
 		);
+
+		this.LOGIC = new Logica_Catalogo(this.dicc_config.catalogo);
 		
 		// ┌•••••••••••••••••••••••••••••••••••
 		// ┌• LOGIN Y REGISTRO: 
-        this.LoG = new Login_Modal('[data-action-nav="conn"]');
+        this.LogIn = new Login_Modal('[data-action-nav="conn"]');
 		
 		// ┌•••••••••••••••••••••••••••••••••••
 		// ┌• C.R.U.D. 
@@ -2739,16 +2744,9 @@ class e_Salon extends Tablero_Touch {
 		const rol = ctlg.rol;
 		const logica = ctlg.logica;
 		if(logica?.motor_mensajes || logica?.motor_alergias){
-			this._abrir_offcanvas_logica(elemento_clickado, ctlg);
-			
-			if(logica?.motor_alergias){
-				// console.log(`${logica.motor_alergias}`);
-			}
-			if(logica?.motor_mensajes){
-				// console.log(`${logica.motor_mensajes}`);
-			}
+			// this._abrir_offcanvas_logica(elemento_clickado, ctlg);
+			this.LOGIC.abrir_offcanvas(elemento_clickado);			
 		}
-
 	}
 
 	_get_indice_en_reserva_s(id_elemento){	
@@ -3459,7 +3457,7 @@ class e_Salon extends Tablero_Touch {
 	 * #### • Establece un puente con Login_Modal. 🌉
 	 */
 	accion_login(){		
-		if(this.LoG) this.LoG.abrir_ventana('login');
+		if(this.LogIn) this.LogIn.abrir_ventana('login');
 	}
 	/**
 	 * ### - Click sobre el Boton-Ojo 👁️ del Nav-Bar(menu superior).
@@ -6088,7 +6086,7 @@ class Foto_CRUD{
 			const datos_auth = Login_Modal.get_datos_auth();		
 			if (!datos_auth?.is_authenticated || !datos_auth?.token) {
 				this._feedback_CU('⚠️ Necesitas iniciar sesión para guardar la foto.', 'warning');
-				this?.Salon?.LoG?._sincroniza_UI();
+				this?.Salon?.LogIn?._sincroniza_UI();
 				return;
 			}			
 			// ┌•• Cacho Formulario.
@@ -6235,7 +6233,7 @@ class Foto_CRUD{
 			if (!datos_auth?.is_authenticated) {
 				this._abrir_ventana_lista_registros_RUD();
 				this._feedback_RUD('⚠️ Necesitas iniciar sesión para cargar la foto.', 'warning');
-				this?.Salon?.LoG?._sincroniza_UI();
+				this?.Salon?.LogIn?._sincroniza_UI();
 				return;
 			}
 			// console.log("📲 Empieza Accion LOAD • • • • ");
@@ -6281,7 +6279,7 @@ class Foto_CRUD{
 			const datos_auth = Login_Modal.get_datos_auth();		
 			if (!datos_auth?.is_authenticated || !datos_auth?.token) {
 				this._feedback_updt_ficha_RUD('⚠️ Necesitas iniciar sesión para guardar la foto.', 'warning');
-				this?.Salon?.LoG?._sincroniza_UI();
+				this?.Salon?.LogIn?._sincroniza_UI();
 				return;
 			}			
 			
@@ -7074,7 +7072,7 @@ class Foto_CRUD{
 		const datos_auth = Login_Modal.get_datos_auth();		
 		if (!datos_auth?.is_authenticated || !datos_auth?.token) {
 			this._feedback_CU('⚠️ Necesitas iniciar sesión para guardar la foto.', 'warning');
-			this?.Salon?.LoG?._sincroniza_UI();
+			this?.Salon?.LogIn?._sincroniza_UI();
 			return;
 		}		
 		try {			
