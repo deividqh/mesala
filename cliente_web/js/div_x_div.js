@@ -2503,6 +2503,7 @@ class e_Salon extends Tablero_Touch {
 		// 💥💥💥💥💥💥💥💥
 		const z_catalogo = Catalogo.get();
 		const z_silla = Catalogo.get("silla");
+		const z_silla_logica = Catalogo.get("silla", "logica");
 		const z_silla_id = Catalogo.get("silla", "id");
 		const z_silla_visual = Catalogo.get("silla", 'visual');
 		const z_silla_visual_css = Catalogo.get("silla", 'visual', "css");
@@ -2590,6 +2591,11 @@ class e_Salon extends Tablero_Touch {
 
 		this.LOGIC = new Logica_Catalogo(this.dicc_config.catalogo);
 		
+		const motor_mensajes = new Motor_Mensajes();
+		const motor_alergias = new Motor_Alergias();
+		Catalogo.set_motor('motor_mensajes', motor_mensajes);
+		Catalogo.set_motor('motor_alergias', motor_alergias);
+		
 		// ┌•••••••••••••••••••••••••••••••••••
 		// ┌• LOGIN Y REGISTRO: 
         this.LogIn = new Login_Modal('[data-action-nav="conn"]');
@@ -2659,7 +2665,7 @@ class e_Salon extends Tablero_Touch {
 		this.eRdS = new El_Rango_del_Salon(this); 	// Instanciamos el gestor de RANGOS y CELDAS de la matriz.		
 		
 		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-		console.log(`${'█'.repeat(30)}  • • •  FINALIZADA LA CARGA DE SALON  • • •`);
+		console.log(`${'█ '.repeat(20)}  • • •  FINALIZADA LA CARGA DE SALON  • • •`);
 	}
 
 	/** 

@@ -343,7 +343,7 @@ class Motor_Mensajes {
 	api_mostrar(id_elemento_dom, arr_mesas_reserva = []){
 		
 		this._registrar_y_mostrar(id_elemento_dom);
-		this._set_contexto_reserva_actual(id_elemento_dom, arr_mesas_reserva);
+		const ids_reserva =this._set_contexto_reserva_actual(id_elemento_dom, arr_mesas_reserva);
 
 		// ■ Cacha Los elementos Dom del PopOver
 		const tip     		= this.bs_popover.tip;							// se crea cuando se hace this.bs_popover.show()
@@ -419,6 +419,8 @@ class Motor_Mensajes {
 
 		// Garantizamos la unicidad de los IDs usando Set para evitar duplicados en la UI.
 		this.ids_reserva_actual = Array.from(new Set(ids));
+
+		return this.ids_reserva_actual;
 	}
 	
 	/** ### • Devuelve los ids afectados por el cambio de alergias, 
@@ -800,8 +802,6 @@ class Motor_Mensajes {
 	api_alergias(){
 		return this.d_alergias || {};
 	}
-
-
 
 	_tiene_mensaje(id_elemento_dom = '') {
 		const mensaje = this.diccionario_datos[id_elemento_dom]?.mensaje || '';

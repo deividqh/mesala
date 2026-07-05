@@ -3,6 +3,7 @@
  * @description Definición centralizada de tipos de objetos del salón.
  */
 class Catalogo {
+    
     // Definición de los datos (Podría venir de un JSON externo o base de datos)
     static #DATA = Object.freeze({
     mesa: {
@@ -19,11 +20,7 @@ class Catalogo {
             css: 'style_visual_agrupador'
         },
         logica: {
-            motor_alergias: false,
-            motor_mensajes: {
-                tipo: 'sumatorio',              // Motor de mensajes: acumula valores por reserva.
-                css: 'estyle_msg_agrupador'
-            }
+            motor_mensajes: { nombre: "Mensajes", tipo: 'sumatorio', css: 'estyle_msg_agrupador', }
         }
     },
     silla: {
@@ -36,11 +33,8 @@ class Catalogo {
             css: 'style_visual_cliente'
         },
         logica: {
-            motor_alergias: true,
-            motor_mensajes: {
-                tipo: 'single', // Motor de mensajes: individual
-                css: 'estyle_msg_cliente'
-            }
+            motor_alergias: { nombre: "Alergias" , content: Catalogo.get_alergenos(), css:'', },
+            motor_mensajes: { nombre: "Mensajes" , tipo: 'single', css: 'estyle_msg_cliente',  }
         }
     },
     taburete: {
@@ -53,8 +47,8 @@ class Catalogo {
             css: 'style_visual_cliente'
         },
         logica: {
-            motor_alergias: true,
-            motor_mensajes: { tipo: 'single', css: 'estyle_msg_cliente' }
+            motor_alergias: { nombre: "Alergias" , content: Catalogo.get_alergenos(), css:'',},
+            motor_mensajes: { nombre: "Mensajes", tipo: 'single', css: 'estyle_msg_cliente', }
         }
     },
     // planta: {
@@ -79,7 +73,39 @@ class Catalogo {
     //     logica: { motor_alergias: false, motor_mensajes: null }
     // }
     });
+    
+    // Diccionario para guardar las instancias de las lógicas (Motores)
+    static #MOTORES = {};
 
+    /**
+     * @description Asigna una instancia de un motor a una clave de lógica.
+     * @param {String} clave_logica - Ej: 'motor_mensajes', 'motor_alergias'
+     * @param {Object} instancia - La instancia de la clase (ej: new Motor_Mensajes())
+     */
+    static set_motor(clave_logica, instancia) {
+        this.#MOTORES[clave_logica] = instancia;
+    }
+
+    /**
+     * @description Devuelve la instancia del motor asociado a esa lógica, si existe.
+     */
+    static get_motor(clave_logica) {
+        return this.#MOTORES[clave_logica] || null;
+    }
+    
+    static get_alergenos() {
+        const d_alergenos = {
+            gluten:    { slug: 'gluten',    svg: '<img src="./imgs/alergia-gluten.svg" alt="Gluten" />' },
+            lacteos:   { slug: 'lacteos',   svg: '<img src="./imgs/alergia-lacteos.svg" alt="Lácteos" />' },
+            crustaceos:{ slug: 'crustaceos',svg: '<img src="./imgs/alergia-crustaceo.svg" alt="Crustáceos" />' },
+            moluscos:  { slug: 'moluscos',  svg: '<img src="./imgs/alergia-moluscos.svg" alt="Moluscos" />' },
+            pescado:   { slug: 'pescado',   svg: '<img src="./imgs/alergia-pescado.svg" alt="Pescado" />' },
+            soja:      { slug: 'soja',      svg: '<img src="./imgs/alergia-soja.svg" alt="Soja" />' },
+            huevos:    { slug: 'huevos',    svg: '<img src="./imgs/alergia-huevo.svg" alt="Huevos" />' },
+            cascara:   { slug: 'cascara',   svg: '<img src="./imgs/alergia-cascara.svg" alt="Frutos de cáscara" />' }
+        };
+        return d_alergenos;
+    }
     /**
      * Acceso seguro a una propiedad específica.
      * Ejemplo: Catalogo.get('mesa', 'visual', 'css')
@@ -214,6 +240,8 @@ class Logica_Catalogo  {
         this.#crear_offcanvas_logica();
     }
 
+    // ■■■ MÉTODOS INTERNOS Y CORE ■■■
+
     /**
      * @description Crea la estructura DOM del offcanvas y sus pestañas globales si no existe.
      */
@@ -259,38 +287,45 @@ class Logica_Catalogo  {
         body.id = 'offcanvas_logica_body';
 
         // 4. DETECTAR LÓGICAS DISTINTAS Y GENERAR WIDGET DE PESTAÑAS (BOOTSTRAP TABS)
-        // Extraemos todos los objetos 'logica' del catálogo
+        // Extraemos todos los objetos 'logica' del catálogo usando la clase Catalogo
         const objetos_logica = Catalogo.get_distinto_s('logica');
         
-        // Recopilamos todas las llaves de lógica únicas existentes (ej: ['motor_alergias', 'motor_mensajes'])
-        const claves_logica_unicas = new Set();
+        // Recopilamos las llaves únicas y buscamos su propiedad 'nombre'
+        const claves_logica_unicas = new Map(); // Usamos Map para guardar la clave y su nombre
+        
         objetos_logica.forEach(obj => {
             if (obj && typeof obj === 'object') {
-                Object.keys(obj).forEach(key => claves_logica_unicas.add(key));
+                Object.keys(obj).forEach(key => {
+                    const valorLogica = obj[key];
+                    // Si la lógica tiene un objeto con "nombre", lo guardamos.
+                    if (valorLogica && typeof valorLogica === 'object' && valorLogica.nombre) {
+                        claves_logica_unicas.set(key, valorLogica.nombre);
+                    } else if (!claves_logica_unicas.has(key)) {
+                        // Fallback por si hay lógicas sin la propiedad 'nombre'
+                        claves_logica_unicas.set(key, key.replace('motor_', '').toUpperCase());
+                    }
+                });
             }
         });
 
-        // Contenedor de la lista de pestañas (<ul class="nav nav-tabs">)
+        // Contenedor de la lista de pestañas
         const tabList = document.createElement('ul');
         tabList.className = 'nav nav-tabs mb-3';
         tabList.id = 'logicaTab';
         tabList.role = 'tablist';
 
-        // Contenedor de los paneles de contenido (<div class="tab-content">)
+        // Contenedor de los paneles de contenido
         const tabContent = document.createElement('div');
         tabContent.className = 'tab-content';
         tabContent.id = 'logicaTabContent';
 
-        // Generamos dinámicamente cada pestaña y su contenedor basado en las lógicas del catálogo
-        claves_logica_unicas.forEach(clave => {
-            // Formateamos un nombre amigable quitando el prefijo 'motor_'
-            const nombrePestana = clave.replace('motor_', '').toUpperCase(); 
-
-            // --- Estructura del Botón/Pestaña (LI > BUTTON) ---
+        // Generamos dinámicamente cada pestaña
+        claves_logica_unicas.forEach((nombrePestana, clave) => {
+            // --- Estructura del Botón/Pestaña ---
             const navItem = document.createElement('li');
             navItem.className = 'nav-item';
             navItem.role = 'presentation';
-            navItem.dataset.tipoLogica = clave; // Guardamos la llave para filtrado posterior
+            navItem.dataset.tipoLogica = clave; 
 
             const tabButton = document.createElement('button');
             tabButton.className = 'nav-link';
@@ -301,7 +336,7 @@ class Logica_Catalogo  {
             tabButton.role = 'tab';
             tabButton.setAttribute('aria-controls', `panel-${clave}`);
             tabButton.setAttribute('aria-selected', 'false');
-            tabButton.innerText = nombrePestana;
+            tabButton.innerText = nombrePestana; // Usamos el nombre detectado del JSON
 
             navItem.appendChild(tabButton);
             tabList.appendChild(navItem);
@@ -313,17 +348,14 @@ class Logica_Catalogo  {
             panel.role = 'tabpanel';
             panel.setAttribute('aria-labelledby', `tab-${clave}`);
             
-            // Contenedor interno específico para inyectar los datos en el futuro
             panel.innerHTML = `<div class="p-3 border border-top-0 content-area">Cargando datos de ${nombrePestana}...</div>`;
 
             tabContent.appendChild(panel);
         });
 
-        // Inyectamos el widget de pestañas en el cuerpo del offcanvas
         body.appendChild(tabList);
         body.appendChild(tabContent);
 
-        // Ensamble final del componente
         offcanvas_logica.appendChild(header);
         offcanvas_logica.appendChild(body);
         document.body.appendChild(offcanvas_logica);
@@ -332,7 +364,7 @@ class Logica_Catalogo  {
     }
 
     /**
-     * @description Abre el offcanvas inferior visualizando y activando únicamente 
+     * @description Abre el offcanvas inferior visualizando únicamente 
      * las lógicas válidas que posea el elemento cliqueado.
      * @param {HTMLElement} elemento_dom - Elemento del salón sobre el que se hace clic.
      */
@@ -341,65 +373,56 @@ class Logica_Catalogo  {
         const ctlg_el = Catalogo.get(grupo_el);
         if (!ctlg_el || !ctlg_el.logica) return null;
         
-        // Recuperamos el Offcanvas ya creado en el DOM
         const offcanvas_dom = document.getElementById('offcanvas_logica');
         if (!offcanvas_dom) return null;
 
-        // Actualizamos el título principal
-        const title = offcanvas_dom.querySelector('#offcanvas_logica_label');
-        title.innerText = `Opciones de ${elemento_dom.id || 'Elemento'} - (${ctlg_el.grupo}) - (${ctlg_el.rol})`;
+        // Utilizamos el nuevo setter para actualizar el título
+        this.set_title(`Opciones de ${elemento_dom.id || 'Elemento'} - (${ctlg_el.grupo}) - (${ctlg_el.rol})`);
 
         const logica_el = ctlg_el.logica;
         const navItems = offcanvas_dom.querySelectorAll('#logicaTab .nav-item');
         
         let primerTabVisible = null;
 
-        // Evaluamos cada pestaña global contra las lógicas del elemento clickeado
         navItems.forEach(item => {
             const tipoLogica = item.dataset.tipoLogica;
             const valorLogica = logica_el[tipoLogica];
             
-            // Localizamos el botón interno y su panel asociado
             const botonTab = item.querySelector('.nav-link');
             const idPanel = botonTab.getAttribute('data-bs-target');
             const panelDOM = offcanvas_dom.querySelector(idPanel);
 
-            // Reseteamos estados activos previos de Bootstrap
             botonTab.classList.remove('active');
             botonTab.setAttribute('aria-selected', 'false');
             if (panelDOM) panelDOM.classList.remove('show', 'active');
 
-            // CRITERIO DE VISIBILIDAD:
-            // Se muestra la pestaña si la propiedad existe, y no es false ni null.
+            // CRITERIO DE VISIBILIDAD: Existe y no es false ni null
+            
             if (valorLogica !== undefined && valorLogica !== false && valorLogica !== null) {
-                item.classList.remove('d-none'); // Hacemos visible la pestaña
+                item.classList.remove('d-none'); 
                 
-                // Guardamos la referencia de la primera pestaña que sea visible
                 if (!primerTabVisible) {
                     primerTabVisible = { boton: botonTab, panel: panelDOM };
                 }
 
-                // --- AQUÍ PUEDES INYECTAR LA LÓGICA ESPECÍFICA SEGÚN EL TIPO ---
+                // Inyección de contenido según el tipo ❌❌ ???? adaptar a motores. ???? ❌❌
                 const areaContenido = panelDOM.querySelector('.content-area');
                 if (tipoLogica === 'motor_mensajes') {
                     areaContenido.innerHTML = `
-                        <h6>Configuración de Mensajería</h6>
                         <p>Tipo de motor: <strong>${valorLogica.tipo}</strong></p>
-                        <p>Clase CSS asociada: <code>${valorLogica.css}</code></p>
                     `;
                 } else if (tipoLogica === 'motor_alergias') {
+                    // Ahora podemos acceder a valorLogica.content si quisiéramos renderizar el diccionario
                     areaContenido.innerHTML = `
-                        <h6>Control de Alérgenos</h6>
-                        <p>El motor de alergias se encuentra actualmente: <span class="badge bg-success">Activado</span></p>
+                        <p>Diccionario de alergias preparado.</p>
                     `;
                 }
+                // ❌❌❌❌❌
             } else {
-                // Si el elemento no tiene esta lógica activa, ocultamos la pestaña por completo
                 item.classList.add('d-none');
             }
         });
 
-        // Si el elemento tiene al menos una lógica activa, la seleccionamos por defecto
         if (primerTabVisible) {
             primerTabVisible.boton.classList.add('active');
             primerTabVisible.boton.setAttribute('aria-selected', 'true');
@@ -408,9 +431,27 @@ class Logica_Catalogo  {
             }
         }
 
-        // Desplegamos el offcanvas usando Bootstrap
         const bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(offcanvas_dom);
         bsOffcanvas.show();
         return offcanvas_dom;
     }
+
+    set_title(html_content) {
+        const titleDOM = document.getElementById('offcanvas_logica_label');
+        if (titleDOM) {
+            titleDOM.innerHTML = html_content;
+        }
+    }
+    /**
+     * @description Reemplaza TODO el contenido del cuerpo del offcanvas.
+     * ADVERTENCIA: Si usas este método, sobrescribirás el widget de pestañas (Tabs). 
+     * Si solo quieres modificar el interior de una pestaña, deberías seleccionar su panel específico.
+     */
+    set_body(html_content) {
+        const bodyDOM = document.getElementById('offcanvas_logica_body');
+        if (bodyDOM) {
+            bodyDOM.innerHTML = html_content;
+        }
+    }
+
 }
