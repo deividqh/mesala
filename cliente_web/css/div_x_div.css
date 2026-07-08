@@ -250,32 +250,30 @@ MENÚ NAVBAR....CONTENEDOR de la imagen .imagen_menu.
 /* HOVER SOBRE LAS IMAGENES DEL MENU.... (cae en cascada). */
 .menu_to_clone:hover .imagen_menu .st0{ fill: rgb(159, 153, 148);  cursor: pointer;  /* transform: scale(1.08);  */ }
 
-/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
- clase común para las dos imagenes del menu nav: silla y mesa del menu nav
- ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  */
+/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+   clase común para las dos imagenes del menu nav: silla y mesa del menu nav */
  .imagen_menu {
    width: 28px;
    height: 28px;
   }
-/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-  clases especifica para cada objeto del menu nav. 
-  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
+/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+   clases especifica para cada objeto del menu nav. */
 .navbar .botones_accion {   font-size: var(--navbar-action-size) !important; color: rgb(var(--navbar-icon-rgb)); margin: 0 !important; padding: 0; }
 .navbar .botones_accion + .botones_accion { margin-left: var(--navbar-action-gap) !important; }
 .navbar .botones_accion:hover { color: rgb(var(--navbar-icon-rgb)); }
 /* la imagen.... No se manipula, se manipula su contenedor */
 .imagen_menu--mesa  .st0, .imagen_menu--silla .st0 {   fill: rgb(var(--navbar-icon-rgb)); }
 
-/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+/* ■■■
 El contenedor que mueve la imagen de la mesa */
 [data-tipo="mesa"] {
   /* Evita que el navegador use gestos predeterminados en este elemento */
-    touch-action: none;    
-    /* Evita la selección de texto accidental mientras arrastras */
+    touch-action: none;
+  /* Evita la selección de texto accidental mientras arrastras */
     -webkit-user-select: none;
     user-select: none;
 }
-/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+/* ■■■
 El contenedor que mueve la imagen de la silla */
 [data-tipo="silla"] {
   /* Evita que el navegador use gestos predeterminados en este elemento */

@@ -513,7 +513,7 @@ class Matriz_Plana extends Work_ClassName {
 	 * SOLO SI arg1 es fila, arg2 PUEDE SER COLUMNA, EN CASO DE 'indice' ó 'celda', arg2 = null
 	 * @returns {MyDiv|null} RETORNA EL OBJETO ALMACENADO EN LA MATRIZ(....será MyDiv)
 	*/
-    at(arg1, arg2 = null) {
+    _at(arg1, arg2 = null) {
 		if (!this._is_lista_OK(this.matriz_plana)) return null;        
         const indice = this.WC.X_to_indice(arg1, arg2); // Delegamos la "traducción" al método universal        
         if (indice === false) return null;
@@ -730,7 +730,7 @@ class Matriz_to_MyDiv extends Matriz_Plana {
 		
 		// ■■■■■■ OBTENGO EL indice en la matriz/matriz por su ID .... la Baldosa ('SALON_15') es donde la mesa(Mesa_0) ha hecho Drop
 		// 			• necesito EL indice para obtener la fila y la columna en la matriz.
-		let indice_to_search = this._get_indice_byId(drop_scan_obj.id);
+		let indice_to_search = this.__get_indice_baldosa_byId(drop_scan_obj.id);
 		if (indice_to_search < 0) return false;	
 		
 		// ■■■■■■ OBTENGO EL NUMERO DE FILA Y DE COLUMNA PARA PODER HACER EL SCANEO SEGURO. 
@@ -748,14 +748,14 @@ class Matriz_to_MyDiv extends Matriz_Plana {
 		const i_sw = this.get_indice_scan(fila, columna , 'sw');
 		
 		// Si ∃ i_n, le asigna el id del objeto que está en esa posición de la matriz, Si ∄, asigna el valor que tenga (null ó false).
-		myDiv_to_search.scan.n = (i_n === null || i_n ===false)  ? i_n : this.get_idcontenido(this.matriz_plana[i_n].elemento_div);	
-		myDiv_to_search.scan.s = (i_s === null || i_s ===false)  ? i_s : this.get_idcontenido(this.matriz_plana[i_s].elemento_div);
-		myDiv_to_search.scan.e = (i_e === null || i_e ===false)  ? i_e : this.get_idcontenido(this.matriz_plana[i_e].elemento_div);
-		myDiv_to_search.scan.w = (i_w === null || i_w ===false)  ? i_w : this.get_idcontenido(this.matriz_plana[i_w].elemento_div);
-		myDiv_to_search.scan.ne = (i_ne === null || i_ne ===false)  ? i_ne : this.get_idcontenido(this.matriz_plana[i_ne].elemento_div);
-		myDiv_to_search.scan.nw = (i_nw === null || i_nw ===false)  ? i_nw : this.get_idcontenido(this.matriz_plana[i_nw].elemento_div);
-		myDiv_to_search.scan.se = (i_se === null || i_se ===false)  ? i_se : this.get_idcontenido(this.matriz_plana[i_se].elemento_div);
-		myDiv_to_search.scan.sw = (i_sw === null || i_sw ===false)  ? i_sw : this.get_idcontenido(this.matriz_plana[i_sw].elemento_div);
+		myDiv_to_search.scan.n = (i_n === null || i_n ===false)  ? i_n : this._get_id_contenido_baldosa(this.matriz_plana[i_n].elemento_div);	
+		myDiv_to_search.scan.s = (i_s === null || i_s ===false)  ? i_s : this._get_id_contenido_baldosa(this.matriz_plana[i_s].elemento_div);
+		myDiv_to_search.scan.e = (i_e === null || i_e ===false)  ? i_e : this._get_id_contenido_baldosa(this.matriz_plana[i_e].elemento_div);
+		myDiv_to_search.scan.w = (i_w === null || i_w ===false)  ? i_w : this._get_id_contenido_baldosa(this.matriz_plana[i_w].elemento_div);
+		myDiv_to_search.scan.ne = (i_ne === null || i_ne ===false)  ? i_ne : this._get_id_contenido_baldosa(this.matriz_plana[i_ne].elemento_div);
+		myDiv_to_search.scan.nw = (i_nw === null || i_nw ===false)  ? i_nw : this._get_id_contenido_baldosa(this.matriz_plana[i_nw].elemento_div);
+		myDiv_to_search.scan.se = (i_se === null || i_se ===false)  ? i_se : this._get_id_contenido_baldosa(this.matriz_plana[i_se].elemento_div);
+		myDiv_to_search.scan.sw = (i_sw === null || i_sw ===false)  ? i_sw : this._get_id_contenido_baldosa(this.matriz_plana[i_sw].elemento_div);
 
 		// VISUALIZACIÓN EN MODO MATRIZ:
 		// console.log(`■■ ${myDiv_to_search.elemento_div.id} ► ${myDiv_to_search.id_contenido}`);
@@ -771,35 +771,44 @@ class Matriz_to_MyDiv extends Matriz_Plana {
 	 * @param {myDiv} my_div - Objeto myDiv que contiene el escaneo n-s-e-w.
 	 * @param {myDiv} base_name_clone - el objeto clone (null, 'mesa' , 'silla')  a buscar.... si null, entra todo(Mesas y Sillas).
 	 * @returns {Array} array_retorno ► [Mesa_0, Mesa_1, Mesa_2] 
-	 * @example: 1► _get_array_scan(my_div, 'mesa'); 2► _get_array_scan(map_data_mesa.get('my_div'), 'silla');
 	*/
-	_get_array_scan(my_div, base_name_clone = null) {    
-		let array_retorno = []
-
-		for (const valor of Object.values(my_div.scan)) {                
-			if (!valor) continue;       // ■ Si el valor es false o null, NO lo añade al array
-			if ( !base_name_clone ) {   // ■ Si base_name_clone es null, retorna todo el entorno, en  este caso  puede ser una 'mesa' o 'silla' o 'x' 
-				array_retorno.push(valor); 
+	_get_array_scan(my_div, rol_busca = null) {    
+		let arr_encontrados = [];	
+		const arr_entorno_scan = Object.values(my_div.scan);	// ■ array de los valores del scan de la baldosa
+		const arr_entorno_limpio = arr_entorno_scan.filter(Boolean);	
+		for (const id_el of arr_entorno_limpio) {
+			if (!rol_busca) {   // ■ Si rol_busca es null, retorna cualquier elemento
+				arr_encontrados.push(id_el);
 				continue;
-			} 
-			if (valor.lastIndexOf(base_name_clone) !== -1)   
-				array_retorno.push(valor); 
+			}
+			const el_dom = document.getElementById(id_el);
+			if(!el_dom) continue;       
+			const item_en_catalogo = Catalogo.get(id_el);
+			// ■ match x rol
+			if(rol_busca === item_en_catalogo.rol) {
+				arr_encontrados.push(id_el);
+			}
+			
 		}
-		return array_retorno;
+		return arr_encontrados;
+
+		
 	}
 
 	/** 
 	 * ### Devuelve las mesas conectadas directamente a la mesa dada.
 	 * 				- LLAMADA DESDE buscar_elementos__conectados ► get_matriz__reservas
 	 * @param {string} id_contenido - ID de la mesa
-	 * @param {Array} lista_info - Lista de map_data_mesa ... Array de Map('id_contenido', 'indice_baldosa', 'my_div')
+	 * @param {Array} lista_info - Lista de ficha_baldosa ... Array de Map('id_contenido', 'indice_baldosa', 'my_div')
 	 * @returns {Array} - Vecinos mesas conectadas ► ['Mesa_0', 'Mesa_3']
 	*/
-	_get_array_vecinos(id_contenido, map_data, data_tipo_scan='') {
-		const map_data_mesa = map_data.find(m => m.get('id_contenido') === id_contenido);
-		if (!map_data_mesa) return [];
+	_get_array_vecinos(id_contenido, ficha_s_baldosa, rol_busca = 'reserver') {
+		const ficha_baldosa = ficha_s_baldosa.find(m => m.get('id_contenido') === id_contenido);
+		if (!ficha_baldosa) return [];		
+		const my_div = ficha_baldosa.get('my_div');
+		if(!my_div) return [];
 		
-		const array_scan = this._get_array_scan(map_data_mesa.get('my_div'), data_tipo_scan);                // Filtra solo mesas.
+		const array_scan = this._get_array_scan(my_div, rol_busca);                // Filtra solo mesas.
 		
 		return array_scan;
 	}
@@ -808,7 +817,7 @@ class Matriz_to_MyDiv extends Matriz_Plana {
 	 * ### 
 	 * @param obj_drop  Objeto onplay sobre el que se suelta un objeto.
 	*/
-	get_idcontenido(obj_drop){
+	_get_id_contenido_baldosa(obj_drop){
 		if (!this.matriz_plana || this.matriz_plana.length == 0) return false;
 		// ■■
 		const myDiv_to_search = this.matriz_plana.find(my_div => my_div.elemento_div.hasChildNodes() && my_div.elemento_div.id === obj_drop.id);
@@ -861,10 +870,10 @@ class Matriz_to_MyDiv extends Matriz_Plana {
 			console.log('myDiv_to_search no es un objeto MyDiv, ni un indice, ni un id de un objeto MyDiv');
 			return false;
 		}
-		console.log(`\n■■■■■■■■■■■■■■■■■■■ BALDOSA► '${b_div.elemento_div.id}'    CONTENIDO► '${this.get_idcontenido(b_div.elemento_div)}'    CLASE► ${b_div.elemento_div.class_name} • • • SCAN:`);
+		console.log(`\n■■■■■■■■■■■■■■■■■■■ BALDOSA► '${b_div.elemento_div.id}'    CONTENIDO► '${this._get_id_contenido_baldosa(b_div.elemento_div)}'    CLASE► ${b_div.elemento_div.class_name} • • • SCAN:`);
 		
 		console.log(`${b_div.scan.nw}\t${b_div.scan.n}\t${b_div.scan.ne}`);
-		console.log(`${b_div.scan.w}\t${this.get_idcontenido(b_div.elemento_div)}\t${b_div.scan.e}`);
+		console.log(`${b_div.scan.w}\t${this._get_id_contenido_baldosa(b_div.elemento_div)}\t${b_div.scan.e}`);
 		console.log(`${b_div.scan.sw}\t${b_div.scan.s}\t${b_div.scan.se}`);
 	}
 
@@ -1341,7 +1350,7 @@ class Matriz_to_MyDiv extends Matriz_Plana {
 	*/
 	get_myDiv_byContenido(id_to_search){    
 		if (!this.matriz_plana.length) return false;
-		const myDiv_to_search = this.matriz_plana.find(my_div => this.get_idcontenido(my_div.elemento_div) === id_to_search);
+		const myDiv_to_search = this.matriz_plana.find(my_div => this._get_id_contenido_baldosa(my_div.elemento_div) === id_to_search);
 		if (!myDiv_to_search) return false;
 		return myDiv_to_search;
 		
@@ -1357,7 +1366,7 @@ class Matriz_to_MyDiv extends Matriz_Plana {
 		if (!document.getElementById(id_to_search)) return false;
 		const my_div = this.get_myDiv_byContenido(id_to_search);
 		if(!my_div) return false;
-		const indice = this._get_indice_byId(my_div.elemento_div.id);
+		const indice = this.__get_indice_baldosa_byId(my_div.elemento_div.id);
 		if ( indice >=0 )
 			return indice;
 		else 
@@ -1365,11 +1374,11 @@ class Matriz_to_MyDiv extends Matriz_Plana {
 	}
 
 	/** Introduce un id de un objeto MyDiv y devuelve el objeto MyDiv si lo encuentra en la matriz o null si no lo encuentr
-	 * @param {String} id_to_search id del objeto MyDiv(baldosa) a buscar.
-	 * @returns -1 si no encuentra y entero de la posicion del MyDiv de id_to_search si lo encuentra.
+	 * @param {String} id_baldosa_busca id del objeto MyDiv(baldosa) a buscar.
+	 * @returns -1 si no encuentra y entero de la posicion del MyDiv de id_baldosa_busca si lo encuentra.
 	 */
-	_get_indice_byId(id_to_search){
-		let indice_to_search = this.matriz_plana.findIndex(objeto => objeto.elemento_div.id === id_to_search);
+	__get_indice_baldosa_byId(id_baldosa_busca){
+		let indice_to_search = this.matriz_plana.findIndex(objeto => objeto.elemento_div.id === id_baldosa_busca);
 		// if (indice_to_search === -1) 
 		// 	return false;
 		return indice_to_search;
@@ -1394,8 +1403,8 @@ class Matriz_to_MyDiv extends Matriz_Plana {
 	 * @param {number} 	indice, número de índice del array de divs. 
 	 * 					tambien se puede pasar una celda('B7') o un objeto coordenadas {fila, columna}
 	 */
-	get_objdiv_from_mydiv(indice) {
-		const my_div = this.at(indice);			// metodo de matriz_plana. asegura el indice correcto.
+	_get_baldosa(indice) {
+		const my_div = this._at(indice);			// metodo de matriz_plana. asegura el indice correcto.
 		if (!my_div) return null;		
 		return my_div.elemento_div;
 	}
@@ -1692,7 +1701,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 			items_html_to_matriz.forEach(el => {
 				
 				this._add_listeners_movimiento(el);
-				el.addEventListener("dragstart", this.dragStart.bind(this));
+				// el.addEventListener("dragstart", this.dragStart.bind(this));
 			});
 		}
 		console.log('✅ Tablero_Drop - Touch-Raton ​​👆​🖱️​ • • • Loaded ✔️');
@@ -1727,7 +1736,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 	 * ### KISS: Inicia el bloqueo del sidebar durante un drag de mesa/silla.
 	 */
 	// _iniciar_bloqueo_sidebar(objeto_drag = null) {
-	// 	if (!this._es_mesa_silla(this.data_tipo)) return;
+	// 	if (!this._es_mesa_silla(this.data__tipo)) return;
 	// 	this._set_bloqueo_sidebar(true);
 	// 	if (objeto_drag) {
 	// 		objeto_drag.addEventListener('dragend', () => this._set_bloqueo_sidebar(false), { once: true });
@@ -1766,7 +1775,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// ev.dataTransfer.setData("rol",this.data_sub_grupo); 
 
 		// ■■■■ LOG	🖥️															
-		// console.log(`▶️ drag_start ■ id ► ${new_obj_drag.id}  , tipo: ${this.data_tipo} , clase: ${new_obj_drag.className}`);  		
+		// console.log(`▶️ drag_start ■ id ► ${new_obj_drag.id}  , tipo: ${this.data__tipo} , clase: ${new_obj_drag.className}`);  		
 	}
 
 	/**
@@ -1792,7 +1801,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 			// const x   = objDrag.dataset.tipo;
 			
 			// ■■■■■■■■■■■■■■■■■■■■■■■■ LOG 🖥️
-			// console.log(`▶️  DROP-SALON ■  ${objDrag.id}  ${this.objeto_drag.id} ◄ SOBRE ►  ${objDrop.id}  , data-tipo(html): ${data_tipo}`);
+			// console.log(`▶️  DROP-SALON ■  ${objDrag.id}  ${this.objeto_drag.id} ◄ SOBRE ►  ${objDrop.id}  , data-tipo(html): ${data__tipo}`);
 	
 			// ████████████████████████  
 			// LOGICA DROP 
@@ -1950,7 +1959,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 	 * ## Desde el MENU, Movemos un Objeto Drag a una Baldosa de la Matriz.
 	 * @param {object} item_menu  El nodo de la silla a arrastrar.(mesa o silla del navbar o cualquier menu.)
 	 * @param {myDiv}  baldosa_matriz  El nodo/objeto de la baldosa donde se va (myDiv.elemento_div)
-	 * @param {string} data_tipo  'mesa', 'silla' . definidos en diccionario de configuracion dicc_config de Salon.js.
+	 * @param {string} data__tipo  'mesa', 'silla' . definidos en diccionario de configuracion dicc_config de Salon.js.
 	 * @returns {object}  el elemento nuevo creado (la silla), que ha sido llevada del menu a la matriz_plana (El Salon)
 	 */
 	elemento_nuevo_to_Salon(item_menu = null, baldosa_matriz = null) {
@@ -1959,7 +1968,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		if (this.is_baldosa_vacia(baldosa_matriz) == false) return
 		
 		const idkey = item_menu.dataset.tipo;
-		// ■■ Creamos un Clon del item del MENU. El id que se asigna es un secuencial del data-tipo(del <data_tipo>)
+		// ■■ Creamos un Clon del item del MENU. El id que se asigna es un secuencial del data-tipo(del <data__tipo>)
 		const clon_item = item_menu.cloneNode(true);                  
 		clon_item.id = Herramientas._get_secuencial_dom(idkey);				
 		clon_item.dataset.tipo = idkey;	// mesa, silla, taburete
@@ -1974,7 +1983,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// ■■ 
 		baldosa_matriz.appendChild(clon_item);           
 		// ■■ LOG  🖥️
-		// console.log(`▶️ ${clon_item.id} ► Padre: ${clon_item.parentNode.id} ■ clase: ${this.get_className(clon_item)} ■ data-tipo(html): ${data_tipo}\n`);
+		// console.log(`▶️ ${clon_item.id} ► Padre: ${clon_item.parentNode.id} ■ clase: ${this.get_className(clon_item)} ■ data-tipo(html): ${data__tipo}\n`);
 		return clon_item;
 	}
 
@@ -1998,7 +2007,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		
 		baldosa_destino.appendChild(obj_drag);
 
-		// console.log(`▶️ Movimiento Interno: ${obj_drag.id}  GO From ${baldosa_origen.id} To ${baldosa_destino.id} ► data-tipo(html): ${data_tipo}`);
+		// console.log(`▶️ Movimiento Interno: ${obj_drag.id}  GO From ${baldosa_origen.id} To ${baldosa_destino.id} ► data-tipo(html): ${data__tipo}`);
 		return true;
 	}
 
@@ -2045,7 +2054,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 					return false;                        // Si no hay elementos, retorna false.
 			}
 			lista_mydivs_onplay.forEach((my_div, indice) =>{
-				const id_contenido = this.get_idcontenido(my_div.elemento_div);
+				const id_contenido = this._get_id_contenido_baldosa(my_div.elemento_div);
 				console.log(`▶️ indice: ${indice} ■ID: ${my_div.elemento_div.id} ■CONTENIDO: ${id_contenido}      n•${my_div.scan.n} s•${my_div.scan.s} e•${my_div.scan.e} w•${my_div.scan.w} ne•${my_div.scan.ne} nw•${my_div.scan.nw} se•${my_div.scan.se} sw•${my_div.scan.sw} `);
 			});			
 		} catch (error) {
@@ -2262,9 +2271,9 @@ class Tablero_Touch extends Tablero_Drop {
 		const preview = this._create_drag_preview(objeto_drag, rect);
 		
 		this.objeto_drag = objeto_drag;
-		this.data_tipo = objeto_drag.getAttribute('data-tipo') || '';
+		this.data_tipo = objeto_drag.getAttribute('data-tipo') || objeto_drag.dataset.tipo || '';
 		
-		// if (this._es_mesa_silla?.(this.data_tipo)) this._set_bloqueo_sidebar(true);
+		// if (this._es_mesa_silla?.(this.data__tipo)) this._set_bloqueo_sidebar(true);
 		
 		const previousVisibility = objeto_drag.style.visibility;
 		objeto_drag.style.visibility = 'hidden';
@@ -2357,7 +2366,7 @@ class Tablero_Touch extends Tablero_Drop {
 
 	/** ### Construye un evento sintético de tipo 'drop' para simular el comportamiento de arrastrar y soltar en dispositivos táctiles.*/
 	_buildSyntheticDropEvent(target, draggedElement, coords = {}){
-		const dataTipo = (draggedElement && draggedElement.getAttribute('data-tipo')) || '';
+		const dataTipo = (draggedElement && draggedElement.getAttribute('data-tipo')) || objeto_drag.dataset.tipo || '';
 		const { x = 0, y = 0 } = coords;
 		return {
 			preventDefault: () => {},
@@ -2383,34 +2392,6 @@ class Tablero_Touch extends Tablero_Drop {
  * ##### • RESERVAS son asociaciones de mesas y sillas. Se pueden juntar varias mesas para formar 1 reserva
 */
 class e_Salon extends Tablero_Touch {
-	/** ### Imagen svg del elemento 'mesa'  ►  {@link Configuracion_Salon._asegurar_plantillas_menu}*/
-	// static MESA = `
-	// 	<div id="mesa_menu" class="menu_to_clone" data-tipo="mesa" draggable="true" title="Arrastra la Mesa hasta el Salón">
-	// 		<svg class="imagen_menu imagen_menu--mesa"
-	// 			fill="currentColor" viewBox="0 0 50 50" width="30" height="30"
-	// 			xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
-	// 			<path class="st0" d="M10.585938 11L0.38085938 21.205078 A 1.0001 1.0001 0 0 0 0.18945312 21.396484L0 21.585938L0 21.832031 A 1.0001 1.0001 0 0 0 0 22.158203L0 28L3 28L3 50L9 50L9 28L11 28L11 43L17 43L17 28L33 28L33 43L39 43L39 28L41 28L41 50L47 50L47 28L50 28L50 22.167969 A 1.0001 1.0001 0 0 0 50 21.841797L50 21.585938L49.806641 21.392578 A 1.0001 1.0001 0 0 0 49.623047 21.207031 A 1.0001 1.0001 0 0 0 49.617188 21.203125L39.414062 11L39 11L10.585938 11 z M 11.414062 13L38.585938 13L46.585938 21L3.4140625 21L11.414062 13 z M 2 23L48 23L48 26L46.167969 26 A 1.0001 1.0001 0 0 0 45.841797 26L42.154297 26 A 1.0001 1.0001 0 0 0 41.984375 25.986328 A 1.0001 1.0001 0 0 0 41.839844 26L38.167969 26 A 1.0001 1.0001 0 0 0 37.841797 26L34.154297 26 A 1.0001 1.0001 0 0 0 33.984375 25.986328 A 1.0001 1.0001 0 0 0 33.839844 26L16.167969 26 A 1.0001 1.0001 0 0 0 15.841797 26L12.154297 26 A 1.0001 1.0001 0 0 0 11.984375 25.986328 A 1.0001 1.0001 0 0 0 11.839844 26L8.1679688 26 A 1.0001 1.0001 0 0 0 7.8417969 26L4.1542969 26 A 1.0001 1.0001 0 0 0 3.984375 25.986328 A 1.0001 1.0001 0 0 0 3.8398438 26L2 26L2 23 z M 5 28L7 28L7 48L5 48L5 28 z M 13 28L15 28L15 41L13 41L13 28 z M 35 28L37 28L37 41L35 41L35 28 z M 43 28L45 28L45 48L43 48L43 28 z"/>
-	// 		</svg>
-	// 	</div>
-	// `;
-	
-	// /** ### Imagen svg del elemento 'silla'  ►  {@link Configuracion_Salon._asegurar_plantillas_menu}*/
-	// static SILLA = `
-	// 	<div id="silla_menu" class="menu_to_clone" data-tipo="silla" draggable="true" title="Arrastra la silla hasta el Salón">
-	// 		<svg class="imagen_menu imagen_menu--silla st0"
-	// 			fill="currentColor" viewBox="0 0 512 512" width="30" height="30"
-	// 			xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
-	// 			<g>
-	// 				<rect x="262.97" y="298.368" class="st0" width="33.329" height="155.344"/>
-	// 				<path class="st0" d="M243.216,23.156l-50.788,201.47h-42.233l-89.148,13.431v36.624l10.08,1.437h-10.08v177.595h33.329V279.441
-	// 					l55.819,7.952V512h41.146V287.392h158.98V512h41.137V259.523L450.953,0L243.216,23.156z M349.317,224.626H225.884l43.386-172.06
-	// 					l122.188-11.116L349.317,224.626z"/>
-	// 			</g>
-	// 		</svg>
-	// 	</div>
-	// `;
-	// static SILLA_ = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="50" height="50"> <g fill="#8B4513"> <rect x="262.97" y="298.368" width="33.329" height="155.344"/> <path d="M243.216,23.156l-50.788,201.47h-42.233l-89.148,13.431v36.624l10.08,1.437h-10.08v177.595h33.329V279.441l55.819,7.952V512h41.146V287.392h158.98V512h41.137V259.523L450.953,0L243.216,23.156z M349.317,224.626H225.884l43.386-172.06l122.188-11.116L349.317,224.626z"/> </g> </svg>`;
-		
 	/** ### Clase que Se encarga de la configuracion incial del Salon y metodos asociadas al Funcionamiento */
 	CFG = null; 
 	/** ### Clase que se encarga del Registro y Log.  */
@@ -2423,7 +2404,7 @@ class e_Salon extends Tablero_Touch {
 	MSG_M=null;
 	/** ### Diccionario principal de configuración. Se valida en el constructor de e-Salon. Contiene los datos de la app. */
 	dicc_config = null;	
-	/** ### Array de diccionarios de reservas. LOGICA DEL NEGOCIO DE SALON ► reservas = [ {'mesas':[], 'sillas':[]} , {...} ] {@link _modulo_reservas}*/
+	/** ### Array de diccionarios de reservas. LOGICA DEL NEGOCIO DE SALON ► reservas = [ {'mesas':[], 'sillas':[]} , {...} ] */
 	reservas = []; 	
 	
 	/** ### Modo Reserva ON/OFF. 
@@ -2503,6 +2484,7 @@ class e_Salon extends Tablero_Touch {
 		// 💥💥💥💥💥💥💥💥
 		const z_catalogo = Catalogo.get();
 		const z_silla = Catalogo.get("silla");
+		const z_silla_zero = Catalogo.get("silla_0");
 		const z_silla_logica = Catalogo.get("silla", "logica");
 		const z_silla_id = Catalogo.get("silla", "id");
 		const z_silla_visual = Catalogo.get("silla", 'visual');
@@ -2734,17 +2716,19 @@ class e_Salon extends Tablero_Touch {
 		const elemento_clickado = ev.currentTarget;
 		if (!elemento_clickado) return;
 
-		const id = elemento_clickado.id;
-		const idkey = elemento_clickado.dataset.tipo;		// el key de Catalogo.
-		const class_obj = elemento_clickado.classList;	// clases css([class_onplay , silla_onplay])
+		const id_el = elemento_clickado.id;
+		// const z_zero = Catalogo.get(id_el);
+
+		const key_catalogo = elemento_clickado.dataset.tipo;		// el key de Catalogo.
+		const clases_el = elemento_clickado.classList;	// clases css([class_onplay , silla_onplay])
 		
 		// ■ Calcula el indice de la reserva a la que pertenece el elemento clickado.
-		const index_reserva = this._get_indice_en_reserva_s(id);
+		const index_reserva = this._get_indice_en_reserva_s(id_el);
 		if (index_reserva == -1) return null;
 		this.index_reserva = index_reserva;			
 		
 		// ■ Logica
-		const ctlg = Catalogo.get(idkey);
+		const ctlg = Catalogo.get(key_catalogo);
 		if (!ctlg || ctlg.grupo !== 'player') 
 			return;
 		const rol = ctlg.rol;
@@ -2753,6 +2737,7 @@ class e_Salon extends Tablero_Touch {
 			// this._abrir_offcanvas_logica(elemento_clickado, ctlg);
 			this.LOGIC.abrir_offcanvas(elemento_clickado);			
 		}
+
 	}
 
 	_get_indice_en_reserva_s(id_elemento){	
@@ -2849,7 +2834,7 @@ class e_Salon extends Tablero_Touch {
 	 * 	* Añade un Event Listener ​👂​👂 para el click en el nuevo elemento.
 	 * @see {@link Tablero_Drop.drop_over_matriz}
 	 * ```javascript
-	 * this.elemento_nuevo_to_Salon_(objDrag, objDrop, data_tipo);			
+	 * this.elemento_nuevo_to_Salon_(objDrag, objDrop, data__tipo);			
 	 * ```
 	*/
 	elemento_nuevo_to_Salon(item_menu = null, baldosa_matriz = null){
@@ -2942,7 +2927,7 @@ class e_Salon extends Tablero_Touch {
 
 
 	/**
-	 * ### Muestra el Offcanvas y actualiza el contenido según si es agrupador o cliente
+	 * ### Muestra el Offcanvas y actualiza el contenido según si es reserver o cliente
 	 */
 	_abrir_offcanvas_logica(elemento_dom, catalogo_item) {
 		// ■ Obtener la referencia al nodo HTML (lo crea si no existe)
@@ -2958,10 +2943,10 @@ class e_Salon extends Tablero_Touch {
 		// ■■ inyectar HTML de forma dinámica
 		let html_content = ``;
 		
-		if (catalogo_item.rol === 'agrupador') {
+		if (catalogo_item.rol === 'reserver') {
 			html_content += `<p>Motor de mensajes: ${catalogo_item.logica?.motor_mensajes?.tipo}</p>`;
 			html_content += `<p>Motor de alergias: ${catalogo_item.logica?.motor_alergias ? 'Activado' : 'Desactivado'})</p>`;
-			// Inyecta aquí los botones/inputs para mesas u agrupadores
+			// Inyecta aquí los botones/inputs para mesas u reserveres
 		} else if (catalogo_item.rol === 'cliente') {
 			html_content += `<p>Motor de mensajes: ${catalogo_item.logica?.motor_mensajes?.tipo}</p>`;
 			html_content += `<p>Motor de alergias: ${catalogo_item.logica.motor_alergias ? 'Activado' : 'Desactivado'})</p>`;
@@ -2989,31 +2974,27 @@ class e_Salon extends Tablero_Touch {
 	 * ```javascript
 	 * scanner = {'id':'mesa_4', 'n':null, 's':'silla_1', 'e':'mesa_2', 'w':'silla_0', 'ne':null, 'nw':null, 'se':null, 'sw':null}
 	 * ```
-	 * @param {String} data_tipo en Salon = o 'mesa' o 'silla'. definido en dicc_config
+	 * @param {String} data__tipo en Salon = o 'mesa' o 'silla'. definido en dicc_config
 	 * @see {@link drop_over_matriz} - {@link drop_exit}
 	*/
-	_modulo_reservas(data_tipo = '', b_registro=true) {
+	_modulo_reservas( rol_busca='reserver' , b_registro=true) {
 		try {
-			// ■■ array de objeto Set (id_contenido, my_div , indice_baldosa) de todos los data_tipo(data_config.tipo = mesa ) 
+			// ■■ array de objeto Set (id_contenido, my_div , indice_baldosa) de todos los data__tipo(data_config.tipo = mesa ) 
 			//   ┌• Objeto datamap: {id_elemento(string), baldosa (myDiv) , indice(integer) }
 			// 	 ┌• [ {'mesa_0', [Object myDiv], 12} , {'mesa_1', [Object myDiv], 3} , ... ]			
-			const array_datamap = this._get_arraydatamap_by_datatipo(data_tipo);
+			const array_datamap = this.#crear_fichas_onplay(rol_busca);
 			// if(!array_datamap) return false;
 	
 			// ■■ Logica del Negocio 🧠🧠:
 			// ┌•••• Obtiene un array de ids de reservas a partir del basenamme: [ ["mesa_0" , "mesa_1"] , ["mesa_2"] ]
-			const matriz_reservas = this._get_matriz_reservas(array_datamap, data_tipo);
-			// if (!matriz_reservas) return false;
-	
+			const matriz_reservas = this.#get_matriz_reservas(array_datamap, rol_busca);
 			// ■■ Obtiene el array de diccionarios de reservas!!
 			const reservas = this._get_array_dicc_reservas(matriz_reservas, array_datamap);
-			// this.reservas = this._get_array_dicc_reservas(matriz_reservas, array_datamap);
 			if ( !reservas || reservas.length === 0 ) 
 				return [];
-			// return this.reservas;
 			
-			// ┌••• si no quiero registrar las reservas en this.reservas y quiero que me retorne el resultado para 
-			// 		trabajarlo aparte ► b_registro = false. 
+			// ┌••• si no quiero registrar las reservas en this.reservas y 
+			// 		quiero que me retorne el resultado para trabajarlo aparte ► b_registro = false. 
 			// ┌••• es útil para pruebas unitarias y re-posicionamiento avanzado donde analizo el resultado y lo cambio si me conviene.
 			if(b_registro){
 				this.reservas = reservas;
@@ -3030,51 +3011,59 @@ class e_Salon extends Tablero_Touch {
 	/** 
 	 * ###  Obtiene un array de dicc DATA (id_contenido, objeto myDiv , indice_baldosa) de los contenidos que empiezan con un prefijo específico en el id.
 	 * ####	Lo uso para tener información de un tipo de objeto('mesa') sobre el Salón. POR ID.
-	 * @param {} data_tipo - El prefijo del id de los contenidos que se quieren buscar (ejemplo: 'mesa' o 'silla').
 	 * ```javascript  
-	 * const lista_mesas = this.get__array_datamap_bybasename('mesa');
+	 * const lista_mesas = this.crear_fichas_onplay('reserver');
 	 * ```
-	 * ### Retorna:  
+	 * ### Retorna un array de fichas:  
 	 * ```javascript
 	 * [ { id_contenido: 'mesa_0', my_div: [Object myDiv], indice_baldosa: 12 }, 
 	 * { id_contenido: 'mesa_1', my_div: [Object myDiv], indice_baldosa: 15 } , ... ]
 	 * ```
-	 * *  **false**, si hay algún error.
-	 * @see {@link _modulo_reservas}
-	*/
-	_get_arraydatamap_by_datatipo(data_tipo){
+	 * *  **false**, si hay algún error.	*/
+	#crear_fichas_onplay(rol_busca='reserver') {
 		// ┌•• Obtiene la lista de baldosas que contienen hijos (mesas o sillas)
 		const lista_baldosas_onplay = this._get_mydivs_onplay();
 		if (!lista_baldosas_onplay || lista_baldosas_onplay.length === 0) return [];
 		
-		let array_to_return = [];
-		
+		// let array_to_return = [];
+		let array_fichas = [];
 		// ┌•• Escanea las reservas actuales y actualiza su estado
 		lista_baldosas_onplay.forEach(my_div => {
-			const id_contenido = this.get_idcontenido(my_div.elemento_div);    		// my_div.elemento_div es el objDrop. id_contenido = 'mesa_3', 'silla_2'
+			const id_contenido = this._get_id_contenido_baldosa(my_div.elemento_div);    		// my_div.elemento_div es el objDrop. id_contenido = 'mesa_3', 'silla_2'
 			const id_baldosa = my_div.elemento_div.id;                               // id_baldosa es el id del div donde cae el objeto drag.
-			
-			if (!id_contenido || !id_baldosa)  {console.log('Error SCAN '); return [];}
-			
-			const indice_baldosa = this._get_indice_byId(id_baldosa);       // el indice en la matriz.
-			if (indice_baldosa < 0) {
-				console.log('Error SCAN a'); 
+			// ■■ Valida Resultados
+			if (!id_contenido || !id_baldosa)  {
+				console.log('Error SCAN '); 
 				return [];
 			}
+			// • Valida Baldosa
+			const indice_baldosa = this.__get_indice_baldosa_byId(id_baldosa);       
+			if (indice_baldosa < 0) return [];
+			// • Valida contenido('mesa_0' por ejemplo)
+			const elemento_onplay = document.getElementById(id_contenido);
+			if (!elemento_onplay) return [];
 
-			// ■■■■■■ Crea un objeto Map y le asigna los valores ( recuerda que luego se tienen que recuperar con .get() ). 
-			if (id_contenido && id_contenido.startsWith(data_tipo)) {
-				let ficha_data_tipo = new Map();
-				ficha_data_tipo.set("id_contenido", id_contenido);         // 'Mesa_2'
-				ficha_data_tipo.set("my_div", my_div);                     // Objeto my_div... contiene su escaneo n-s-e-w.
-				ficha_data_tipo.set("indice_baldosa", indice_baldosa);     // 12, el indice en la matriz principal de drops de la app.
-				
-				array_to_return.push(ficha_data_tipo);                     // 
-			}    
+			// ■■ Obtenemos el rol del elemento en catalogo.
+			const rol_elemento_onplay = this.#get_rol_en_catalogo(elemento_onplay);
+
+			// ■■ match por rol_busca.			
+			if(rol_elemento_onplay && rol_elemento_onplay === rol_busca ) {
+				let ficha = new Map();
+				ficha.set("id_contenido", id_contenido);         // 'Mesa_2'
+				ficha.set("my_div", my_div);                     // Objeto my_div... contiene su escaneo n-s-e-w.
+				ficha.set("indice_baldosa", indice_baldosa);     // 12, el indice en la matriz principal de drops de la app.
+				array_fichas.push(ficha);                     	 // 
+			}
 		});
-		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ FIN SCAN lista_baldosas_onplay.
+		return array_fichas; 
+	}
 
-		return array_to_return; // Retorna los indices de las mesas que empiezan con el data_tipo.
+	#get_rol_en_catalogo(elemento_dom){
+		if(!elemento_dom) return null;
+		const key_catalogo = elemento_dom.dataset.tipo;
+		if(!key_catalogo) return null;
+		const rol = Catalogo.get(key_catalogo, "rol");
+		return rol || null;
 	}
 
 	/** 🚫 
@@ -3082,8 +3071,8 @@ class e_Salon extends Tablero_Touch {
 	 * @example ► Log de reservas con objetos.
 	 *      const arraydicc_mydivs_reservas  = _get_arraydicc_mydivs_reservas();
 			arraydicc_mydivs_reservas.forEach(dicc_mydivs => {
-				const arr_indice_mesas  = dicc_mydivs.mesas.map(m => this._get_indice_byId(m.elemento_div.id)).join(', ');
-				const arr_indice_sillas = dicc_mydivs.sillas.map(s => this._get_indice_byId(s.elemento_div.id)).join(', ');
+				const arr_indice_mesas  = dicc_mydivs.mesas.map(m => this.__get_indice_baldosa_byId(m.elemento_div.id)).join(', ');
+				const arr_indice_sillas = dicc_mydivs.sillas.map(s => this.__get_indice_baldosa_byId(s.elemento_div.id)).join(', ');
 				console.log(` indices: Mesas:  ${arr_indice_mesas} | Sillas: ${arr_indice_sillas}`);
 			});
 	*/ 
@@ -3092,9 +3081,9 @@ class e_Salon extends Tablero_Touch {
 			return false;
 
 		const array_myDiv_reservas = [];
-		this.reservas.forEach(dicc => {
-			const array_myDiv_mesas  = dicc.mesas.map(m => this.get_myDiv_byContenido(m));
-			const array_myDiv_sillas = dicc.sillas.map(s => this.get_myDiv_byContenido(s));
+		this.reservas.forEach(d => {
+			const array_myDiv_mesas  = d.mesas.map(m => this.get_myDiv_byContenido(m));
+			const array_myDiv_sillas = d.sillas.map(s => this.get_myDiv_byContenido(s));
 			array_myDiv_reservas.push({
 				mesas: array_myDiv_mesas,
 				sillas: array_myDiv_sillas
@@ -3135,10 +3124,9 @@ class e_Salon extends Tablero_Touch {
 	 * @return {array} 
 	 * ```javascript
 	 *  _get_ids_onplay_('cliente') ► ['silla_0', 'silla_1', 'taburete_0', ... ]
-	 *  _get_ids_onplay_('agrupador')  ► ['mesa_0', 'mesa_1', ... ]	
+	 *  _get_ids_onplay_('reserver')  ► ['mesa_0', 'mesa_1', ... ]	
 	 * ```
 	 */
-
 	_get_ids_onplay(rol_busca='todo'){		
 		const CFG = this.dicc_config;
 		if(!CFG) return;
@@ -3164,28 +3152,6 @@ class e_Salon extends Tablero_Touch {
 		}
 		return arr_retorno.filter(Boolean);
 
-		// switch (rol_busca) {
-        // case CFG.salon.tipos.mesa:
-		// 	arr_onplay_nodes = Array.from(document.querySelectorAll('.mesa_onplay'));
-		// 	break;
-		// case CFG.salon.tipos.silla:
-		// 	arr_onplay_nodes = Array.from(document.querySelectorAll('.silla_onplay'));
-		// 	break;			
-		// case 'todo':
-		// case 'all':
-		// 	arr_onplay_nodes = Array.from(document.querySelectorAll('.mesa_onplay, .silla_onplay'));
-		// 	break;
-		// default:
-		// 	return false;
-        // }
-
-		// // const sillas_onplay_nodes = Array.from(document.querySelectorAll('.silla_onplay'));
-
-		// // ■ mesa_3, silla_2
-		// const getID = (el) => el.id || el.getAttribute('id') || (el.dataset ? el.dataset.drag_id : null); 			
-
-		// const arr_id_elemento = arr_onplay_nodes.map(getID).filter(Boolean); // quitamos null
-		// return arr_id_elemento;
 	}
 
 	/** ■■■■■■■■■■■■■■■■■ MESAS
@@ -3194,21 +3160,21 @@ class e_Salon extends Tablero_Touch {
 	 * @param {Array}  lista_mapdata, array flat de ids de todas las Mesas del Salon.
 	 * @returns {Array} array de array de reservas de mesas ► [ ['Mesa_1'] , ['Mesa_2'] , ['Mesa_0', 'Mesa_3'] ]
 	*/ 
-	_get_matriz_reservas(lista_mapdata, data_tipo_busca='') {
+	#get_matriz_reservas(lista_mapdata, rol_busca=null) {
 		// Empiezo con las mesas, que crean las reservas.
 		const visitadas = new Set();
 		let matriz_reservas = [];
 		if (!lista_mapdata || lista_mapdata.length === 0) return [];
 
-		lista_mapdata.forEach(info_mesa => {
-			const id_mesa = info_mesa.get('id_contenido');
+		lista_mapdata.forEach(ficha_reserva => {
+			const id_mesa = ficha_reserva.get('id_contenido');
 			
 			if (!visitadas.has(id_mesa)) {
 				// Encontramos un nuevo grupo (reserva)
 				const array_reserva = this._buscar_elementos_conectados(id_mesa, 
 																		lista_mapdata, 
-																		visitadas, 
-																		data_tipo_busca
+																		visitadas, 																		
+																		rol_busca,
 				);
 				matriz_reservas.push(array_reserva);
 			}
@@ -3221,9 +3187,8 @@ class e_Salon extends Tablero_Touch {
 
 	/**
 	 * ### Busca todas las mesas conectadas usando DFS
-	 * @see {@link _get_matriz_reservas}
 	 * @param {string} mesa_inicio - ID de la mesa inicial ► 'Mesa_0'                              
-	 * @param {Array} lista_mapdata - Lista de info_mesa (Map)
+	 * @param {Array} lista_mapdata - Lista de ficha_reserva (Map)
 	 * ```javascript                             
 	 * [{"id_contenido", "Mesa_0"}  , {"my_div", MyDiv} , {"indice_baldosa", 13} ,
 	 * {"id_contenido", "Mesa_1"}  , {"my_div", MyDiv} , {"indice_baldosa", 43} ]
@@ -3231,7 +3196,7 @@ class e_Salon extends Tablero_Touch {
 	 * @param {Set} visitadas - Conjunto Set de ids de mesas ya tratadas, ... para evitar repetir mesas
 	 * @returns {Set} - Grupo de mesas conectadas (reserva)
 	*/
-	_buscar_elementos_conectados(mesa_inicio, lista_mapdata, visitadas, data_tipo_busca='') {
+	_buscar_elementos_conectados(mesa_inicio, lista_mapdata, visitadas, rol_busca='') {
 		const Pila = [mesa_inicio];         // ■ Pila  Lifo
 		const set_retorno = new Set();      // ■ Conjunto para almacenar mesas conectadas
 		
@@ -3243,7 +3208,7 @@ class e_Salon extends Tablero_Touch {
 				set_retorno.add(elemento_actual);
 				
 				// Buscamos mesas vecinas 
-				const array_vecinos = this._get_array_vecinos(elemento_actual, lista_mapdata, data_tipo_busca);
+				const array_vecinos = this._get_array_vecinos(elemento_actual, lista_mapdata, rol_busca);
 				array_vecinos.forEach(vecino => {
 					if (!visitadas.has(vecino)) {
 						Pila.push(vecino);              // Llena la Pila.
@@ -3260,41 +3225,40 @@ class e_Salon extends Tablero_Touch {
 	/** 
 	 * ### Recibe array de reservas de mesas y crea un array de dicc{mesas:[], sillas:[]}
 	 * #### Las sillas que no tienen mesa no se incluyen.
-	 * #### @see {@link _modulo_reservas}
 	 * @param {Array} matriz_reservas [ ['Mesa_1'] , ['Mesa_2'] , ['Mesa_0', 'Mesa_3'] ]
 	 * @param {Array} lista_info_mesas  [ {id_contenido: 'Mesa_0', my_div: [Object myDiv], indice_baldosa: 12 }, 
 	 * @returns {Array} [] Si error
 	 * ```javascript
-	 * [{mesas: ['Mesa_0', 'Mesa_3'], sillas: ['Silla_4', 'Silla_5, Silla_0'] }, 
-	 * { mesas: ['Mesa_1']          , sillas: ['Silla_1', 'Silla_2, Silla_3'] }, 
+	 * [{mesas: ['Mesa_0', 'Mesa_3'], 	sillas: ['Silla_4', 'Silla_5, Silla_0'] }, 
+	 * { mesas: ['Mesa_1']          , 	sillas: ['Silla_1', 'Silla_2, Silla_3'] }, 
 	 * . . .
-	 * {mesas: [], sillas: ['Silla_6', 'Silla_7'] } ]
+	 * {mesas: [], 		sillas: ['Silla_6', 'Silla_7'] } ]
 	 * ```
 	 */
 	_get_array_dicc_reservas(matriz_reservas, lista_info_mesas) {
 		// ┌•• Validacion		
 		if (!matriz_reservas || matriz_reservas.length === 0) {
-			return  this._get_sillas_ronin();
+			return  this.#get_clientes_sin_reserva();
 		};
 		if (!lista_info_mesas || lista_info_mesas.length === 0) return [];
 		
 		let arraydicc_rsrvs = [];            // Array de diccionarios {mesas: [], sillas: []} RETORNO.
-		let set_sillas_visited = new Set();      // Para evitar duplicados entre reservas.
+		let clientes_visited = new Set();      // Para evitar duplicados entre reservas.
 
 		matriz_reservas.forEach((array_idMesas, i) => {
 			let set_sub_sillas = new Set();      // Conjunto de sillas para esta reserva de mesas.
 
 			// Recorremos todas las mesas de este grupo de reserva
 			array_idMesas.forEach(id_mesa => {
-				const info_mesa = lista_info_mesas.find(m => m.get('id_contenido') === id_mesa);
-				if (info_mesa) {
-					let array_scan = this._get_array_scan(info_mesa.get('my_div'), 'silla'); // Filtra solo sillas.
+				const ficha_reserva = lista_info_mesas.find(m => m.get('id_contenido') === id_mesa);
+				if (ficha_reserva) {
+					let array_scan = this._get_array_scan(ficha_reserva.get('my_div'), 'cliente'); // Filtra solo sillas.
 					if (array_scan) {
-						array_scan.forEach(silla => {
-							// Solo añadimos la silla si aún no estaba usada en otra reserva
-							if (!set_sillas_visited.has(silla)) {
-								set_sub_sillas.add(silla);
-								set_sillas_visited.add(silla);
+						array_scan.forEach(id_cliente => {
+							// Solo add un cliente si aún no estaba usada en otra reserva
+							if (!clientes_visited.has(id_cliente)) {
+								set_sub_sillas.add(id_cliente);
+								clientes_visited.add(id_cliente);
 							}
 						});
 					}
@@ -3302,23 +3266,17 @@ class e_Salon extends Tablero_Touch {
 			});
 
 			// ■■ Creamos el diccionario para este grupo
-			let dicc_reservas = {
+			const dicc_reservas = {
 				mesas: array_idMesas,
 				sillas: [...set_sub_sillas]  // convertimos Set → Array
 			};
-
 			arraydicc_rsrvs.push(dicc_reservas);
 		});
-
-		// ■■ Log de reservas
-		// arraydicc_rsrvs.forEach(dicc => {
-			//     console.log('dicc_reservas:', ...dicc.mesas, ...dicc.sillas);
-			// });
 			
 		// ■■■■■■■■■■■■ Sillas Ronin
-		const sillas_ronin = this._get_sillas_ronin(set_sillas_visited);	
-		if (sillas_ronin && sillas_ronin.length > 0) {
-			arraydicc_rsrvs.push(...sillas_ronin);
+		const clientes_sin_reserva = this.#get_clientes_sin_reserva(clientes_visited);	
+		if (clientes_sin_reserva && clientes_sin_reserva.length > 0) {
+			arraydicc_rsrvs.push(...clientes_sin_reserva);
 		}
 
 		return arraydicc_rsrvs;
@@ -3326,26 +3284,25 @@ class e_Salon extends Tablero_Touch {
 
 	/**
 	 * 
-	 * @param {*} set_sillas_visited Conjunto (Set) con un array de id's de sillas visitadas totales, no solo de la reserva.
+	 * @param {*} clientes_visited Conjunto (Set) con un array de id's de sillas visitadas totales, no solo de la reserva.
 	 * @returns {array} devuelve un array vacio( [] ) si no hay sillas sueltas o un array de id's de las sillas sueltas por el salon.
 	 * 					1 Reserva con todas las sillas sueltas del salon.
 	 */
-	_get_sillas_ronin(set_sillas_visited=null){
-		let sillas_ronin = [];
+	#get_clientes_sin_reserva(clientes_visited=null){
+		let clientes_ronin = [];
 		// ■■■■■■■■■■■■ Sillas Ronin
-		// const arr_id_sillas = this._get_ids_onplay(this.dicc_config.salon.tipos.silla);
-		const arr_id_sillas = this._get_ids_onplay('cliente');
-		const sillas_no_asignadas = arr_id_sillas.filter(silla_id => !set_sillas_visited?.has(silla_id));
+		const clientes = this._get_ids_onplay('cliente');
+		const clientes_sin_reserva = clientes.filter(id_cliente => !clientes_visited?.has(id_cliente));
 
-		if (sillas_no_asignadas.length > 0) {
-			// console.log('Sillas no asignadas a ninguna reserva:', sillas_no_asignadas);
+		if (clientes_sin_reserva.length > 0) {
+			// console.log('Sillas no asignadas a ninguna reserva:', clientes_sin_reserva);
 			let ficha_reservas = {
 				mesas: [],
-				sillas: [...sillas_no_asignadas]  
+				sillas: [...clientes_sin_reserva]  
 			};
-			sillas_ronin.push(ficha_reservas);
+			clientes_ronin.push(ficha_reservas);
 		}
-		return sillas_ronin;
+		return clientes_ronin;
 	}
 
 	/** 👂​👂 🌈 🪑
@@ -3368,7 +3325,8 @@ class e_Salon extends Tablero_Touch {
 	 */
 	_reset_color_reserva() {
 		// ■■ Cacho Los divs contenedores de las imagenes.
-		const nodeList_onplay = document.querySelectorAll(".mesa_onplay , .silla_onplay");
+		// const nodeList_onplay = document.querySelectorAll(".mesa_onplay , .silla_onplay");
+		const nodeList_onplay = document.querySelectorAll(".class_onplay");
 		if (nodeList_onplay.length === 0) return;
 		
 		// ■■ Des-Pinto todos los objetos mesa_onplay y silla_onplay, y de cada objeto, las clases mas profudas del svg.
@@ -3416,11 +3374,11 @@ class e_Salon extends Tablero_Touch {
 	 */
 	RegisteR(){
 		try {
-			// REGISTRO LOS CAMBIOS EN EL SALON.
+			// REGISTRO LOS CAMBIOS EN MyDivs 
 			this._onplay_scan_salon(); 		
 			
 			// LLAMO AL MODULO DE RESERVAS SOBRE LOS OBJETOS CUYO ID EMPIEZA POR 'mesa' 
-			const reservas = this._modulo_reservas(this.dicc_config.salon.tipos.mesa);
+			const reservas = this._modulo_reservas( 'reserver', true);
 			return reservas;
 		} catch (error) {
 			console.log(`Error :::  e-Salon ::: Register ::: msg: ${error}`)
@@ -3776,24 +3734,25 @@ class e_Salon extends Tablero_Touch {
 			};
 
 			// Contenido del diccionario separando
-			const key_value = Object.entries(dicc_api_indices);			
-			key_value.forEach(([key, value]) => {
+			const api_indices = Object.entries(dicc_api_indices);			
+			api_indices.forEach(([id_el, i_baldosa]) => {
 
 				let mesa_o_silla = null;
-				const data_tipo = get_tipo_from_idkey(key);
+				const data_tipo = get_tipo_from_idkey(id_el);
+
 				if ( es_tipo_valido(data_tipo) ) 
 					mesa_o_silla = get_mesa_o_silla_by_datatipo(data_tipo);				
 
 				// ◘
-				const objDrop = this.get_objdiv_from_mydiv(value);
+				const objDrop = this._get_baldosa(i_baldosa);
 
 				// ■■ Verificamos que la baldosa de destino esté vacía
 				if (this.is_baldosa_vacia(objDrop) == false) 
 					return;
 
-				// ■■ Creamos un Clon del MENU. El id que se asigna es un secuencial del data-tipo(del <data_tipo>)
+				// ■■ Creamos un Clon del MENU. El id que se asigna es un secuencial del data-tipo(del <data__tipo>)
 				const clon_item = mesa_o_silla.cloneNode(true);                  
-				clon_item.id = key;				
+				clon_item.id = id_el;				
 				clon_item.title = clon_item.id;
 				
 				//  ​👂​👂  Hace el clon del item del menu DRAGGABLE
@@ -4088,6 +4047,10 @@ class e_Salon extends Tablero_Touch {
 		
 		// ┌■■ Definimos el tipo del id
 		const data_tipo = e_Salon.__get_tipo_from_id(id_mesa_o_silla, el_menu_s);
+		const keys_catalogo = Catalogo.get_keys();
+		const z_silla_zero = Catalogo.get("silla_0");
+
+
 		// ┌■■ Check que es un tipo introducido en el 'diccionario de configuracion'
 		if ( e_Salon.__es_tipo_valido(data_tipo, this.dicc_config) ) {
 
@@ -4099,8 +4062,7 @@ class e_Salon extends Tablero_Touch {
 			return null;
 		}	
 	}		
-	/** ## Busca en el menú la plantilla cuyo data-tipo coincide con el pasado.
-	 * ### funcion subordinada exclusivamente de {@link _what_player_menu}	 */
+	/** ## Busca en el menú la plantilla cuyo data-tipo coincide con el pasado. */
 	static __get_elemento_by_dataset(data_set, items_menu){
 		for (const el of items_menu) {
 			const t = (el.dataset && el.dataset.tipo) || el.getAttribute('data-tipo');
@@ -4108,8 +4070,7 @@ class e_Salon extends Tablero_Touch {
 		}
 		return null;
 	}	
-	/** ## Valida el tipo contra dicc_config (soporta dos formas comunes)
-	 * ### funcion subordinada exclusivamente de {@link _what_player_menu}	 */
+	/** ## Valida el tipo contra dicc_config (soporta dos formas comunes)	 * */
 	static __es_tipo_valido(tipo_a_validar , diccionario_configuracion){
 		const CFG = diccionario_configuracion;
 		if (!CFG || typeof CFG !== 'object') return false;
@@ -4117,7 +4078,7 @@ class e_Salon extends Tablero_Touch {
 		return arr_values_tipos.includes(tipo_a_validar);				
 	}
 	/** ## Dada una clave "mesa_0" o "silla_12", retorna el tipo. se compara contra los tipos presentes en el menú.
-	 * ### funcion subordinada exclusivamente de {@link _what_player_menu}	 */
+	 * */
 	static __get_tipo_from_id(id_elemento, items_menu){
 		for (const el of items_menu) {
 			const player = (el.dataset && el.dataset.tipo) || el.getAttribute('data-tipo');
@@ -4147,10 +4108,6 @@ class e_Salon extends Tablero_Touch {
  * @see {@link _load_offcanvas_configuracion} - {@link api_update_columnas}
  */
 class Configuracion_Salon {
-	// ACTUALIZACIONES:🍏🍏🍏🍏🍏🍏🍏🍏🍏🍏🍏
-	// set_altura_baldosas(){}
-	// set_gap_baldosas(){}
-
 	/**
 	 * @param {e_Salon} salon instancia de la clase e_Salon. normalmente this.
 	 * @param {object} dicc_config diccionario de configuración principal. se define en Salon.js
@@ -4163,37 +4120,20 @@ class Configuracion_Salon {
 			console.error("❌ Configuracion__Salon: No se ha proporcionado una referencia válida al salón padre.");
 			return false;
 		}		
-		// if (!salon.dicc_config){
-		// 	console.log('❌ No existe dicc_config desde Salon')
-		// }
+		
+		// ┌■■ 
 		this.Salon = salon; 
 		this.dicc_config_inicial = dicc_config;
 		
-		// ■■ Configuración validada y completada
+		// ┌■■ Configuración validada y completada
 		if(!dicc_config || typeof(dicc_config) != 'object') {
 			console.error("❌ Configuracion__Salon: La configuración proporcionada no es válida.");
 			return false;
 		}
-		// •••••••••••••••••••••••••••••••
-		//  DICCIONARIO DE CONFIGURACION
+		// ┌•• DICCIONARIO DE CONFIGURACION
 		this.configuracion = this.set_diccionario_configuracion(dicc_config);  
 
-		// •••••••••••••••
-		// ┌•• QUIEN SOY
-		/** ### Detección de Entorno ( Define la configuración ) */
-		// this.entorno = Compatibilidad._detectar_entorno();
-		// ┌■ Determinar DIMENSIONES INICIALES dependiendo del tipo/ancho de la pantalla. 
-		// ┌• dimesion_inicial = {filas, columnas} 
-		
-		// this.dimension_inicial = Compatibilidad._get_dimension_inicial(this.entorno.tipo);
-		// this.dimension_inicial = this.Salon.dimension;
-		// ┌■ Determinar LIMITES MAX MIN de columnas y filas dependiendo del tipo/ancho de la pantalla. 
-		// ┌• limites = { columnas:{min:8, max:30}, filas: {min:8, max:100} }
-		// this.limites = Compatibilidad._get_limites_max_min(this.entorno.tipo);
-		// console.log(`${this.Salon.entorno} + ${this.Salon.dimension} + ${this.Salon.limites}`);
-		
-		// •••••••••••••••••••••••••••••••••••••• 
-		// OFFCANVAS DE CONFIGURACION DE LA APP
+		// ┌•• OFFCANVAS DE CONFIGURACION DE LA APP
 		// ┌•• Cacho el trigger que abre el offcanvas
 		this.$trigger = e_Salon._to_element(icono_trigger);
 		if(!this.$trigger) {
@@ -4488,7 +4428,7 @@ class Configuracion_Salon {
 	 * ### Reorganiza las reservas en el salón buscando la posición más óptima y compacta.
 	 * ####	• Asegura que las reservas no se toquen entre sí usando scanner_nsew y validando 8 vecinos.
 	 * ####	• No depende de api_indices sino que los elementos se reubican por las 'reservas'
-	 * ### • reservas_impuestas = la ficha de {@link _procesar_geometria_relativa} + la reserva {@link e_Salon._modulo_reservas} que se quiere conseguir. 
+	 * ### • reservas_impuestas = la ficha de {@link _procesar_geometria_relativa} + la reserva  que se quiere conseguir. 
 	 * ### De Momento sin uso.  Quiero conseguir abrir en cualquier dispositivo. efecto Guau!!! 
 	 * ### Pendiente de analisis final. pensando pasar ficha_impuesta por parametro para trampear api_re_posicionar_.
 	 * 
@@ -4578,7 +4518,7 @@ class Configuracion_Salon {
 						
 						if (celda_destino) {
 							const indice_matriz = Ranget.X_to_indice(celda_destino);
-							const baldosa = this.Salon.get_objdiv_from_mydiv(indice_matriz);
+							const baldosa = this.Salon._get_baldosa(indice_matriz);
 							
 							if (baldosa) {
 								// Re-insertamos el elemento DOM (que fue extraído en clean__elementos_Salon('todo'))
@@ -4621,10 +4561,9 @@ class Configuracion_Salon {
 			// ┌•••••••••••••••••
 			Salon.RegisteR();
 			
-			
 			// ┌••             •••      •••   
 			// ┌•• Validación Antes y despues de registrar
-			const val_api_reservas_aft = Salon._modulo_reservas(this.configuracion.salon.tipos.mesa, false);
+			const val_api_reservas_aft = Salon._modulo_reservas( 'reserver' , false);
 			if(val_api_reservas_aft.length !== val_api_reservas_bef.length) {
 				console.log(`⚠️​ Advertencia: El número de reservas antes (${val_api_reservas_bef.length}) y después (${val_api_reservas_aft.length}) de re-posicionar no coincide.`);
 			}
@@ -5018,61 +4957,60 @@ class Configuracion_Salon {
 	 * @param {Object} ficha Datos de la reserva a colocar
 	 * @param {Array<String>} ids_reserva Lista de IDs que pertenecen a esta reserva (no son conflicto)
 	 * @returns {Boolean} true si hay conflicto con otra reserva, false si es seguro colocar.
-	 * {@link api_re_posicionar}
 	 */
 	_es_posicion_conflictiva(rango_free, ficha, ids_reserva = []) {
 		const celda_inicio_free = rango_free.celda_inicio;
-		const tipo_mesa = this.configuracion.salon.tipos.mesa || 'mesa';
+		const tipo_mesa = 'mesa';
 		let soy_mesa = false;
 
 		// Recorremos solo los elementos que vamos a colocar
 		for (const item of ficha.items) {
-				// Si el objeto de la reserva que quiero colocar es una mesa.....
-				if (item.id.toLowerCase().startsWith(tipo_mesa)) 
-					soy_mesa = true;
-				else  
-					soy_mesa = false;
-				
-				// 1. Calculamos dónde caería esta mesa
-				const celda_destino = this.Salon.eRdS.suma_fc(celda_inicio_free, item.delta_y, item.delta_x);
-				if (!celda_destino) return true; // Error o fuera de rango
+			// Si el objeto de la reserva que quiero colocar es una mesa.....
+			if (item.id.toLowerCase().startsWith(tipo_mesa)) 
+				soy_mesa = true;
+			else  
+				soy_mesa = false;
+			
+			// 1. Calculamos dónde caería esta mesa
+			const celda_destino = this.Salon.eRdS.suma_fc(celda_inicio_free, item.delta_y, item.delta_x);
+			if (!celda_destino) return true; // Error o fuera de rango
 
-				const indice_matriz = this.Salon.eRdS.X_to_indice(celda_destino);
-				let baldosa_obj = this.Salon.matriz_plana[indice_matriz]; 
-				if (!baldosa_obj) return true;
+			const indice_matriz = this.Salon.eRdS.X_to_indice(celda_destino);
+			let baldosa_obj = this.Salon.matriz_plana[indice_matriz]; 
+			if (!baldosa_obj) return true;
 
-				// 2. USAMOS SCANNER_NSEW sobre esa baldosa para ver sus vecinos ACTUALES
-				const scan_result = this.Salon.scanner_nsew(baldosa_obj.elemento_div); 
+			// 2. USAMOS SCANNER_NSEW sobre esa baldosa para ver sus vecinos ACTUALES
+			const scan_result = this.Salon.scanner_nsew(baldosa_obj.elemento_div); 
 
-				// 3. Revisamos los 8 vecinos (N, S, E, W + Diagonales)
-				let vecinos = [
-					baldosa_obj.scan.n,  baldosa_obj.scan.s,  baldosa_obj.scan.e,  baldosa_obj.scan.w,
-					baldosa_obj.scan.ne, baldosa_obj.scan.nw, baldosa_obj.scan.se, baldosa_obj.scan.sw
-				];
-				// ...y eliminamos null/false
-				vecinos = vecinos.filter(x => x !== null && x !== false && x !== undefined && x.trim() !== '');	
-				if(vecinos.length === 0) continue; // No hay vecinos, no hay conflicto
-				
-				// Recorremos los vecinos ya colocados antes de hacer scanner_nsew... si los tiene
-				for (const vecino_id of vecinos) {					
-					if (typeof(vecino_id) === 'string') {						
-						// ► Si Soy mesa y además tengo vecinos, sea mesa o silla, HAY CONFLICTO ❌
-						if(soy_mesa === true) return true;
-						// ■ NO SOY MESA, SOY SILLA
-						// ■ ¿EL VECION, Es una MESA?
-						if (vecino_id.toLowerCase().startsWith(tipo_mesa)) {							
-							// ¿Es de nuestra propia reserva ("familia")?
-							if (ids_reserva.includes(vecino_id)) {
-								// Mesa propia, NO hay CONFLICTO.
-								continue; 
-							} else {
-								// ¡Es una Mesa de otra reserva! CONFLICTO.
-								return true; 
-							}
+			// 3. Revisamos los 8 vecinos (N, S, E, W + Diagonales)
+			let vecinos = [
+				baldosa_obj.scan.n,  baldosa_obj.scan.s,  baldosa_obj.scan.e,  baldosa_obj.scan.w,
+				baldosa_obj.scan.ne, baldosa_obj.scan.nw, baldosa_obj.scan.se, baldosa_obj.scan.sw
+			];
+			// ...y eliminamos null/false
+			vecinos = vecinos.filter(x => x !== null && x !== false && x !== undefined && x.trim() !== '');	
+			if(vecinos.length === 0) continue; // No hay vecinos, no hay conflicto
+			
+			// Recorremos los vecinos ya colocados antes de hacer scanner_nsew... si los tiene
+			for (const vecino_id of vecinos) {					
+				if (typeof(vecino_id) === 'string') {						
+					// ► Si Soy mesa y además tengo vecinos, sea mesa o silla, HAY CONFLICTO ❌
+					if(soy_mesa === true) return true;
+					// ■ NO SOY MESA, SOY SILLA
+					// ■ ¿EL VECION, Es una MESA?
+					if (vecino_id.toLowerCase().startsWith(tipo_mesa)) {							
+						// ¿Es de nuestra propia reserva ("familia")?
+						if (ids_reserva.includes(vecino_id)) {
+							// Mesa propia, NO hay CONFLICTO.
+							continue; 
+						} else {
+							// ¡Es una Mesa de otra reserva! CONFLICTO.
+							return true; 
 						}
 					}
 				}
-			// }
+			}
+		// }
 		}
 		
 		// Ninguna de las mesas a colocar encontró conflicto

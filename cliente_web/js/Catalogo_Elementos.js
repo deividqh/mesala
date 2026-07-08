@@ -9,7 +9,7 @@ class Catalogo {
     mesa: {
         id: 'mesa',
         grupo: 'player',
-        rol: 'agrupador', // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc)
+        rol: 'reserver', // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc)
         fisica: {
             ancho: 1, // Medida en celdas/baldosas
             alto: 1,
@@ -17,10 +17,10 @@ class Catalogo {
         },
         visual: {
             content: `<svg class="imagen_menu imagen_menu--mesa"fill="currentColor" viewBox="0 0 50 50" width="30" height="30"xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"><path class="st0" d="M10.585938 11L0.38085938 21.205078 A 1.0001 1.0001 0 0 0 0.18945312 21.396484L0 21.585938L0 21.832031 A 1.0001 1.0001 0 0 0 0 22.158203L0 28L3 28L3 50L9 50L9 28L11 28L11 43L17 43L17 28L33 28L33 43L39 43L39 28L41 28L41 50L47 50L47 28L50 28L50 22.167969 A 1.0001 1.0001 0 0 0 50 21.841797L50 21.585938L49.806641 21.392578 A 1.0001 1.0001 0 0 0 49.623047 21.207031 A 1.0001 1.0001 0 0 0 49.617188 21.203125L39.414062 11L39 11L10.585938 11 z M 11.414062 13L38.585938 13L46.585938 21L3.4140625 21L11.414062 13 z M 2 23L48 23L48 26L46.167969 26 A 1.0001 1.0001 0 0 0 45.841797 26L42.154297 26 A 1.0001 1.0001 0 0 0 41.984375 25.986328 A 1.0001 1.0001 0 0 0 41.839844 26L38.167969 26 A 1.0001 1.0001 0 0 0 37.841797 26L34.154297 26 A 1.0001 1.0001 0 0 0 33.984375 25.986328 A 1.0001 1.0001 0 0 0 33.839844 26L16.167969 26 A 1.0001 1.0001 0 0 0 15.841797 26L12.154297 26 A 1.0001 1.0001 0 0 0 11.984375 25.986328 A 1.0001 1.0001 0 0 0 11.839844 26L8.1679688 26 A 1.0001 1.0001 0 0 0 7.8417969 26L4.1542969 26 A 1.0001 1.0001 0 0 0 3.984375 25.986328 A 1.0001 1.0001 0 0 0 3.8398438 26L2 26L2 23 z M 5 28L7 28L7 48L5 48L5 28 z M 13 28L15 28L15 41L13 41L13 28 z M 35 28L37 28L37 41L35 41L35 28 z M 43 28L45 28L45 48L43 48L43 28 z"/></svg>`,
-            css: 'style_visual_agrupador'
+            css: 'style_visual_reserver'
         },
         logica: {
-            motor_mensajes: { nombre: "Mensajes", tipo: 'sumatorio', css: 'estyle_msg_agrupador', }
+            motor_mensajes: { nombre: "Mensajes", tipo: 'sumatorio', css: 'estyle_msg_reserver', }
         }
     },
     silla: {
@@ -40,7 +40,7 @@ class Catalogo {
     taburete: {
         id: 'taburete',
         grupo: 'player',
-        rol: 'cliente',   // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc)
+        rol: 'reserver',   // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc)
         fisica: { ancho: 1, alto: 1, colision: true },
         visual: {
             content: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50"><g fill="#8B4513"><rect x="12" y="25" width="4" height="20" rx="1" /><rect x="34" y="25" width="4" height="20" rx="1" /><rect x="18" y="20" width="4" height="15" rx="1" opacity="0.8" /><rect x="28" y="20" width="4" height="15" rx="1" opacity="0.8" /><ellipse cx="25" cy="20" rx="18" ry="12" /><path d="M7,20 Q7,30 25,30 Q43,30 43,20 L43,22 Q43,32 25,32 Q7,32 7,22 Z" /></g></svg>',
@@ -116,6 +116,11 @@ class Catalogo {
         let actual = this.#DATA;
 
         for (const clave of niveles) {
+            // ■ Testeo si clave es un id de un elemento del DOM y si existe, lo obtenemos.
+            const item_catalog = Catalogo.from_id_to_catalogo(clave);
+            if (item_catalog)   return item_catalog;                        
+
+            // ■ No es un id de DOM y buscamos las claves.
             if (actual !== null && typeof actual === 'object' && clave in actual) {
                 actual = actual[clave];
             } else {
@@ -123,6 +128,23 @@ class Catalogo {
             }
         }
         return actual;
+    }
+
+    static from_id_to_catalogo(id) {
+        const es_dom = document.getElementById(id);
+        if (!es_dom) return null;
+        // const key_el_dom = es_dom.dataset.tipo;
+        // if (key_el_dom && key_el_dom in this.#DATA) {
+        //     return this.#DATA[key_el_dom];
+        // }
+
+        const id_keys = Catalogo.get_keys();
+        for (const id_key of id_keys) {
+            if (id.startsWith(id_key)) {
+                return this.#DATA[id_key];
+            }
+        }
+        return null;
     }
 
     /**

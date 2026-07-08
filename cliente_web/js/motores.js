@@ -1162,22 +1162,22 @@ class Motor_Alergias {
 
 //   /**
 //    * Conmuta de forma limpia y exclusiva las pestañas del DOM
-//    * @param {string} rolActivo - Rol del elemento ('agrupador' o 'cliente')
+//    * @param {string} rolActivo - Rol del elemento ('reserver' o 'cliente')
 //    */
 //   #gestionarPestañas(rolActivo) {
-//     const liAgrupador = document.getElementById('li-tab-agrupador');
+//     const lireserver = document.getElementById('li-tab-reserver');
 //     const liCliente = document.getElementById('li-tab-cliente');
 
 //     // 1. Ocultamos todas por defecto usando la clase utilitaria de Bootstrap
-//     liAgrupador.classList.add('d-none');
+//     lireserver.classList.add('d-none');
 //     liCliente.classList.add('d-none');
 
 //     // 2. Activamos visualmente solo la pestaña correspondiente al rol del objeto
-//     if (rolActivo === 'agrupador') {
-//       liAgrupador.classList.remove('d-none');
+//     if (rolActivo === 'reserver') {
+//       lireserver.classList.remove('d-none');
       
-//       // Forzamos a Bootstrap a seleccionar y pintar el panel del agrupador
-//       const tabBtn = bootstrap.Tab.getOrCreateInstance(document.getElementById('agrupador-tab'));
+//       // Forzamos a Bootstrap a seleccionar y pintar el panel del reserver
+//       const tabBtn = bootstrap.Tab.getOrCreateInstance(document.getElementById('reserver-tab'));
 //       tabBtn.show();
 //     } 
 //     else if (rolActivo === 'cliente') {
@@ -1194,8 +1194,8 @@ class Motor_Alergias {
 //    * @param {Object} elemento - Datos del catálogo
 //    */
 //   #llenarContenido(elemento) {
-//     if (elemento.rol === 'agrupador') {
-//       const pane = document.getElementById('content-agrupador');
+//     if (elemento.rol === 'reserver') {
+//       const pane = document.getElementById('content-reserver');
 //       pane.innerHTML = `
 //         <div class="text-center my-3 ${elemento.visual.css}">
 //           ${elemento.visual.content}
