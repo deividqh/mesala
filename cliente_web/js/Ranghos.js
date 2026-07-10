@@ -2512,16 +2512,17 @@ class Rango_Ghost extends Working_Rangos{
 				// ┌■■ Ejecución de la Manipulación del DOM
 				if (!proceder_pegado) throw ('. . . procesar_pegado = false, No se Puede Pegar');
 				
-				/** ### _what_player_menu devuelve: { tipo:(str) , elemento: < object > } */
 				const menu_element = Salon?._what_player_menu(id_player_fantasma);					
-				if(!menu_element) return; 	// . . . continue 				
+				if(!menu_element) return; 	// . . . continue 	
+				const idkey_menu = menu_element.dataset.tipo;
+				if(!idkey_menu) return; 	// . . . continue 	
 				
 				// ┌■■ Cut o Copy ??  🧠🧠									
 				if(Cut && !Copy){
 					// ┌• Si No Existe en el Salon lo Crea(lo saloniza).
 					// const player = this._X_to_element(player_fantasma?.id);					
 
-					const player = menu_element.elemento.cloneNode(true);
+					const player = menu_element.cloneNode(true);
 					if (player) {
 						player.id = id_player_fantasma; 
 						Salon._saloniza_elemento(player);
@@ -2535,9 +2536,9 @@ class Rango_Ghost extends Working_Rangos{
 				}else if(!Cut && Copy){					
 					
 					// ┌• Clonamos el nodo para mantener el ghost intacto para futuros pegados
-					const new_player = menu_element.elemento.cloneNode(true);
+					const new_player = menu_element.cloneNode(true);
 					if (new_player) {
-						new_player.id = Herramientas.get_dom_secuency(menu_element.tipo); 
+						new_player.id = Herramientas.get_dom_secuency(idkey_menu); 
 						Salon._saloniza_elemento(new_player);
 					}
 					// ┌• Se deposita sobre la baldosa.
@@ -2751,8 +2752,10 @@ class Rango_Ghost extends Working_Rangos{
 			// Pasas por aqui sólo Si elemento no existe como DOM en Salon, es string ► me pasas un id a crear:
 			// • creo un clon del elemento, le asigno el div pasado y  lo salonizo.
 			const menu_element = Salon?._what_player_menu(id_del_elemento);					
+			// Catalogo.get(id_del_elemento)
+			
 			if(!menu_element) return; 	// . . . continue 
-			const new_elemento = menu_element?.elemento?.cloneNode(true);
+			const new_elemento = menu_element.cloneNode(true);
 			new_elemento.id = id_del_elemento;
 			 if(!new_elemento) return;  // . . . continue
 			Salon._saloniza_elemento(new_elemento);
