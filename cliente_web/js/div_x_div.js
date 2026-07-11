@@ -2629,9 +2629,15 @@ class e_Salon extends Tablero_Touch {
 		const d_indices_mock = {silla_0: 8, mesa_0: 9, silla_1: 12, mesa_1: 13, silla_2: 14 };
 		const d_mensajs_mock = {silla_0: "Nadie", mesa_0: 'Sabe', silla_2: 'Nada' };
 		const d_alergias_mock = {silla_0: ['soja', 'lacteos'], silla_1: ['cereal'], };
-		// this._load_elementos_en_Salon(d_indices_mock);
-		// this._load_mensajes_en_Salon(d_mensajs_mock);
-		// this._load_alergias_en_Salon(d_alergias_mock);
+		this._load_elementos_en_Salon(d_indices_mock);
+		this.RegisteR();
+		this.CFG.api_re_posicionar();				
+		this._load_alergias_en_Salon(d_alergias_mock);		
+		console.log(JSON.stringify(this.MSG_S.d_alergias, null, 2)); 
+		
+		this._load_mensajes_en_Salon(d_mensajs_mock);
+		console.log(JSON.stringify(this.MSG_S.d_mensajes, null, 2)); 
+		
 
 	}
 
@@ -3626,25 +3632,25 @@ class e_Salon extends Tablero_Touch {
 	 * @param {object} dicc_api_mensajes 
 	 */
 	_load_mensajes_en_Salon(dicc_api_mensajes){
-		const nodeList_onplay = document.querySelectorAll(".class_onplay");
-		if (nodeList_onplay.length === 0) return;
-		// Lo convierto en array para recorrerlo
-		const arr_elementos = Array.from(nodeList_onplay);
+		if (!dicc_api_mensajes || Object.keys(dicc_api_mensajes).length === 0) return;
+        const id_keys = Catalogo.get_keys();
 
-		Object.entries(dicc_api_mensajes).forEach(([id, mensaje]) => {
-			const elemento = arr_elementos.find(el => el.id === id);
-			if (elemento && elemento.id) {
-				// SOLUCIÓN: Discriminación de destino basada en el ID del elemento
-				const id_destino = elemento.id.toString().toLowerCase();
-				if (id_destino.includes('mesa')) {
-					this.MSG_M.update_mensaje(elemento.id, mensaje);
-				} else if (id_destino.includes('silla') ) {
-					this.MSG_S.update_mensaje(elemento.id, mensaje);
-				} else {
-					console.warn(`[Salon] ID no reconocido al cargar mensaje: ${elemento.id}`);
-				}
-			}
-		});
+		// 2. Iteramos directamente sobre los mensajes recibidos
+        Object.entries(dicc_api_mensajes).forEach(([id, mensaje]) => {
+            // Buscamos la clave base en el catálogo para este ID
+            const key_elemento = id_keys.find(k => id.startsWith(k));
+            const item_catalogo = key_elemento ? Catalogo.get(key_elemento) : null;
+            // Validamos que exista en el catálogo y que tenga el motor de mensajes activo
+            if (!item_catalogo || !item_catalogo.logica || !item_catalogo.logica.motor_mensajes) {
+                return; // Ignoramos si no tiene el motor encendido
+            }
+            // Obtenemos el elemento utilizando el método estático
+            const elemento = e_Salon._to_element(id);
+            // Si el elemento está en el DOM, actualizamos su mensaje usando el gestor unificado
+            if (elemento) {
+                this.MSG_S.update_mensaje(id, mensaje);
+            }
+        });
 	}
 	
 	/**
@@ -3652,20 +3658,28 @@ class e_Salon extends Tablero_Touch {
 	 * @param {object} dicc_api_mensajes 
 	 */
 	_load_alergias_en_Salon(dicc_api_alergias){
-		const nodeList_onplay = document.querySelectorAll(".silla_onplay");
-		if (nodeList_onplay.length === 0) return;
-		// Lo convierto en array para recorrerlo
-		const arr_elementos = Array.from(nodeList_onplay);
+		if (!dicc_api_alergias || Object.keys(dicc_api_alergias).length === 0) return;
 
-		Object.entries(dicc_api_alergias).forEach(([id, alergia_s]) => {
-			// ┌■ Cacha la silla
-			const elemento = arr_elementos.find(el => el.id === id);			
-			if(!elemento) return;
+        // ■ Obtenemos las claves del catálogo una sola vez por rendimiento
+        const id_keys = Catalogo.get_keys();
 
-			this.MSG_S.update_alergia(elemento.id, alergia_s);
-			this.MSG_S._actualizar_markador_elemento(elemento.id);
+        // ■ Iteramos directamente sobre las alergias recibidas (o del mock)
+        Object.entries(dicc_api_alergias).forEach(([id, alergia_s]) => {
+            
+            // ■ Buscamos la clave base en el catálogo para este ID
+            const key_elemento = id_keys.find(k => id.startsWith(k));
+            const item_catalogo = key_elemento ? Catalogo.get(key_elemento) : null;
+
+            // ■ Validamos si el elemento existe en el catálogo y tiene activo el motor de alergias
+            if (!item_catalogo || !item_catalogo.logica || !item_catalogo.logica.motor_alergias ) {
+                return; // Si no tiene el motor activo, ignoramos este elemento
+            }
+            const elemento = e_Salon._to_element(id);
+            if (!elemento) return;
 			
-		});
+            // CAMBIAR O ELIMINAR.
+			this.MSG_S.update_alergia(id, alergia_s);
+        });
 	}
 	
 	/**
@@ -3955,7 +3969,7 @@ class Configuracion_Salon {
 			clases_css: { contenedor: 'contenedor_salon' , baldosas: 'estiloBaldosas', },	
 			
 			// ■ Tipos de elementos que se pueden colocar en el salon.
-			tipos: { silla: 'silla', mesa:  'mesa', },
+			// tipos: { silla: 'silla', mesa:  'mesa', },
 			
 			// ■ Diccionario de Elementos definido en la clase Catalogo de Catalogo_Elementos.js
 			catalogo: {},
@@ -3963,7 +3977,8 @@ class Configuracion_Salon {
 		};
 		// ■■■■■■■■■ la alternativa limpia
 		const dicc_new_default = {
-			salon: {family:'Salon',contenedor:'',div_maestro:'', filas:8, columnas:8,estilo:'original', clases_css:{contenedor: 'contenedor_salon' , baldosas: 'estiloBaldosas',}, tipos: { silla: 'silla', mesa:  'mesa', },}, 
+			// salon: {family:'Salon',contenedor:'',div_maestro:'', filas:8, columnas:8,estilo:'original', clases_css:{contenedor: 'contenedor_salon' , baldosas: 'estiloBaldosas',}, tipos: { silla: 'silla', mesa:  'mesa', },}, 
+			salon: {family:'Salon',contenedor:'',div_maestro:'', filas:8, columnas:8,estilo:'original', clases_css:{contenedor: 'contenedor_salon' , baldosas: 'estiloBaldosas',}, }, 
 			catalogo:{},
 		}
 		// Limpia y estructura la configuración
@@ -4323,7 +4338,6 @@ class Configuracion_Salon {
 	}
 	
 	/**
-	 * 🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱
 	 * @param {object} dimension {filas:(integer) , columnas:(integer)} 
 	 * */
 	_is_dimension_ok(dimension=null, limites=null){
@@ -4685,68 +4699,137 @@ class Configuracion_Salon {
 	 * ### Valida que un elemento de una reserva no toca a otra mesa de otra reserva(si puede tocar sillas.).
 	 * (Valida los 8 puntos cardinales y diagonales: N, S, E, W, NE, NW, SE, SW).
 	 * @param {Object} rango_free Rango propuesto
-	 * @param {Object} ficha Datos de la reserva a colocar
 	 * @param {Array<String>} ids_reserva Lista de IDs que pertenecen a esta reserva (no son conflicto)
 	 * @returns {Boolean} true si hay conflicto con otra reserva, false si es seguro colocar.
 	 */
 	_es_posicion_conflictiva(rango_free, ficha, ids_reserva = []) {
 		const celda_inicio_free = rango_free.celda_inicio;
-		const tipo_mesa = 'mesa';
-		let soy_mesa = false;
+		// const tipo_mesa = 'mesa';
+		// let soy_mesa = false;
+		
+		// Obtenemos las claves del catálogo UNA sola vez por rendimiento
+        const id_keys = Catalogo.get_keys();
 
 		// Recorremos solo los elementos que vamos a colocar
 		for (const item of ficha.items) {
 
-			// Si el objeto de la reserva que quiero colocar es una mesa.....
-			if (item.id.toLowerCase().startsWith(tipo_mesa)) 
-				soy_mesa = true;
-			else  
-				soy_mesa = false;
+			// 💥💥💥💥💥💥💥💥
+			// 💥💥💥💥💥💥💥💥
+			// ■ Identificar el ROL del elemento a colocar (reserver, cliente...)
+            const key_item = id_keys.find(k => item.id.startsWith(k));
+            const item_catalogo = key_item ? Catalogo.get(key_item) : null;
+            const mi_rol = item_catalogo ? item_catalogo.rol : null;
+
+			// ■ Calculamos dónde caería esta pieza
+            const celda_destino = this.Salon.eRdS.suma_fc(celda_inicio_free, item.delta_y, item.delta_x);
+            if (!celda_destino) return true; // Error o fuera de rango
+
+            const indice_matriz = this.Salon.eRdS.X_to_indice(celda_destino);
+            let baldosa_obj = this.Salon.matriz_plana[indice_matriz]; 
+            if (!baldosa_obj) return true;
 			
-			// 1. Calculamos dónde caería esta mesa
-			const celda_destino = this.Salon.eRdS.suma_fc(celda_inicio_free, item.delta_y, item.delta_x);
-			if (!celda_destino) return true; // Error o fuera de rango
+			// ■ USAMOS SCANNER_NSEW sobre esa baldosa para ver sus vecinos ACTUALES
+            const scan_result = this.Salon.scanner_nsew(baldosa_obj.elemento_div); 
 
-			const indice_matriz = this.Salon.eRdS.X_to_indice(celda_destino);
-			let baldosa_obj = this.Salon.matriz_plana[indice_matriz]; 
-			if (!baldosa_obj) return true;
-
-			// 2. USAMOS SCANNER_NSEW sobre esa baldosa para ver sus vecinos ACTUALES
-			const scan_result = this.Salon.scanner_nsew(baldosa_obj.elemento_div); 
-
-			// 3. Revisamos los 8 vecinos (N, S, E, W + Diagonales)
-			let vecinos = [
-				baldosa_obj.scan.n,  baldosa_obj.scan.s,  baldosa_obj.scan.e,  baldosa_obj.scan.w,
-				baldosa_obj.scan.ne, baldosa_obj.scan.nw, baldosa_obj.scan.se, baldosa_obj.scan.sw
-			];
-			// ...y eliminamos null/false
-			vecinos = vecinos.filter(x => x !== null && x !== false && x !== undefined && x.trim() !== '');	
-			if(vecinos.length === 0) continue; // No hay vecinos, no hay conflicto
+            // ■ Revisamos los 8 vecinos (N, S, E, W + Diagonales)
+            let vecinos = [
+                baldosa_obj.scan.n,  baldosa_obj.scan.s,  baldosa_obj.scan.e,  baldosa_obj.scan.w,
+                baldosa_obj.scan.ne, baldosa_obj.scan.nw, baldosa_obj.scan.se, baldosa_obj.scan.sw
+            ];
+			// Limpiamos los vecinos (solo strings válidos)
+            vecinos = vecinos.filter(x => x && typeof x === 'string' && x.trim() !== ''); 
+            
+            if(vecinos.length === 0) continue; // No hay vecinos, no hay conflicto
 			
-			// Recorremos los vecinos ya colocados antes de hacer scanner_nsew... si los tiene
-			for (const vecino_id of vecinos) {					
-				if (typeof(vecino_id) === 'string') {						
-					// ► Si Soy mesa y además tengo vecinos, sea mesa o silla, HAY CONFLICTO ❌
-					if(soy_mesa === true) return true;
-					// ■ NO SOY MESA, SOY SILLA
-					// ■ ¿EL VECION, Es una MESA?
-					if (vecino_id.toLowerCase().startsWith(tipo_mesa)) {							
-						// ¿Es de nuestra propia reserva ("familia")?
-						if (ids_reserva.includes(vecino_id)) {
-							// Mesa propia, NO hay CONFLICTO.
-							continue; 
-						} else {
-							// ¡Es una Mesa de otra reserva! CONFLICTO.
-							return true; 
-						}
-					}
-				}
-			}
-		// }
+			// ■ Analizamos conflictos basados puramente en el ROL
+            for (const vecino_id of vecinos) {
+                
+                // Obtenemos el rol del vecino
+                const key_vecino = id_keys.find(k => vecino_id.startsWith(k));
+                const vecino_catalogo = key_vecino ? Catalogo.get(key_vecino) : null;
+                const rol_vecino = vecino_catalogo ? vecino_catalogo.rol : null;
+
+                // Si el vecino es decoración o estructura, no interactúa con los players (no hay conflicto)
+                if (rol_vecino !== 'reserver' && rol_vecino !== 'cliente') {
+                    continue; 
+                }
+
+                // ► Si YO soy un 'reserver' (ej: mesa, taburete) y tengo un vecino player (sea lo que sea) HAY CONFLICTO ❌
+                if (mi_rol === 'reserver') {
+                    return true;
+                }
+                
+                // ■ Si NO soy un 'reserver' (ej: soy un 'cliente' como una silla)
+                // y me choco con un 'reserver' vecino...
+                if (rol_vecino === 'reserver') {                            
+                    // ¿Es de nuestra propia reserva ("familia")?
+                    if (ids_reserva.includes(vecino_id)) {
+                        continue; // Reserver propio, NO hay conflicto.
+                    } else {
+                        return true; // ¡Es un reserver de otra reserva! CONFLICTO.
+                    }
+                }
+                
+                // Si llegamos aquí, es un cliente tocando a otro cliente, lo cual está permitido
+                // (por ejemplo, dos sillas tocándose espalda con espalda)
+            }
+			
+			// Ninguna de las piezas a colocar encontró conflicto
+			return false;
+
+			// 💥💥💥💥💥💥💥💥
+			// 💥💥💥💥💥💥💥💥
+
+		// 	// Si el objeto de la reserva que quiero colocar es una mesa.....
+		// 	if (item.id.toLowerCase().startsWith(tipo_mesa)) 
+		// 		soy_mesa = true;
+		// 	else  
+		// 		soy_mesa = false;
+			
+		// 	// 1. Calculamos dónde caería esta mesa
+		// 	const celda_destino = this.Salon.eRdS.suma_fc(celda_inicio_free, item.delta_y, item.delta_x);
+		// 	if (!celda_destino) return true; // Error o fuera de rango
+
+		// 	const indice_matriz = this.Salon.eRdS.X_to_indice(celda_destino);
+		// 	let baldosa_obj = this.Salon.matriz_plana[indice_matriz]; 
+		// 	if (!baldosa_obj) return true;
+
+		// 	// 2. USAMOS SCANNER_NSEW sobre esa baldosa para ver sus vecinos ACTUALES
+		// 	const scan_result = this.Salon.scanner_nsew(baldosa_obj.elemento_div); 
+
+		// 	// 3. Revisamos los 8 vecinos (N, S, E, W + Diagonales)
+		// 	let vecinos = [
+		// 		baldosa_obj.scan.n,  baldosa_obj.scan.s,  baldosa_obj.scan.e,  baldosa_obj.scan.w,
+		// 		baldosa_obj.scan.ne, baldosa_obj.scan.nw, baldosa_obj.scan.se, baldosa_obj.scan.sw
+		// 	];
+		// 	// ...y eliminamos null/false
+		// 	vecinos = vecinos.filter(x => x !== null && x !== false && x !== undefined && x.trim() !== '');	
+		// 	if(vecinos.length === 0) continue; // No hay vecinos, no hay conflicto
+			
+		// 	// Recorremos los vecinos ya colocados antes de hacer scanner_nsew... si los tiene
+		// 	for (const vecino_id of vecinos) {					
+		// 		if (typeof(vecino_id) === 'string') {						
+		// 			// ► Si Soy mesa y además tengo vecinos, sea mesa o silla, HAY CONFLICTO ❌
+		// 			if(soy_mesa === true) return true;
+		// 			// ■ NO SOY MESA, SOY SILLA
+		// 			// ■ ¿EL VECION, Es una MESA?
+		// 			if (vecino_id.toLowerCase().startsWith(tipo_mesa)) {							
+		// 				// ¿Es de nuestra propia reserva ("familia")?
+		// 				if (ids_reserva.includes(vecino_id)) {
+		// 					// Mesa propia, NO hay CONFLICTO.
+		// 					continue; 
+		// 				} else {
+		// 					// ¡Es una Mesa de otra reserva! CONFLICTO.
+		// 					return true; 
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// // }
 		}
 		
-		// Ninguna de las mesas a colocar encontró conflicto
-		return false;
+		// // Ninguna de las mesas a colocar encontró conflicto
+		// return false;
 	}
 
 	/** 

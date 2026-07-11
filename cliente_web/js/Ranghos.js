@@ -2514,7 +2514,7 @@ class Rango_Ghost extends Working_Rangos{
 				
 				const menu_element = Salon?._what_player_menu(id_player_fantasma);					
 				if(!menu_element) return; 	// . . . continue 	
-				const idkey_menu = menu_element.dataset.tipo;
+				const idkey_menu = menu_element.dataset.id_key;
 				if(!idkey_menu) return; 	// . . . continue 	
 				
 				// ┌■■ Cut o Copy ??  🧠🧠									

@@ -31,7 +31,7 @@ let dicc_salon = {
     modelo_salon: 'limitado',                 // 🍏🍏 Un modelo limitado, te dice cuantas columnas y filas tienes que poner según tu ancho de pantalla.
     clases_css : { contenedor: 'estiloSalon', baldosas: 'estiloBaldosas' },    
     
-    tipos: { mesa: 'mesa', silla:'silla' } ,  // 🍏🍏 Lo tengo que cambiar por el array de elementos svg que quuiero que figuren en la logica de salon.
+    // tipos: { mesa: 'mesa', silla:'silla' } ,  // 🍏🍏 Lo tengo que cambiar por el array de elementos svg que quuiero que figuren en la logica de salon.
         
     catalogo: Catalogo.get(),       // Inyectamos el catálogo completo para que e_Salon lo propague
     

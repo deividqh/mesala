@@ -32,7 +32,7 @@ class Catalogo {
             css: 'style_visual_reserver'
         },
         logica: {
-            motor_mensajes: { nombre: "Mensajes", tipo: 'sumatorio', css: 'estyle_msg_reserver', }
+            motor_mensajes: { nombre: "Mensajes", content: 'sumatorio', css: 'estyle_msg_reserver', }
         }
     },
     silla: {
@@ -46,7 +46,7 @@ class Catalogo {
         },
         logica: {
             motor_alergias: { nombre: "Alergias" , content: Catalogo.get_alergenos(), css:'', },
-            motor_mensajes: { nombre: "Mensajes" , tipo: 'single', css: 'estyle_msg_cliente',  }
+            motor_mensajes: { nombre: "Mensajes" , content: 'single', css: 'estyle_msg_cliente',  }
         }
     },
     taburete: {
@@ -60,7 +60,7 @@ class Catalogo {
         },
         logica: {
             motor_alergias: { nombre: "Alergias" , content: Catalogo.get_alergenos(), css:'',},
-            motor_mensajes: { nombre: "Mensajes", tipo: 'single', css: 'estyle_msg_cliente', }
+            motor_mensajes: { nombre: "Mensajes" , content: 'single', css: 'estyle_msg_cliente', }
         }
     },
     // planta: {
@@ -145,10 +145,6 @@ class Catalogo {
     static from_id_to_catalogo(id) {
         const es_dom = document.getElementById(id);
         if (!es_dom) return null;
-        // const key_el_dom = es_dom.dataset.tipo;
-        // if (key_el_dom && key_el_dom in this.#DATA) {
-        //     return this.#DATA[key_el_dom];
-        // }
 
         const id_keys = Catalogo.get_keys();
         for (const id_key of id_keys) {
@@ -443,7 +439,7 @@ class Logica_Catalogo  {
                 const areaContenido = panelDOM.querySelector('.content-area');
                 if (tipoLogica === 'motor_mensajes') {
                     areaContenido.innerHTML = `
-                        <p>Tipo de motor: <strong>${valorLogica.tipo}</strong></p>
+                        <p>Tipo de motor: <strong>${valorLogica.content}</strong></p>
                     `;
                 } else if (tipoLogica === 'motor_alergias') {
                     // Ahora podemos acceder a valorLogica.content si quisiéramos renderizar el diccionario
