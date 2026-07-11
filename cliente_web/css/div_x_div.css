@@ -266,7 +266,7 @@ MENÚ NAVBAR....CONTENEDOR de la imagen .imagen_menu.
 
 /* ■■■
 El contenedor que mueve la imagen de la mesa */
-[data-tipo="mesa"] {
+[data-id_key="mesa"] {
   /* Evita que el navegador use gestos predeterminados en este elemento */
     touch-action: none;
   /* Evita la selección de texto accidental mientras arrastras */
@@ -275,7 +275,7 @@ El contenedor que mueve la imagen de la mesa */
 }
 /* ■■■
 El contenedor que mueve la imagen de la silla */
-[data-tipo="silla"] {
+[data-id_key="silla"] {
   /* Evita que el navegador use gestos predeterminados en este elemento */
     touch-action: none;    
     /* Evita la selección de texto accidental mientras arrastras */
@@ -298,7 +298,7 @@ estas Clases SE CREAN cuando desde NavBar se Arrastran(D&D) hasta el Salón.
 /* ■■■■■■■■■■■■ 
 EXIT-PAPELERA 
 ■■■■■■■■■■■■■■■ */
-[data-tipo="exit"] {
+[data-id_key="exit"] {
   /* Evita que el navegador use gestos predeterminados en este elemento */
     touch-action: none;    
     /* Evita la selección de texto accidental mientras arrastras */
@@ -309,7 +309,7 @@ EXIT-PAPELERA
     transform-origin: center; /* Asegura que crezca desde el centro */
     
   }
-[data-tipo="exit"]:hover {
+[data-id_key="exit"]:hover {
   transform: scale(1.75);     /* Aumenta su tamaño  */
   transition: transform 0.1s ease; /* Opcional: suaviza el cambio si lo activas con hover */
   opacity: 1;

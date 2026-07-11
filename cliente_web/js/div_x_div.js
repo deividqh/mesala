@@ -1640,7 +1640,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 	/** ## Objeto donde cae el objeto_drag (una baldosa u objeto myDiv) */
 	objeto_drop = null;			
 	
-	/** ## Cacha el data-tipo('mesa' o 'silla') del objeto que se mueve... {@link Tablero_Drop.dragStart} */
+	/** ## Cacha el data-id_key('mesa' o 'silla') del objeto que se mueve... {@link Tablero_Drop.dragStart} */
 	id_key = '';				
 	
 	/**
@@ -1667,8 +1667,8 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		}
 		
 		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■		
-		// ■■  ​👂​👂 LISTENERS EXIT : Papeleras.... preparado para que haya varias salidas(todos los data-tipo='exit') a todas les doto el mismo handler. 
-		const exit = Array.from(document.querySelectorAll("[data-tipo]")).filter(el => el.dataset.tipo === 'exit');
+		// ■■  ​👂​👂 LISTENERS EXIT : Papeleras.... preparado para que haya varias salidas(todos los data-id_key='exit') a todas les doto el mismo handler. 
+		const exit = Array.from(document.querySelectorAll("[data-id_key]")).filter(el => el.dataset.id_key === 'exit');
 		if (exit.length > 0) {	
 			exit.forEach(el => el.addEventListener("dragover", this.AllowDrop));
 			exit.forEach(el => el.addEventListener("drop", this.drop_exit.bind(this)));
@@ -1753,13 +1753,13 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 	 */
 	dragStart(ev) {
 		const new_obj_drag = ev.target;                         // ■ cacha el objeto que se mueve(drag).  
-		if(!new_obj_drag || !new_obj_drag?.dataset?.tipo || !new_obj_drag?.id){
+		if(!new_obj_drag || !new_obj_drag?.dataset?.id_key || !new_obj_drag?.id){
 			console.log("❌ ERROR DRAGSTART")
 			return null;
 		}
 		// ■■ 
 		this.objeto_drag = new_obj_drag;
-		this.id_key = new_obj_drag.dataset.tipo;
+		this.id_key = new_obj_drag.dataset.id_key;
 
 		// ■■ Bloquea el movimiento del sidebar si movemos una mesa o silla.
 		// this._iniciar_bloqueo_sidebar(new_obj_drag);
@@ -1767,9 +1767,9 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// ■■ ESTABLECE/GUARDA EL ID DEL OBJETO DRAG
 		ev.dataTransfer.setData("drag_id", this.objeto_drag.id);      	// ■ dataTransfer guarda en la transacción d&d un dato "text" con el id del drag.
 		// ■■ GUARDA EL id_key ('mesa', 'silla', 'taburete') en catalogo.
-		ev.dataTransfer.setData("tipo", this.id_key); 
+		ev.dataTransfer.setData("id_key", this.id_key); 
 		
-		const ds_t = Catalogo.get(this.objeto_drag.dataset.tipo)
+		const ds_t = Catalogo.get(this.objeto_drag.dataset.id_key)
 	}
 
 	/**
@@ -1956,11 +1956,11 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// ■■ Verificamos que la baldosa de destino esté vacía
 		if (this.is_baldosa_vacia(baldosa_matriz) == false) return
 		
-		const idkey = item_menu.dataset.tipo;
+		const idkey = item_menu.dataset.id_key;
 		// ■■ Creamos un Clon del item del MENU. El id que se asigna es un secuencial del dataset _tipo(del <data__tipo>)
 		const clon_item = item_menu.cloneNode(true);                  
 		clon_item.id = Herramientas._get_secuencial_dom(idkey);				
-		clon_item.dataset.tipo = idkey;	// mesa, silla, taburete
+		clon_item.dataset.id_key = idkey;	// mesa, silla, taburete
 		clon_item.title = clon_item.id;
 		clon_item.style.visibility = 'visible';
 		// ■■ CAMBIA DE CLASE PARA NO HEREDAR EL ESTILO DEL MENU....
@@ -1972,7 +1972,7 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		// ■■ 
 		baldosa_matriz.appendChild(clon_item);           
 		// ■■ LOG  🖥️
-		// console.log(`▶️ ${clon_item.id} ► Padre: ${clon_item.parentNode.id} ■ clase: ${this.get_className(clon_item)} ■ data-tipo(html): ${data__tipo}\n`);
+		// console.log(`▶️ ${clon_item.id} ► Padre: ${clon_item.parentNode.id} ■ clase: ${this.get_className(clon_item)} ■ data-id_key(html): ${data__tipo}\n`);
 		return clon_item;
 	}
 
@@ -1996,7 +1996,6 @@ class Tablero_Drop extends Matriz_to_MyDiv{
 		
 		baldosa_destino.appendChild(obj_drag);
 
-		// console.log(`▶️ Movimiento Interno: ${obj_drag.id}  GO From ${baldosa_origen.id} To ${baldosa_destino.id} ► data-tipo(html): ${data__tipo}`);
 		return true;
 	}
 
@@ -2226,9 +2225,9 @@ class Tablero_Touch extends Tablero_Drop {
 	/** ### Obtiene el contenedor de caída real para un elemento detectado 	*/
 	_obtener_contenedor_drop_real(elementoDetectado) {
 		if (!elementoDetectado) return null;
-		if (elementoDetectado.dataset && elementoDetectado.dataset.tipo) return elementoDetectado;
-		const contenedorExit = elementoDetectado.closest('[data-tipo]');
-		if (contenedorExit && contenedorExit.dataset.tipo) return contenedorExit;
+		if (elementoDetectado.dataset && elementoDetectado.dataset.id_key) return elementoDetectado;
+		const contenedorExit = elementoDetectado.closest('[data-id_key]');
+		if (contenedorExit && contenedorExit.dataset.id_key) return contenedorExit;
 		if (elementoDetectado.classList && elementoDetectado.classList.contains('estiloBaldosas')) return elementoDetectado;
 		const contenedorBaldosa = elementoDetectado.closest('.estiloBaldosas');
 		if (contenedorBaldosa) return contenedorBaldosa;
@@ -2260,7 +2259,7 @@ class Tablero_Touch extends Tablero_Drop {
 		const preview = this._create_drag_preview(objeto_drag, rect);
 		
 		this.objeto_drag = objeto_drag;
-		this.id_key = objeto_drag.getAttribute('data-tipo') || objeto_drag.dataset.tipo || '';
+		this.id_key = objeto_drag.getAttribute('data-id_key') || objeto_drag.dataset.id_key || '';
 		
 		// if (this._es_mesa_silla?.(this.data__tipo)) this._set_bloqueo_sidebar(true);
 		
@@ -2325,7 +2324,7 @@ class Tablero_Touch extends Tablero_Drop {
 		const syntheticEvent = this._buildSyntheticDropEvent(targetReal, el, { x, y });
 		let dropExitoso = false;
 		if (targetReal) {
-			const isExit = targetReal.dataset && targetReal.dataset.tipo === 'exit';
+			const isExit = targetReal.dataset && targetReal.dataset.id_key === 'exit';
 			if (isExit && this.drop_exit) {
 				syntheticEvent.target = targetReal;
 				dropExitoso = this.drop_exit(syntheticEvent);
@@ -2355,7 +2354,7 @@ class Tablero_Touch extends Tablero_Drop {
 
 	/** ### Construye un evento sintético de tipo 'drop' para simular el comportamiento de arrastrar y soltar en dispositivos táctiles.*/
 	_buildSyntheticDropEvent(target, draggedElement, coords = {}){
-		const dataTipo = (draggedElement && draggedElement.getAttribute('data-tipo')) || objeto_drag.dataset.tipo || '';
+		const id_key = (draggedElement && draggedElement.getAttribute('data-id_key')) || objeto_drag.dataset.id_key || '';
 		const { x = 0, y = 0 } = coords;
 		return {
 			preventDefault: () => {},
@@ -2365,7 +2364,7 @@ class Tablero_Touch extends Tablero_Drop {
 			dataTransfer: {
 				getData: (key) => {
 					if (key === 'drag_id') return draggedElement ? draggedElement.id : '';
-					if (key === 'tipo') return dataTipo;
+					if (key === 'id_key') return id_key;
 					return '';
 				}
 			}
@@ -2526,23 +2525,19 @@ class e_Salon extends Tablero_Touch {
 			elementos: e_Salon._to_element('[data-action-nav="elementos"]'),
 		};
 					
-		// ┌•••••••••••••••••••••••••••••••••••
-		// ┌•• ENTORNO - DIMENSIONES - LIMITES
+		// ┌••• ENTORNO - DIMENSIONES - LIMITES
 		this.entorno = entorno;
 		this.dimension = dimesion_inicial;
 		this.limites = limites;
 					
-		// 💥💥💥💥💥💥💥💥
-		// ┌•••••••••••••••••••••••••••••••••••
-		// ┌• CONFIGURACION DEL SALON: 
+		// ┌••• CONFIGURACION DEL SALON: 
 		// this.CFG = new Configuracion_Salon(this, dicc_config, '[data-bs-toggle="offcanvas"]');
 		this.CFG = new Configuracion_Salon(this, dicc_config, this.bi_nav.set_up);
 		
 		// ■ ASEGURA QUE EL DICCIONARIO DE CONFIGURACION ESTA LIMPIO
 		this.dicc_config = this.CFG.configuracion;		
 		
-		// ┌•••••••••••••••••••••••••••••••••••
-		// ■■ Sidebar persistente de elementos (mesa/silla/...) 
+		// ┌••• Sidebar persistente de elementos (mesa/silla/...) 
 		// const $ico_trigger_elementos = document.querySelector('[data-action-nav="elementos"]');
 		const $ico_trigger_elementos = document.querySelector(this.bi_nav.elementos);
 		this.Side_Elementos = new Side_Elementos(
@@ -2550,7 +2545,8 @@ class e_Salon extends Tablero_Touch {
 			z_catalogo,
 			this.$bi_nav.elementos,
 		);
-
+		
+		// ┌••• Relaciona Acciones con los Elementos del catalogo.
 		this.LOGIC = new Logica_Catalogo(this.dicc_config.catalogo);
 		
 		// Asocia el Catalogo a la Logica ... y viceversa.
@@ -2559,13 +2555,11 @@ class e_Salon extends Tablero_Touch {
 		Catalogo.set_motor('motor_mensajes', motor_mensajes);
 		Catalogo.set_motor('motor_alergias', motor_alergias);
 		
-		// ┌•••••••••••••••••••••••••••••••••••
-		// ┌• LOGIN Y REGISTRO: 
+		// ┌••• LOGIN Y REGISTRO: 
         // this.LogIn = new Login_Modal('[data-action-nav="conn"]');
         this.LogIn = new Login_Modal(this.bi_nav.login);
 		
-		// ┌•••••••••••••••••••••••••••••••••••
-		// ┌• C.R.U.D. 
+		// ┌••• C.R.U.D. 
 		this.crud = new Foto_CRUD(this);
 		
 		// ┌••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
@@ -2598,28 +2592,26 @@ class e_Salon extends Tablero_Touch {
 		}		
 		
 		// 💥💥💥💥💥💥💥💥
-		// ┌••••••••••••••••••••••••••••••••••••••••••••
-		// ■■ BOOTSTRAP PopOver para MENSAJES DE SILLAS(single=true).
+		// ┌••• BOOTSTRAP PopOver para MENSAJES DE SILLAS(single=true).
 		this.MSG_S = new Motor_Mensajes( 'pastel', true, true);
 		if (this.MSG_S) 
 			console.log('✅ MOTOR MENSAJES DE SILLAS MSG_S • • • • • Loaded ✔️');
 		else 
 			console.log('❌ ERROR MOTOR MENSAJES DE SILLAS  :(');
 		
-		// ┌••••••••••••••••••••••••••••••••••••••••••••
-		// ┌•• BOOTSTRAP PopOver para MENSAJES DE MESAS(single=false)[Reservas]
+		// 💥💥💥💥💥💥💥💥
+		// ┌••• BOOTSTRAP PopOver para MENSAJES DE MESAS(single=false)[Reservas]
 		this.MSG_M = new Motor_Mensajes('moderno'  , false, false);			
 		if (this.MSG_M) 
 			console.log('✅ MOTOR MENSAJES DE RESERVAS MSG_M  • • • Loaded ✔️');
 		else 
 			console.log('❌ ERROR MOTOR MENSAJES DE RESERVAS  :(');
-		// 💥💥💥💥💥💥💥💥
 		
-		// ┌••••••••••••••••••••••••••••••••
-		// ​👂​👂 'desactivar__modo_reserva'
-		// ┌••••••••••••••••••••••••••••••••
+		// 💥💥💥💥💥💥💥💥
+		// ┌•• ​👂​👂 'desactivar__modo_reserva'
 		this.contenedor_div_x_div.addEventListener("dblclick", this._desactivar_modo_reserva.bind(this));
 		
+		// 💥💥💥💥💥💥💥💥
 		// ┌•• Inicia el MODO RESERVA a false.
 		this.is_mode_reserva = false;	
 
@@ -2628,10 +2620,19 @@ class e_Salon extends Tablero_Touch {
 		// ■■■■■■■■■■■■■■■■■■■■■
 		this.eRdS = new El_Rango_del_Salon(this); 	// Instanciamos el gestor de RANGOS y CELDAS de la matriz.		
 		
-		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		// ■ MENSAJE FINAL DE CARGA
 		console.log(`${'█ '.repeat(20)}  • • •  FINALIZADA LA CARGA DE SALON  • • •`);
+		
+		// 💥💥💥💥💥💥💥💥
+		// 💥💥💥💥💥💥💥💥	MOCK'S
+		// 💥💥💥💥💥💥💥💥
+		const d_indices_mock = {silla_0: 8, mesa_0: 9, silla_1: 12, mesa_1: 13, silla_2: 14 };
+		const d_mensajs_mock = {silla_0: "Nadie", mesa_0: 'Sabe', silla_2: 'Nada' };
+		const d_alergias_mock = {silla_0: ['soja', 'lacteos'], silla_1: ['cereal'], };
+		// this._load_elementos_en_Salon(d_indices_mock);
+		// this._load_mensajes_en_Salon(d_mensajs_mock);
+		// this._load_alergias_en_Salon(d_alergias_mock);
 
-		const d = {silla_0: 8, mesa_0: 9, silla_1: 12, mesa_1: 13, silla_2: 14 };
 	}
 
 	/** 
@@ -2700,7 +2701,7 @@ class e_Salon extends Tablero_Touch {
 		const elemento_clickado = ev.currentTarget;
 		if (!elemento_clickado) return;
 		const id_el = elemento_clickado.id;
-		const id_key_el = elemento_clickado.dataset.tipo;		// el key de Catalogo.
+		const id_key_el = elemento_clickado.dataset.id_key;		// el key de Catalogo.
 		// const clases_el = elemento_clickado.classList;	// clases css([class_onplay , silla_onplay])
 		
 		// ┌■ Calcula el indice de la reserva a la que pertenece el elemento clickado.
@@ -2751,7 +2752,7 @@ class e_Salon extends Tablero_Touch {
 		const id = ev.currentTarget.id;               
 		
 		// ■■ BUSCA EN EL ARRAY DE RESERVAS el indice de la silla
-		const index_reserva = this.reservas.findIndex(dicc => { return dicc.sillas.includes(id); });
+		const index_reserva = this.reservas.findIndex(dicc => { return dicc.clientes.includes(id); });
 		if (index_reserva == -1) return;        	
 		
 		// ► para accion__save()
@@ -2782,10 +2783,10 @@ class e_Salon extends Tablero_Touch {
 		this._elemento_onplay_click(ev);
 
 		// ■■ Siempre hace click el elemento con el listener(div contenedor), no la imagen 
-		const id_mesa = ev.currentTarget.id;                    
+		const id_reserver = ev.currentTarget.id;                    
 		
 		// ■■ Busca en el array de diccionario de reserva el indice de la reserva que contiene la mesa clickada.
-		const index_reserva = this.reservas.findIndex(dicc => {	return dicc.mesas.includes(id_mesa); });
+		const index_reserva = this.reservas.findIndex(dicc => {	return dicc.reservers.includes(id_reserver); });
 		if (index_reserva == -1) return;       	
 
 		this.index_reserva = index_reserva; 	
@@ -2802,10 +2803,10 @@ class e_Salon extends Tablero_Touch {
 		// ■■ APLANA las mesas de la reserva de cuya mesa está nuestra reserva.
 		// const dicc_reserva_flat = Object.values(this.reservas[index_reserva]).flat();	
 		const d_reserva = this.reservas[index_reserva];		
-		const arr_mesas_reserva_flat = Object.values(d_reserva.mesas).flat();		
-		this.MSG_M.id = id_mesa;    // mesa actual (clave para guardar)
+		const arr_mesas_reserva_flat = Object.values(d_reserva.reservers).flat();		
+		this.MSG_M.id = id_reserver;    // mesa actual (clave para guardar)
 		// ■■ Si is_single=true, no se pinta el sumatorio.
-		this.MSG_M.api_mostrar(id_mesa ,  arr_mesas_reserva_flat);
+		this.MSG_M.api_mostrar(id_reserver ,  arr_mesas_reserva_flat);
 
 		// ■■ SE ACTIVA EL MODO RESERVA CUAANDO SE HACE CLICK SOBRE UNA MESA.
 		this.is_mode_reserva = true;
@@ -2813,7 +2814,6 @@ class e_Salon extends Tablero_Touch {
 	
 	/** ✒️✒️
 	 * #### SOBRE-ESCRIBE ✒️ EL MÉTODO elemento_nuevo_to__Salon DE DRAG_X_DROP 
-	 * 	* Añade un CLASSNAME según el data-tipo(html) del elemento (silla o mesa)
 	 * 	* Añade un Event Listener ​👂​👂 para el click en el nuevo elemento.
 	 * @see {@link Tablero_Drop.drop_over_matriz}
 	 * ```javascript
@@ -2828,7 +2828,7 @@ class e_Salon extends Tablero_Touch {
 
 		if (new_onplay){			
 			
-			const idkey = new_onplay.dataset.tipo;
+			const idkey = new_onplay.dataset.id_key;
 			const class_new_div = idkey+'_onplay';
 			new_onplay.classList.add(idkey);
 			new_onplay.classList.add(class_new_div);
@@ -2856,22 +2856,19 @@ class e_Salon extends Tablero_Touch {
 	 * ```javascript
 	 * scanner = {'id':'mesa_4', 'n':null, 's':'silla_1', 'e':'mesa_2', 'w':'silla_0', 'ne':null, 'nw':null, 'se':null, 'sw':null}
 	 * ```
-	 * @param {String} data__tipo en Salon = o 'mesa' o 'silla'. definido en dicc_config
 	 * @see {@link drop_over_matriz} - {@link drop_exit}
 	*/
 	_modulo_reservas( rol_busca='reserver' , b_registro=true) {
 		try {
-			// ■■ array de objeto Set (id_contenido, my_div , indice_baldosa) de todos los data__tipo(data_config.tipo = mesa ) 
-			//   ┌• Objeto datamap: {id_elemento(string), baldosa (myDiv) , indice(integer) }
-			// 	 ┌• [ {'mesa_0', [Object myDiv], 12} , {'mesa_1', [Object myDiv], 3} , ... ]			
-			const array_datamap = this.#crear_fichas_onplay(rol_busca);
-			// if(!array_datamap) return false;
+			// ┌• Objeto datamap: {id_elemento(string), baldosa (myDiv) , indice(integer) }
+			// ┌• [ {'mesa_0', [Object myDiv], 12} , {'mesa_1', [Object myDiv], 3} , ... ]			
+			const fichas_onplay = this.#crear_fichas_onplay(rol_busca);
+			// if(!fichas_onplay) return false;
 	
 			// ■■ Logica del Negocio 🧠🧠:
-			// ┌•••• Obtiene un array de ids de reservas a partir del basenamme: [ ["mesa_0" , "mesa_1"] , ["mesa_2"] ]
-			const matriz_reservas = this.#get_matriz_reservas(array_datamap, rol_busca);
+			const matriz_reservas = this.#get_matriz_reservas(fichas_onplay, rol_busca);
 			// ■■ Obtiene el array de diccionarios de reservas!!
-			const reservas = this._get_array_dicc_reservas(matriz_reservas, array_datamap);
+			const reservas = this._get_array_dicc_reservas(matriz_reservas, fichas_onplay);
 			if ( !reservas || reservas.length === 0 ) 
 				return [];
 			
@@ -2882,7 +2879,8 @@ class e_Salon extends Tablero_Touch {
 				this.reservas = reservas;
 			}
 			return reservas;
-			// ■■■■■■ Log de reservas ...................................BORRAR
+			
+			// ■ Log de reservas ...................................BORRAR
 			// this.reservas.forEach((dicc_reservas, i) => console.log(`■■■ Reserva ${i+1} • • •   ${dicc_reservas.mesas.join(', ')}    ■■■   ${dicc_reservas.sillas.join(', ')}`) );
 		} catch (error) {
 			console.log(`Error::: Modulo Reservas ::: ${error}`);
@@ -2942,7 +2940,7 @@ class e_Salon extends Tablero_Touch {
 
 	#get_rol_en_catalogo(elemento_dom){
 		if(!elemento_dom) return null;
-		const key_catalogo = elemento_dom.dataset.tipo;
+		const key_catalogo = elemento_dom.dataset.id_key;
 		if(!key_catalogo) return null;
 		const rol = Catalogo.get(key_catalogo, "rol");
 		return rol || null;
@@ -2964,13 +2962,13 @@ class e_Salon extends Tablero_Touch {
 
 		const array_myDiv_reservas = [];
 		this.reservas.forEach(d => {
-			const array_myDiv_mesas  = d.mesas.map(m => this.get_myDiv_byContenido(m));
-			const array_myDiv_sillas = d.sillas.map(s => this.get_myDiv_byContenido(s));
+			const reservers_mydiv = d.reservers.map(m => this.get_myDiv_byContenido(m));
+			const clientes_mydiv = d.clientes.map(s => this.get_myDiv_byContenido(s));
 			array_myDiv_reservas.push({
-				mesas: array_myDiv_mesas,
-				sillas: array_myDiv_sillas
+				reservers: reservers_mydiv,
+				clientes: clientes_mydiv
 			});
-			// console.log(`objetos Reserva • • • Mesas:  ${array_myDiv_mesas}    ··· Sillas:  ${array_myDiv_sillas}`);
+			// console.log(`objetos Reserva • • • Mesas:  ${reservers_mydiv}    ··· Sillas:  ${clientes_mydiv}`);
 		});
 		return array_myDiv_reservas || [];
 	}
@@ -3025,7 +3023,7 @@ class e_Salon extends Tablero_Touch {
 		}
 		let arr_retorno = [];
 		for(const el of arr_onplay_nodes){
-			const idkey = el.dataset.tipo;
+			const idkey = el.dataset.id_key;
 			const rol_el = Catalogo.get(idkey)?.rol;
 			if (rol_el === rol_busca) {
 				arr_retorno.push(el?.id);
@@ -3048,11 +3046,11 @@ class e_Salon extends Tablero_Touch {
 		if (!lista_mapdata || lista_mapdata.length === 0) return [];
 
 		lista_mapdata.forEach(ficha_reserva => {
-			const id_mesa = ficha_reserva.get('id_contenido');
+			const id_reserver = ficha_reserva.get('id_contenido');
 			
-			if (!visitadas.has(id_mesa)) {
+			if (!visitadas.has(id_reserver)) {
 				// Encontramos un nuevo grupo (reserva)
-				const array_reserva = this._buscar_elementos_conectados(id_mesa, 
+				const array_reserva = this._buscar_elementos_conectados(id_reserver, 
 																		lista_mapdata, 
 																		visitadas, 																		
 																		rol_busca,
@@ -3126,19 +3124,19 @@ class e_Salon extends Tablero_Touch {
 		let arraydicc_rsrvs = [];            // Array de diccionarios {mesas: [], sillas: []} RETORNO.
 		let clientes_visited = new Set();      // Para evitar duplicados entre reservas.
 
-		matriz_reservas.forEach((array_idMesas, i) => {
-			let set_sub_sillas = new Set();      // Conjunto de sillas para esta reserva de mesas.
+		matriz_reservas.forEach((arr_reserver_s, i) => {
+			let set_sub_clientes = new Set();      // Conjunto de sillas para esta reserva de mesas.
 
 			// Recorremos todas las mesas de este grupo de reserva
-			array_idMesas.forEach(id_mesa => {
-				const ficha_reserva = lista_info_mesas.find(m => m.get('id_contenido') === id_mesa);
+			arr_reserver_s.forEach(id_reserver => {
+				const ficha_reserva = lista_info_mesas.find(m => m.get('id_contenido') === id_reserver);
 				if (ficha_reserva) {
 					let array_scan = this._get_array_scan(ficha_reserva.get('my_div'), 'cliente'); // Filtra solo sillas.
 					if (array_scan) {
 						array_scan.forEach(id_cliente => {
 							// Solo add un cliente si aún no estaba usada en otra reserva
 							if (!clientes_visited.has(id_cliente)) {
-								set_sub_sillas.add(id_cliente);
+								set_sub_clientes.add(id_cliente);
 								clientes_visited.add(id_cliente);
 							}
 						});
@@ -3148,8 +3146,8 @@ class e_Salon extends Tablero_Touch {
 
 			// ■■ Creamos el diccionario para este grupo
 			const dicc_reservas = {
-				mesas: array_idMesas,
-				sillas: [...set_sub_sillas]  // convertimos Set → Array
+				reservers: arr_reserver_s,
+				clientes: [...set_sub_clientes]  // convertimos Set → Array
 			};
 			arraydicc_rsrvs.push(dicc_reservas);
 		});
@@ -3178,8 +3176,8 @@ class e_Salon extends Tablero_Touch {
 		if (clientes_sin_reserva.length > 0) {
 			// console.log('Sillas no asignadas a ninguna reserva:', clientes_sin_reserva);
 			let ficha_reservas = {
-				mesas: [],
-				sillas: [...clientes_sin_reserva]  
+				reservers: [],
+				clientes: [...clientes_sin_reserva]  
 			};
 			clientes_ronin.push(ficha_reservas);
 		}
@@ -3356,16 +3354,16 @@ class e_Salon extends Tablero_Touch {
 	
 			// Construcción: mesas/sillas como diccionarios
 			const salida = reservas.map(dicc => {
-				const mesas  = {};
-				const sillas = {};
+				const reservers  = {};
+				const clientes = {};
 	
-				for (const id of (Array.isArray(dicc.mesas) ? dicc.mesas : [])) {
-					mesas[id] = ficha(msg_mesas[id]);
+				for (const id of (Array.isArray(dicc.reservers) ? dicc.reservers : [])) {
+					reservers[id] = ficha(msg_mesas[id]);
 				}
-				for (const id of (Array.isArray(dicc.sillas) ? dicc.sillas : [])) {
-					sillas[id] = ficha(msg_sillas[id]);
+				for (const id of (Array.isArray(dicc.clientes) ? dicc.clientes : [])) {
+					clientes[id] = ficha(msg_sillas[id]);
 				}
-				return { mesas, sillas };
+				return { reservers, clientes };
 				});
 			
 			return salida;
@@ -3383,7 +3381,7 @@ class e_Salon extends Tablero_Touch {
 	 */
 	api_indices(){
 		// 1) Obtener los elementos onplay del DOM
-		const nodeList_onplay = document.querySelectorAll(".mesa_onplay , .silla_onplay");
+		const nodeList_onplay = document.querySelectorAll(".class_onplay");
 		if ( nodeList_onplay.length <= 0 ) return;		
 		// 2) Convertir el NodeList en un array
 		const arr_elementos = Array.from(nodeList_onplay);
@@ -3467,9 +3465,9 @@ class e_Salon extends Tablero_Touch {
 		};
 
 		// Procesa todas las reservas para agregar índices
-		const reservas_con_indices = dicc_api_reservas.map((grupo = {}) => ({
-			mesas: agregarIndice(grupo.mesas),
-			sillas: agregarIndice(grupo.sillas)
+		const reservas_con_indices = dicc_api_reservas.map((reserv = {}) => ({
+			reservers: agregarIndice(reserv.reservers),
+			clientes: agregarIndice(reserv.clientes)
 		}));		
 
 		// ■■■■■■ CONFIGURACION
@@ -3503,7 +3501,7 @@ class e_Salon extends Tablero_Touch {
 			filas: CFG.salon.filas ?? this.filas ?? null,
 			div_maestro: sanitizeDomRef(CFG.salon.div_maestro),
 			contenedor: CFG.salon.contenedor ?? '',
-			tipos: cloneSimple(CFG.salon.tipos) || {},
+			tipos: cloneSimple(Catalogo.get_keys()) || {},
 			clases_css: cloneSimple(CFG.salon.clases_css) || {},
 			rutas: cloneSimple(CFG.salon.rutas) || {},
 		};
@@ -3579,7 +3577,7 @@ class e_Salon extends Tablero_Touch {
 			// ■■ Busca en el menú la plantilla cuyo data-tipo coincide con el pasado.
 			const get_elemento_menu_byKey = (id_key) => {
 				for (const el of items_menu) {
-					const id_key_el = (el.dataset && el.dataset.tipo) || el.getAttribute('data-tipo');
+					const id_key_el = (el.dataset && el.dataset.id_key) || el.getAttribute('data-id_key');
 					if (id_key_el === id_key) 
 						return el;
 				}
@@ -3678,9 +3676,9 @@ class e_Salon extends Tablero_Touch {
 	 * this.clean__elementos_Salon(); ► "Elimnia todos los elementos."								
 	 * ``` 	
 	 */
-	clean_elementos_Salon(tipo = 'todo') {
+	clean_elementos_Salon(rol_busca = 'todo') {
 		// 1. Obtiene los IDs usando tu función existente que ya valida los tipos.
-		const ids_to_remove = this._get_ids_onplay(tipo);		
+		const ids_to_remove = this._get_ids_onplay(rol_busca);		
 		if (!ids_to_remove || ids_to_remove.length === 0) return;
 
 		// 2. Recorre los IDs, busca el elemento y lo elimina de su padre (la baldosa).
@@ -3814,7 +3812,7 @@ class e_Salon extends Tablero_Touch {
 		// ┌• CAMBIA DE CLASE PARA NO HEREDAR EL ESTILO DEL MENU....
 		el.className = "";
 		el.classList.add('class_onplay');
-		el.classList.add(`${el.dataset.tipo}_onplay`);
+		el.classList.add(`${el.dataset.id_key}_onplay`);
 
 		// ┌•  ​👂​👂 
 		this._add_listeners_movimiento(el);		
@@ -3837,7 +3835,7 @@ class e_Salon extends Tablero_Touch {
 		const $el = e_Salon._to_element(el);
 		if(!$el) return null;
 		// ┌■■ key en catalogo del elemento de entrada ('silla_2')
-		const el_key = $el.dataset.tipo || $el.getAttribute('data-tipo');
+		const el_key = $el.dataset.id_key || $el.getAttribute('data-id_key');
 		// ┌■■ Valido existencia en el catalogo.
 		const valid_keys = Catalogo.get_keys();
 		if(!valid_keys || !valid_keys.includes(el_key)) return null;
@@ -3846,11 +3844,11 @@ class e_Salon extends Tablero_Touch {
 		const elementos_menu = Array.from(document.querySelectorAll(".menu_to_clone"));
 		if(!elementos_menu) return;
 		// ┌■■ FILTRO quito papeleras (exit)
-		const elementos_menu_filter = elementos_menu.filter(el => el.dataset.tipo != 'exit');
+		const elementos_menu_filter = elementos_menu.filter(el => el.dataset.id_key != 'exit');
 		if(!elementos_menu_filter) return null;
 		
 		// ┌■■ MATCH		
-		const $el_menu = elementos_menu_filter.find(menu => menu.dataset.tipo === el_key)
+		const $el_menu = elementos_menu_filter.find(menu => menu.dataset.id_key === el_key)
 
 		return $el_menu ? $el_menu : null;
 	}		
@@ -3925,12 +3923,11 @@ class Configuracion_Salon {
 
 		
 	}
-	// async prueba_mensajes(){
-		// const respuesta = await this.UI.ConfirM("Quieres Seguir?", "Elige entre estos dos", "warning");
-		// if (respuesta)
-		// 	this.UI._NotA("Texto del body", "Texto del head", "success");
-	// }
 
+	// Acciones para Crear un OffCanvas de Configuración(Por pestañas, tiene que tener botones de accion.)
+	set_UI_configuration(){
+
+	}
 
 	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	// ■■ VALIDACION DICCIONARIO CONFIGURACION
@@ -4005,7 +4002,7 @@ class Configuracion_Salon {
 			div_maestro: sanitizeDomRef(dicc_config.div_maestro) || dicc_default.div_maestro,
 			contenedor: dicc_config.contenedor 	|| dicc_default.contenedor,
 			estilo:	dicc_config.estilo || dicc_default.estilo,
-			tipos: cloneSimple(dicc_config.tipos) || dicc_default.tipos,
+			tipos: cloneSimple(Catalogo.get_keys()) ,
 			clases_css: cloneSimple(dicc_config.clases_css) || dicc_default.clases_css,
 			catalogo: dicc_config.catalogo || dicc_default.catalogo,
 		};
@@ -4017,7 +4014,7 @@ class Configuracion_Salon {
 			columnas:dicc_config.columnas || dicc_default.columnas,
 			estilo:dicc_config.estilo || dicc_default.estilo, 
 			clases_css:cloneSimple(dicc_config.clases_css) || dicc_default.clases_css,
-			tipos: cloneSimple(dicc_config.tipos) || dicc_default.tipos,
+			tipos: cloneSimple(Catalogo.get_keys()) ,
 		};
 		const new_config_limpio = {
 			salon:salon || {},
@@ -4205,8 +4202,8 @@ class Configuracion_Salon {
 		// ┌•••••••••••••••••••••••••••••••••• 	
 		try {
 			// ┌•• GEOMETRÍA (Fase PREV)
-			const fichas_x_reserva = this._procesar_geometria_relativa(reservas_raw);
-			if (!fichas_x_reserva || fichas_x_reserva.length === 0) {
+			const fichas_geo_x_reserva = this._procesar_geometria_relativa(reservas_raw);
+			if (!fichas_geo_x_reserva || fichas_geo_x_reserva.length === 0) {
 				// Si no hay fichas válidas después de la limpieza, no es un error, solo un aviso.
 				console.log("⚠️ No se encontró geometría válida en el salón activo.");
 				return null;
@@ -4218,11 +4215,11 @@ class Configuracion_Salon {
 			let cursor = 'A0'; 
 			// ┌••••••••••••••••••••••••••••••••••••••••••••••••
 			// ┌•• MONTAJE (Fase CURSOR con BUCLE DE CONFLICTO)
-			for (const ficha of fichas_x_reserva) {
-				// ┌•• dimension de la ficha actual, . . .parametros de  _busca_dimension_free()
-				const dim_ficha = `${ficha.num_rows}x${ficha.num_cols}`;
+			for (const ficha_geo of fichas_geo_x_reserva) {
+				// ┌•• dimension de la ficha_geo actual, . . .parametros de  _busca_dimension_free()
+				const dim_ficha = `${ficha_geo.num_rows}x${ficha_geo.num_cols}`;
 				// ┌•• Cacha los ids de 'cada' reserva
-				const ids_reserva = ficha.items.map(item => item.id);
+				const ids_reserva = ficha_geo.items.map(item => item.id);
 
 				// ┌•••••••••••••••••••••••••••••••• 
 				// ┌•• Buscamos hueco físico libre 
@@ -4241,12 +4238,12 @@ class Configuracion_Salon {
 							cursor = 'A0';
 							continue; 
 						} else {
-							// throw new Error(`No cabe la reserva ${ficha.nombre_rango} (${dim_ficha})`);
+							// throw new Error(`No cabe la reserva ${ficha_geo.nombre_rango} (${dim_ficha})`);
 						}
 					}					
 					// ┌•••••••••••••••••••••••••••••••• 
 					// ┌•• Validacion de Vecinos / Politica del Posicionamiento.
-					if (this._es_posicion_conflictiva(rango_free, ficha, ids_reserva)) { 
+					if (this._es_posicion_conflictiva(rango_free, ficha_geo, ids_reserva)) { 
 						// ◘◘◘ CONFLICTO: Avanzamos el cursor 1 posición y reintentamos(continue)
 						const siguiente_celda = Ranget.plus(rango_free.celda_inicio, 1); 
 						if (!siguiente_celda) {
@@ -4259,7 +4256,7 @@ class Configuracion_Salon {
 					// ┌••                   ••••••••••••••••••••••••••   ••••••••• 
 					// ┌•• Si llegamos aquí: No es posicion-conflictiva y Colocamos Fisicamente.
 					const celda_base_destino = rango_free.celda_inicio;
-					ficha.items.forEach(item => {
+					ficha_geo.items.forEach(item => {
 						const celda_destino = Ranget.suma_fc(celda_base_destino, item.delta_y, item.delta_x);
 						
 						if (celda_destino) {
@@ -4272,7 +4269,7 @@ class Configuracion_Salon {
 							}
 						} else {
 							// Este throw es importante si falla la suma_fc (fuera de límites)
-							throw new Error(`💥 Error al calcular destino para el elemento ${item.id} de la reserva ${ficha.nombre_rango}.`);
+							throw new Error(`💥 Error al calcular destino para el elemento ${item.id} de la reserva ${ficha_geo.nombre_rango}.`);
 						}
 					});
 					
@@ -4294,7 +4291,7 @@ class Configuracion_Salon {
 					is_colocado = true; 
 				}
 				if (intentos >= MAX_INTENTOS) {
-					// throw new Error(`💥 Máximo de ${MAX_INTENTOS} intentos alcanzado para la reserva ${ficha.nombre_rango}.`);
+					// throw new Error(`💥 Máximo de ${MAX_INTENTOS} intentos alcanzado para la reserva ${ficha_geo.nombre_rango}.`);
 					break; // Salimos del bucle de reservas.
 				}
 			}
@@ -4699,6 +4696,7 @@ class Configuracion_Salon {
 
 		// Recorremos solo los elementos que vamos a colocar
 		for (const item of ficha.items) {
+
 			// Si el objeto de la reserva que quiero colocar es una mesa.....
 			if (item.id.toLowerCase().startsWith(tipo_mesa)) 
 				soy_mesa = true;
@@ -4776,17 +4774,17 @@ class Configuracion_Salon {
 		foto_reservas.forEach((reserva, i) => {
 			// 1. Identificar todos los IDs de la reserva
 			
-			const mesas = Array.isArray(reserva?.mesas) ? reserva.mesas : [];
-			const sillas = Array.isArray(reserva?.sillas) ? reserva.sillas : [];
-			const ids_items = [...mesas, ...sillas].filter(Boolean);
+			const reservers = Array.isArray(reserva?.reservers) ? reserva.reservers : [];
+			const clientes = Array.isArray(reserva?.clientes) ? reserva.clientes : [];
+			const ids_items = [...reservers, ...clientes].filter(Boolean);
 			if (ids_items.length === 0) return [];
 
 			// ┌••   •••••••••••••  •••••••••••••••••••
 			// • • • Caso especial: reservas sin mesas. Las sillas se agrupan en línea
 			// para compactar la geometría y facilitar el re_posicionamiento.
-			if (mesas.length === 0 && sillas.length > 0) {
+			if (reservers.length === 0 && clientes.length > 0) {
 				const items_geometria = [];
-				sillas.forEach((id, index) => {
+				clientes.forEach((id, index) => {
 					const elemento_dom = document.getElementById(id);
 					if (!elemento_dom) return [];
 					items_geometria.push({
@@ -8078,7 +8076,7 @@ class Side_Elementos {
 			div_item.title = `Arrastra hacia el Salón`;            
             div_item.className = 'menu_to_clone';             
             
-			div_item.dataset.tipo = key;       
+			div_item.dataset.id_key = key;       
             div_item.dataset.grupo = el.grupo;   
             div_item.dataset.rol = el.rol;   
             

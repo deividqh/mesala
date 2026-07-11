@@ -20,7 +20,7 @@ Este README documenta, con foco en mantenimiento, los controles UI y el mapa de 
 | `cliente_web/index.html` | Video de engagement | `video#videoCamarero` con fallback JS | Reproducción multimedia | Carga `Camarero.mp4` si existe y, si falla, activa un vídeo de respaldo para no romper la experiencia. |
 | `cliente_web/index.html` | CTA final de cierre | Botón `a.btn.cta-primary[href="./mesala.html"]` dentro de bloque gradiente | Conversión final | Cierra el flujo con una acción única y directa: entrar a Prueba Gratis. |
 | `cliente_web/index.html` | Módulo JS scroll suave | Script IIFE `initSmoothScroll()` | Mejora UX | Suaviza navegación en anclas internas y evita saltos bruscos. |
-| `cliente_web/mesala.html` | Papelera de eliminación | `#id_exit[data-tipo="exit"]` | Zona de borrado Drag & Drop | Permite eliminar elementos del plano del salón arrastrándolos a la papelera. |
+| `cliente_web/mesala.html` | Papelera de eliminación | `#id_exit[data-id_key="exit"]` | Zona de borrado Drag & Drop | Permite eliminar elementos del plano del salón arrastrándolos a la papelera. |
 | `cliente_web/mesala.html` | Disparador sidebar elementos | `i[data-action-nav="elementos"]` | Abrir/cerrar panel de elementos | Muestra/oculta catálogo de elementos para construir el plano del salón. |
 | `cliente_web/mesala.html` | Acción guardar foto | `i[data-action-nav="save"]` | Guardar snapshot | Inicia flujo de guardado del estado del salón. |
 | `cliente_web/mesala.html` | Acción cargar foto | `i[data-action-nav="load"]` | Cargar snapshot | Recupera una configuración de salón guardada previamente. |

@@ -1525,17 +1525,17 @@ class Working_Rangos  extends Working_Celdas{
 		foto_reservas.forEach((reserva, i) => {
 			
 			// ┌• Cacho todos los IDs de la reserva			
-			const mesas = Array.isArray(reserva?.mesas) ? reserva.mesas : [];
-			const sillas = Array.isArray(reserva?.sillas) ? reserva.sillas : [];
-			const ids_items = [...mesas, ...sillas].filter(Boolean);
+			const reservers = Array.isArray(reserva?.reservers) ? reserva.reservers : [];
+			const clientes = Array.isArray(reserva?.clientes) ? reserva.clientes : [];
+			const ids_items = [...reservers, ...clientes].filter(Boolean);
 			if (ids_items.length === 0) return [];
 
 			// ┌••   •••••••••••••  •••••••••••••••••••
 			// • • • Caso especial: reservas sin mesas. Las sillas se agrupan en línea
 			// para compactar la geometría y facilitar el re_posicionamiento.
-			if (mesas.length === 0 && sillas.length > 0) {
+			if (reservers.length === 0 && clientes.length > 0) {
 				const items_geometria = [];
-				sillas.forEach((id, index) => {
+				clientes.forEach((id, index) => {
 					const elemento_dom = document.getElementById(id);
 					if (!elemento_dom) return [];
 					items_geometria.push({
@@ -3211,14 +3211,14 @@ class El_Rango_del_Salon extends Wedding_Rangos{
 			// ┌••••••••••••••••••••••••
 			arr_reservas.forEach(reserva => {
 
-				const mesas = Array.isArray(reserva?.mesas) ? reserva.mesas : [];
-				const sillas = Array.isArray(reserva?.sillas) ? reserva.sillas : [];
+				const reservers = Array.isArray(reserva?.reservers) ? reserva.reservers : [];
+				const clientes = Array.isArray(reserva?.clientes) ? reserva.clientes : [];
 				
 				// ┌■■ La Reserva de 'Sillas Ronin': Se da como resultado un [Array de Rangos].
 				// ┌■■ Cada silla genera un rango 1x1 independiente.
-                if (mesas.length === 0 && sillas.length > 0) {
+                if (reservers.length === 0 && clientes.length > 0) {
 					const array_ronin = [];
-                    sillas.forEach(silla => {
+                    clientes.forEach(silla => {
                         // Encontrar la celda donde está ubicada la silla actual
                         const entrada = Object.entries(dicc_celda_elemento).find(([celda, elemento]) => elemento === silla);
                         if (!entrada) return;                         
@@ -3239,7 +3239,7 @@ class El_Rango_del_Salon extends Wedding_Rangos{
                 }
 				// ┌■■■ PREPARO EL DICC VALUES 
 				// ┌• Junto mesas y sillas, filtro vacíos.
-				const ids_reserva = [...mesas, ...sillas].filter(Boolean);				
+				const ids_reserva = [...reservers, ...clientes].filter(Boolean);				
 				// ┌• Desmontamos el diccionario en pares [celda, elemento] y filtramos comprobando si el elemento existe en el array.
 				const pares_reservados = Object.entries(dicc_celda_elemento).filter(([celda, elemento]) => ids_reserva.includes(elemento));
 				// ┌• Ensamblamos (reconstruimos) el nuevo diccionario exclusivamente con las reservas confirmadas.
