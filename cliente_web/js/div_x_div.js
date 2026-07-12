@@ -2631,12 +2631,12 @@ class e_Salon extends Tablero_Touch {
 		const d_alergias_mock = {silla_0: ['soja', 'lacteos'], silla_1: ['cereal'], };
 		this._load_elementos_en_Salon(d_indices_mock);
 		this.RegisteR();
-		this.CFG.api_re_posicionar();				
-		this._load_alergias_en_Salon(d_alergias_mock);		
-		console.log(JSON.stringify(this.MSG_S.d_alergias, null, 2)); 
+		// this.CFG.api_re_posicionar();				
+		// this._load_alergias_en_Salon(d_alergias_mock);		
+		// console.log(JSON.stringify(this.MSG_S.d_alergias, null, 2)); 
 		
-		this._load_mensajes_en_Salon(d_mensajs_mock);
-		console.log(JSON.stringify(this.MSG_S.d_mensajes, null, 2)); 
+		// this._load_mensajes_en_Salon(d_mensajs_mock);
+		// console.log(JSON.stringify(this.MSG_S.d_mensajes, null, 2)); 
 		
 
 	}

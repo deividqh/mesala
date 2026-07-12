@@ -3218,9 +3218,9 @@ class El_Rango_del_Salon extends Wedding_Rangos{
 				// ┌■■ Cada silla genera un rango 1x1 independiente.
                 if (reservers.length === 0 && clientes.length > 0) {
 					const array_ronin = [];
-                    clientes.forEach(silla => {
+                    clientes.forEach(cli => {
                         // Encontrar la celda donde está ubicada la silla actual
-                        const entrada = Object.entries(dicc_celda_elemento).find(([celda, elemento]) => elemento === silla);
+                        const entrada = Object.entries(dicc_celda_elemento).find(([celda, elemento]) => elemento === cli);
                         if (!entrada) return;                         
                         const [celda_silla, id_silla] = entrada;                        
                         // ⏳ Generando rango temporal 1x1 para la silla ⏳

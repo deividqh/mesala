@@ -1109,9 +1109,10 @@ class Motor_Alergias {
         this.modalInstancia?.show();
     }
     
-    get_alergenos(tipo = '') {
-        if (typeof tipo === 'string' && tipo.trim() !== '') {
-            return this.d_alergenos[tipo];
+    get_alergenos(key_alergenos_busca = '') {
+        if (typeof key_alergenos_busca === 'string' && key_alergenos_busca.trim() !== '') {
+			const alergeno = this.d_alergenos[key_alergenos_busca];
+            return alergeno;
         }
         return this.d_alergenos;
     }
