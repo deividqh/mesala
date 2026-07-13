@@ -2706,10 +2706,11 @@ class e_Salon extends Tablero_Touch {
 		if (index_reserva == -1) return;
 		this.index_reserva = index_reserva;			
 
-		// ┌■ Rol. esto lo quiero cambiar.
+		// ┌■ Grupo only players
 		const ctlg_el = Catalogo.get(id_key_el);
 		if (!ctlg_el || ctlg_el.grupo !== 'player') 
 			return;
+		// ┌■ Rol. esto lo quiero cambiar.
 		if (ctlg_el.rol === 'reserver'){
 			// ┌•• Cambio de reserva ...2 clicks 
 			if (index_reserva != this.last_reserva_clicked){
