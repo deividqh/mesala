@@ -1,6 +1,32 @@
 /**
  * @file Catalogo_Elementos.js
  * @description Definición centralizada de tipos de objetos del salón.
+ * 
+ *  // ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+    // 💥 EJEMPLOS DE LLAMADAS DESDE PROGRAMA:
+    // const z_catalogo = Catalogo.get();
+    // const z_silla = Catalogo.get("silla");
+    // const z_silla_id = Catalogo.get("silla", "id");
+    // const z_silla_visual = Catalogo.get("silla", 'visual');
+    // const z_silla_visual_css = Catalogo.get("silla", 'visual', "css");
+    // const z_visual_css = Catalogo.get('visual', "css"); 	// NULL		
+
+    // const z_grupo = Catalogo.get_distinto_s("grupo");
+    // const z_visual = Catalogo.get_distinto_s('visual');
+    // const z_visual_content = Catalogo.get_distinto_s('visual', 'content');		
+    // const z_log_msg = Catalogo.get_distinto_s('logica', 'motor_mensajes');
+    // const z_log_msg_tipo = Catalogo.get_distinto_s('logica', 'motor_mensajes', 'tipo');
+    // const z_id_s = Catalogo.get_distinto_s('id');		
+    // const z_mesa = Catalogo.get_distinto_s('mesa');	// NULL
+    // const z_mesa_id = Catalogo.get_distinto_s('mesa' , 'id');	// NULL
+
+    // const z_keys = Catalogo.get_keys();
+
+    // const z_players = Catalogo.get_item_s("grupo", "player");
+    // const z_logica_alergias = Catalogo.get_item_s("logica", "motor_alergias", true);
+    // const z_sub_grupos = Catalogo.get_item_s("rol", "cliente");
+    // 💥💥💥💥💥💥💥💥
+
  */
 class Catalogo {
     // De momento lo pongo aparte pero quiero meterlo en el catalogo
@@ -77,7 +103,7 @@ class Catalogo {
     //     id: 'esquina_muro',
     //     grupo: 'structure',
     //     rol: 'estructura',    
-    //     fisica: { ancho: 1, alto: 1, colision: true },
+    //     fisica: { ancho: 2, alto: 1, colision: true },
     //     visual: { 
     //         content: '',
     //         css: 'estiloEsquinaMuro'
@@ -86,6 +112,20 @@ class Catalogo {
     // }
     });
     
+    static get_alergenos() {
+        const d_alergenos = {
+            gluten:    { slug: 'gluten',    svg: '<img src="./imgs/alergia-gluten.svg" alt="Gluten" />' },
+            lacteos:   { slug: 'lacteos',   svg: '<img src="./imgs/alergia-lacteos.svg" alt="Lácteos" />' },
+            crustaceos:{ slug: 'crustaceos',svg: '<img src="./imgs/alergia-crustaceo.svg" alt="Crustáceos" />' },
+            moluscos:  { slug: 'moluscos',  svg: '<img src="./imgs/alergia-moluscos.svg" alt="Moluscos" />' },
+            pescado:   { slug: 'pescado',   svg: '<img src="./imgs/alergia-pescado.svg" alt="Pescado" />' },
+            soja:      { slug: 'soja',      svg: '<img src="./imgs/alergia-soja.svg" alt="Soja" />' },
+            huevos:    { slug: 'huevos',    svg: '<img src="./imgs/alergia-huevo.svg" alt="Huevos" />' },
+            cascara:   { slug: 'cascara',   svg: '<img src="./imgs/alergia-cascara.svg" alt="Frutos de cáscara" />' }
+        };
+        return d_alergenos;
+    }
+
     // Diccionario para guardar las instancias de las lógicas (Motores)
     static #MOTORES = {};
 
@@ -105,19 +145,7 @@ class Catalogo {
         return this.#MOTORES[clave_logica] || null;
     }
     
-    static get_alergenos() {
-        const d_alergenos = {
-            gluten:    { slug: 'gluten',    svg: '<img src="./imgs/alergia-gluten.svg" alt="Gluten" />' },
-            lacteos:   { slug: 'lacteos',   svg: '<img src="./imgs/alergia-lacteos.svg" alt="Lácteos" />' },
-            crustaceos:{ slug: 'crustaceos',svg: '<img src="./imgs/alergia-crustaceo.svg" alt="Crustáceos" />' },
-            moluscos:  { slug: 'moluscos',  svg: '<img src="./imgs/alergia-moluscos.svg" alt="Moluscos" />' },
-            pescado:   { slug: 'pescado',   svg: '<img src="./imgs/alergia-pescado.svg" alt="Pescado" />' },
-            soja:      { slug: 'soja',      svg: '<img src="./imgs/alergia-soja.svg" alt="Soja" />' },
-            huevos:    { slug: 'huevos',    svg: '<img src="./imgs/alergia-huevo.svg" alt="Huevos" />' },
-            cascara:   { slug: 'cascara',   svg: '<img src="./imgs/alergia-cascara.svg" alt="Frutos de cáscara" />' }
-        };
-        return d_alergenos;
-    }
+    
     /**
      * Acceso seguro a una propiedad específica.
      * Ejemplo: Catalogo.get('mesa', 'visual', 'css')
@@ -129,7 +157,7 @@ class Catalogo {
 
         for (const clave of niveles) {
             // ■ Testeo si clave es un id de un elemento del DOM y si existe, lo obtenemos.
-            const item_catalog = Catalogo.from_id_to_catalogo(clave);
+            const item_catalog = Catalogo._from_id_to_catalogo(clave);
             if (item_catalog)   return item_catalog;                        
 
             // ■ No es un id de DOM y buscamos las claves.
@@ -142,7 +170,7 @@ class Catalogo {
         return actual;
     }
 
-    static from_id_to_catalogo(id) {
+    static _from_id_to_catalogo(id) {
         const es_dom = document.getElementById(id);
         if (!es_dom) return null;
 
@@ -231,30 +259,6 @@ class Catalogo {
     // export default Catalogo;
 }
 
-// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-// 💥 EJEMPLOS DE LLAMADAS DESDE PROGRAMA:
-// const z_catalogo = Catalogo.get();
-// const z_silla = Catalogo.get("silla");
-// const z_silla_id = Catalogo.get("silla", "id");
-// const z_silla_visual = Catalogo.get("silla", 'visual');
-// const z_silla_visual_css = Catalogo.get("silla", 'visual', "css");
-// const z_visual_css = Catalogo.get('visual', "css"); 	// NULL		
-
-// const z_grupo = Catalogo.get_distinto_s("grupo");
-// const z_visual = Catalogo.get_distinto_s('visual');
-// const z_visual_content = Catalogo.get_distinto_s('visual', 'content');		
-// const z_log_msg = Catalogo.get_distinto_s('logica', 'motor_mensajes');
-// const z_log_msg_tipo = Catalogo.get_distinto_s('logica', 'motor_mensajes', 'tipo');
-// const z_id_s = Catalogo.get_distinto_s('id');		
-// const z_mesa = Catalogo.get_distinto_s('mesa');	// NULL
-// const z_mesa_id = Catalogo.get_distinto_s('mesa' , 'id');	// NULL
-
-// const z_keys = Catalogo.get_keys();
-
-// const z_players = Catalogo.get_item_s("grupo", "player");
-// const z_logica_alergias = Catalogo.get_item_s("logica", "motor_alergias", true);
-// const z_sub_grupos = Catalogo.get_item_s("rol", "cliente");
-// 💥💥💥💥💥💥💥💥
 
 /**
  * @class Logica_Catalogo
@@ -276,42 +280,43 @@ class Logica_Catalogo  {
      * @description Crea la estructura DOM del offcanvas y sus pestañas globales si no existe.
      */
     #crear_offcanvas_logica() {
-        let offcanvas_logica = document.getElementById('offcanvas_logica');
+        let $offcanvas_logica = document.getElementById('offcanvas_logica');
+        if ($offcanvas_logica) 
+            return $offcanvas_logica;
         
-        if (offcanvas_logica) {
-            return offcanvas_logica;
-        }
-
-        // 1. Contenedor principal del offcanvas
-        offcanvas_logica = document.createElement('div');
-        offcanvas_logica.id = 'offcanvas_logica';
-        offcanvas_logica.className = 'offcanvas offcanvas-bottom'; 
-        offcanvas_logica.tabIndex = -1;
+        // ■ Contenedor principal del offcanvas
+        $offcanvas_logica = document.createElement('div');
+        $offcanvas_logica.id = 'offcanvas_logica';
+        $offcanvas_logica.className = 'offcanvas offcanvas-bottom'; 
+        $offcanvas_logica.tabIndex = -1;
         
-        offcanvas_logica.dataset.logica = 'true'; 
-        offcanvas_logica.style.backgroundColor = 'var(--color-egg-white)'; 
-        offcanvas_logica.style.height = 'auto'; 
-        offcanvas_logica.style.minHeight = '35vh'; 
+        $offcanvas_logica.dataset.logica = 'true'; 
+        $offcanvas_logica.style.backgroundColor = 'var(--color-egg-white)'; 
+        $offcanvas_logica.style.height = 'auto'; 
+        $offcanvas_logica.style.minHeight = '35vh'; 
 
-        // 2. Header del offcanvas
+        // ■ Header del offcanvas
         const header = document.createElement('div');
         header.className = 'offcanvas-header';
         
+        // ■ TITULO
         const title = document.createElement('h6');
         title.className = 'offcanvas-title';
-        title.id = 'offcanvas_logica_label';
-        title.innerText = 'Lógica del Elemento'; 
-
-        const btn_close = document.createElement('button');
-        btn_close.type = 'button';
-        btn_close.className = 'btn-close text-reset';
-        btn_close.setAttribute('data-bs-dismiss', 'offcanvas');
-        btn_close.setAttribute('aria-label', 'Close');
-
+        title.id = 'offcanvas_logica_title';
+        title.innerText = 'THE LOGIC ZONE'; 
+        
+        // ■ BOTON CERRAR
+        const $btn_close = document.createElement('button');
+        $btn_close.type = 'button';
+        $btn_close.className = 'btn-close text-reset';
+        $btn_close.setAttribute('data-bs-dismiss', 'offcanvas');
+        $btn_close.setAttribute('aria-label', 'Close');
+        
+        // ■ CONSTRUCCION CABECERA.
         header.appendChild(title);
-        header.appendChild(btn_close);
-
-        // 3. Body del offcanvas
+        header.appendChild($btn_close);
+        
+        // ■ BODY DEL OFFCANVAS 
         const body = document.createElement('div');
         body.className = 'offcanvas-body';
         body.id = 'offcanvas_logica_body';
@@ -330,55 +335,58 @@ class Logica_Catalogo  {
                     // Si la lógica tiene un objeto con "nombre", lo guardamos.
                     if (valorLogica && typeof valorLogica === 'object' && valorLogica.nombre) {
                         claves_logica_unicas.set(key, valorLogica.nombre);
-                    } else if (!claves_logica_unicas.has(key)) {
-                        // Fallback por si hay lógicas sin la propiedad 'nombre'
-                        claves_logica_unicas.set(key, key.replace('motor_', '').toUpperCase());
-                    }
+                    } 
                 });
             }
         });
 
-        // Contenedor de la lista de pestañas
+        // ■ Contenedor de la lista de pestañas
         const tabList = document.createElement('ul');
         tabList.className = 'nav nav-tabs mb-3';
         tabList.id = 'logicaTab';
         tabList.role = 'tablist';
 
-        // Contenedor de los paneles de contenido
+        // ■ Contenedor de los paneles de contenido
         const tabContent = document.createElement('div');
         tabContent.className = 'tab-content';
         tabContent.id = 'logicaTabContent';
 
-        // Generamos dinámicamente cada pestaña
-        claves_logica_unicas.forEach((nombrePestana, clave) => {
+        // ■ Generamos Dinámicamente cada pestaña
+        claves_logica_unicas.forEach((nombrePestana, motor_key) => {
             // --- Estructura del Botón/Pestaña ---
             const navItem = document.createElement('li');
             navItem.className = 'nav-item';
             navItem.role = 'presentation';
-            navItem.dataset.tipoLogica = clave; 
+            navItem.dataset.motor = motor_key; 
 
-            const tabButton = document.createElement('button');
-            tabButton.className = 'nav-link';
-            tabButton.id = `tab-${clave}`;
-            tabButton.setAttribute('data-bs-toggle', 'tab');
-            tabButton.setAttribute('data-bs-target', `#panel-${clave}`);
-            tabButton.type = 'button';
-            tabButton.role = 'tab';
-            tabButton.setAttribute('aria-controls', `panel-${clave}`);
-            tabButton.setAttribute('aria-selected', 'false');
-            tabButton.innerText = nombrePestana; // Usamos el nombre detectado del JSON
+            const $tabButton = document.createElement('button');
+            $tabButton.className = 'nav-link';
+            $tabButton.id = `tab-${motor_key}`;
+            $tabButton.setAttribute('data-bs-toggle', 'tab');
+            $tabButton.setAttribute('data-bs-target', `#panel-${motor_key}`);
+            $tabButton.type = 'button';
+            $tabButton.role = 'tab';
+            $tabButton.setAttribute('aria-controls', `panel-${motor_key}`);
+            $tabButton.setAttribute('aria-selected', 'false');
+            $tabButton.innerText = nombrePestana; // Usamos el nombre detectado del JSON
 
-            navItem.appendChild(tabButton);
+            navItem.appendChild($tabButton);
             tabList.appendChild(navItem);
 
-            // --- Estructura del Panel de Contenido ---
+            // --- PANEL(DIV) DE CONTENIDO ---
             const panel = document.createElement('div');
             panel.className = 'tab-pane fade';
-            panel.id = `panel-${clave}`;
+            panel.id = `panel-${motor_key}`;
             panel.role = 'tabpanel';
-            panel.setAttribute('aria-labelledby', `tab-${clave}`);
+            panel.setAttribute('aria-labelledby', `tab-${motor_key}`);
             
-            panel.innerHTML = `<div class="p-3 border border-top-0 content-area">Cargando datos de ${nombrePestana}...</div>`;
+            // ■ Crear el AREA DE CONTENIDO.
+            const $content_div = document.createElement('div');
+            $content_div.className = 'p-3 border border-top-0 area-de-contenido';
+            $content_div.textContent = `Cargando datos de ${nombrePestana}...`; 
+
+            // 3. Añadir el div interno al panel
+            panel.appendChild($content_div);
 
             tabContent.appendChild(panel);
         });
@@ -386,11 +394,13 @@ class Logica_Catalogo  {
         body.appendChild(tabList);
         body.appendChild(tabContent);
 
-        offcanvas_logica.appendChild(header);
-        offcanvas_logica.appendChild(body);
-        document.body.appendChild(offcanvas_logica);
+        $offcanvas_logica.appendChild(header);
+        $offcanvas_logica.appendChild(body);
+        document.body.appendChild($offcanvas_logica);
 
-        return offcanvas_logica;
+        return $offcanvas_logica;
+        // $offcanvas_logica ahora tiene tantas pestañas como logicas distintas hay en el Catalogo.
+        // Cuando vaya a abrir tengo que ver que logicas tiene el elemento que quiero abrir.
     }
 
     /**
@@ -403,51 +413,44 @@ class Logica_Catalogo  {
         const ctlg_el = Catalogo.get(grupo_el);
         if (!ctlg_el || !ctlg_el.logica) return null;
         
-        const offcanvas_dom = document.getElementById('offcanvas_logica');
-        if (!offcanvas_dom) return null;
+        const $offcanvas_dom = document.getElementById('offcanvas_logica');
+        if (!$offcanvas_dom) return null;
 
         // Utilizamos el nuevo setter para actualizar el título
         this.set_title(`Opciones de ${elemento_dom.id || 'Elemento'} - (${ctlg_el.grupo}) - (${ctlg_el.rol})`);
 
         const logica_el = ctlg_el.logica;
-        const navItems = offcanvas_dom.querySelectorAll('#logicaTab .nav-item');
+
+        const navItems = $offcanvas_dom.querySelectorAll('#logicaTab .nav-item');
         
         let primerTabVisible = null;
-
         navItems.forEach(item => {
-            const tipoLogica = item.dataset.tipoLogica;
-            const valorLogica = logica_el[tipoLogica];
+            const motor = item.dataset.motor;     // 'motor_mensajes' , 'motor_alergias'
+            const data_logica = logica_el[motor];      
             
             const botonTab = item.querySelector('.nav-link');
             const idPanel = botonTab.getAttribute('data-bs-target');
-            const panelDOM = offcanvas_dom.querySelector(idPanel);
+            const $panel_dom = $offcanvas_dom.querySelector(idPanel);
 
             botonTab.classList.remove('active');
             botonTab.setAttribute('aria-selected', 'false');
-            if (panelDOM) panelDOM.classList.remove('show', 'active');
+            if ($panel_dom) $panel_dom.classList.remove('show', 'active');
 
             // CRITERIO DE VISIBILIDAD: Existe y no es false ni null
             
-            if (valorLogica !== undefined && valorLogica !== false && valorLogica !== null) {
+            if (data_logica !== undefined && data_logica !== false && data_logica !== null) {
                 item.classList.remove('d-none'); 
                 
                 if (!primerTabVisible) {
-                    primerTabVisible = { boton: botonTab, panel: panelDOM };
+                    primerTabVisible = { boton: botonTab, panel: $panel_dom };
                 }
 
                 // Inyección de contenido según el tipo ❌❌ ???? adaptar a motores. ???? ❌❌
-                const areaContenido = panelDOM.querySelector('.content-area');
-                if (tipoLogica === 'motor_mensajes') {
-                    areaContenido.innerHTML = `
-                        <p>Tipo de motor: <strong>${valorLogica.content}</strong></p>
-                    `;
-                } else if (tipoLogica === 'motor_alergias') {
-                    // Ahora podemos acceder a valorLogica.content si quisiéramos renderizar el diccionario
-                    areaContenido.innerHTML = `
-                        <p>Diccionario de alergias preparado.</p>
-                    `;
-                }
+                // Ahora podemos acceder a valorLogica.content si quisiéramos renderizar el diccionario
+                const areaContenido = $panel_dom.querySelector('.area-de-contenido');                
+                this.#inyectar_render_motor(motor, data_logica, areaContenido);
                 // ❌❌❌❌❌
+
             } else {
                 item.classList.add('d-none');
             }
@@ -461,16 +464,15 @@ class Logica_Catalogo  {
             }
         }
 
-        const bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(offcanvas_dom);
+        const bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance($offcanvas_dom);
         bsOffcanvas.show();
-        return offcanvas_dom;
+        return $offcanvas_dom;
     }
 
     set_title(html_content) {
-        const titleDOM = document.getElementById('offcanvas_logica_label');
-        if (titleDOM) {
-            titleDOM.innerHTML = html_content;
-        }
+        const $title_dom = document.getElementById('offcanvas_logica_title');
+        if (!$title_dom) return;
+        $title_dom.innerHTML = html_content;
     }
     /**
      * @description Reemplaza TODO el contenido del cuerpo del offcanvas.
@@ -478,10 +480,51 @@ class Logica_Catalogo  {
      * Si solo quieres modificar el interior de una pestaña, deberías seleccionar su panel específico.
      */
     set_body(html_content) {
-        const bodyDOM = document.getElementById('offcanvas_logica_body');
-        if (bodyDOM) {
-            bodyDOM.innerHTML = html_content;
+        const $body_dom = document.getElementById('offcanvas_logica_body');
+        if ($body_dom) {
+            $body_dom.innerHTML = html_content;
         }
     }
 
+    /**
+     * @description Ejecuta el método render del motor correspondiente e inyecta el resultado.
+     * @param {String} motor_busca - La clave del motor (ej. 'motor_mensajes', 'motor_alergias')
+     * @param {Object} data_logica - Los datos de configuración de esa lógica para el elemento (ej. el objeto con 'nombre', 'content', etc.)
+     * @param {HTMLElement} areaContenido - El contenedor DOM donde se inyectará el resultado
+     */
+    #inyectar_render_motor(motor_busca, data_logica, areaContenido) {
+        // 1. Obtenemos la instancia del motor desde el Catálogo
+        const instancia_motor = Catalogo.get_motor(motor_busca);
+
+        // 2. Verificamos que exista y tenga un método render()
+        if(!instancia_motor || !instancia_motor.render) {
+            // Fallback por si el motor no ha sido instanciado con Catalogo.set_motor() previamente
+            areaContenido.innerHTML = `<span class="text-danger">Motor <strong>${motor_busca}</strong> no instanciado o sin método render().</span>`;
+            return;
+        }
+        // if (instancia_motor && typeof instancia_motor.render === 'function') {
+            
+        // Limpiamos el área antes de inyectar lo nuevo
+        areaContenido.innerHTML = '';         
+        // Llamamos al render pasándole los datos del catálogo que le corresponden a este elemento
+        const resultado = instancia_motor.render(data_logica);
+
+        // 3. Evaluamos qué tipo de dato ha devuelto el motor para insertarlo correctamente
+        if (typeof resultado === 'string') {
+            areaContenido.innerHTML = resultado;
+        } else if (resultado instanceof Node) {
+            areaContenido.appendChild(resultado);
+        } else {
+            console.warn(`El motor ${motor_busca} no ha devuelto ni un String ni un Nodo del DOM.`);
+        }
+
+        // } else {
+        //     // Fallback por si el motor no ha sido instanciado con Catalogo.set_motor() previamente
+        //     areaContenido.innerHTML = `<span class="text-danger">Motor <strong>${motor_busca}</strong> no instanciado o sin método render().</span>`;
+        // }
+    }
+
+
 }
+
+

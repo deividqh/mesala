@@ -1,3 +1,281 @@
+/**
+ * @file motores.js
+ * @description Motores de datos para la lógica del salón.
+ *
+ * Los motores NO construyen interfaz. La UI pertenece a Logica_Catalogo.
+ * Estas clases sólo guardan, leen, actualizan y eliminan datos.
+ */
+
+/**
+ * Motor de mensajes.
+ *
+ * Responsabilidad única:
+ * - Mantener el diccionario de mensajes por elemento del salón.
+ * - Respetar la estructura de datos histórica para no romper guardado/carga.
+ *
+ * Estructura de salida:
+ * {
+ * silla_3: { usuario: 'usu', fecha: '25/8/2025', hora: '21:27:41', mensaje: 'sin gluten' }
+ * }
+ */
+class Motor_M {
+    static FICHA_VACIA = Object.freeze({ fecha: '', hora: '', usuario: '', mensaje: '' });
+
+    constructor(opciones = {}) {
+        this.usuario_default = opciones.usuario_default || 'usu';
+        this.d_data = {};
+        this.id_elemento = '';
+        this.ids_reserva_actual = [];
+    }
+
+    _crear_ficha(mensaje = '', ficha_base = {}) {
+        const now = new Date();
+        return {
+            ...Motor_M.FICHA_VACIA,
+            ...ficha_base,
+            usuario: ficha_base.usuario || this.usuario_default,
+            fecha: ficha_base.fecha || now.toLocaleDateString(),
+            hora: ficha_base.hora || now.toLocaleTimeString(),
+            mensaje: typeof mensaje === 'string' ? mensaje : ''
+        };
+    }
+
+    _normalizar_ficha(valor = '') {
+        if (typeof valor === 'string') return this._crear_ficha(valor);
+        if (!valor || typeof valor !== 'object') return this._crear_ficha('');
+        return this._crear_ficha(valor.mensaje || '', valor);
+    }
+
+    set_contexto(id_elemento = '', ids_reserva = []) {
+        this.id_elemento = id_elemento || '';
+        const ids = Array.isArray(ids_reserva) ? ids_reserva.filter(Boolean) : [];
+        if (this.id_elemento && !ids.includes(this.id_elemento)) ids.push(this.id_elemento);
+        this.ids_reserva_actual = Array.from(new Set(ids));
+        return this.ids_reserva_actual;
+    }
+
+    get(id_elemento = '') {
+        if (!id_elemento) return null;
+        return this.d_data[id_elemento] || null;
+    }
+
+    get_mensaje(id_elemento = '') {
+        return this.get(id_elemento)?.mensaje || '';
+    }
+
+    get_all() {
+        return this.d_data;
+    }
+
+    set(id_elemento = '', mensaje = '', ficha_base = {}) {
+        if (!id_elemento) return false;
+
+        const texto = typeof mensaje === 'string' ? mensaje : '';
+        if (!texto.trim()) {
+            this.delete(id_elemento);
+            return true;
+        }
+
+        this.d_data[id_elemento] = this._crear_ficha(texto, ficha_base);
+        return true;
+    }
+
+    set_ficha(id_elemento = '', ficha = {}) {
+        if (!id_elemento) return false;
+        this.d_data[id_elemento] = this._normalizar_ficha(ficha);
+        if (!this.d_data[id_elemento].mensaje.trim()) this.delete(id_elemento);
+        return true;
+    }
+
+    set_many(diccionario = {}) {
+        if (!diccionario || typeof diccionario !== 'object') return false;
+        Object.entries(diccionario).forEach(([id, valor]) => {
+            if (typeof valor === 'string') this.set(id, valor);
+            else this.set_ficha(id, valor);
+        });
+        return true;
+    }
+
+    delete(id_elemento = '') {
+        if (!id_elemento) return false;
+        delete this.d_data[id_elemento];
+        return true;
+    }
+
+    has(id_elemento = '') {
+        return this.get_mensaje(id_elemento).trim() !== '';
+    }
+
+    reset() {
+        this.d_data = {};
+        this.id_elemento = '';
+        this.ids_reserva_actual = [];
+    }
+
+    // Compatibilidad temporal con código antiguo mientras Logica_Catalogo absorbe la UI.
+    api_mostrar(id_elemento = '', ids_reserva = []) {
+        return this.set_contexto(id_elemento, ids_reserva);
+    }
+
+	api_mensajes(){
+		return this.get_all();
+	}
+
+    accion_borrar(id_elemento = null) {
+        return this.delete(id_elemento || this.id_elemento);
+    }
+
+    update(id_elemento = '', valor_mensaje = null) {
+        if (!id_elemento) return false;
+        if (valor_mensaje === null) {
+            if (!this.d_data[id_elemento]) {
+                this.d_data[id_elemento] = { ...Motor_M.FICHA_VACIA };
+            }
+            return true;
+        }
+        return this.set(id_elemento, valor_mensaje);
+    }
+
+    read_popover() {
+        return Object.entries(this.d_data)
+            .map(([key, value]) => `📍${key}: ${JSON.stringify(value)}`)
+            .join('\n');
+    }
+
+    reset_all_data() {
+        this.reset();
+    }
+
+	render(data_logica){
+		// console.log('render motor: ', data_logica);
+		data_logica.nombre;			// Nombre pestaña
+		data_logica.content;		// en Mensajes es single o sumatorio. Logica del renderizado.
+		data_logica.css;			// clase css que se aplica. tiene que estar en .css
+
+		// Tengo que devolver un objeto Node
+		return JSON.stringify(data_logica, null, 2);
+	}
+
+    get datos() {
+        return this.d_data;
+    }
+
+    get d_mensajes() {
+        return this.d_data;
+    }
+}
+
+/**
+ * Motor de alergias.
+ *
+ * Responsabilidad única:
+ * - Mantener el diccionario de alergias seleccionadas por elemento.
+ * - Usar Catalogo.get_alergenos() como fuente de verdad de alérgenos disponibles.
+ *
+ * Estructura de salida:
+ * {
+ * silla_0: ['soja', 'lacteos']
+ * }
+ */
+class Motor_A {
+    constructor() {
+        this.d_data = {};
+    }
+
+    get_alergenos(key_alergeno = '') {
+        const alergenos = Catalogo.get_alergenos();
+        if (typeof key_alergeno === 'string' && key_alergeno.trim()) {
+            return alergenos[key_alergeno] || null;
+        }
+        return alergenos;
+    }
+
+    _normalizar(alergias = []) {
+        const alergenos_validos = this.get_alergenos();
+        const seleccion = Array.isArray(alergias) ? alergias : [];
+        return Array.from(new Set(
+            seleccion.filter((alergia) => typeof alergia === 'string' && alergenos_validos[alergia])
+        ));
+    }
+
+    get(id_elemento = '') {
+        if (!id_elemento) return [];
+        return this.d_data[id_elemento] || [];
+    }
+
+    get_all() {
+        return this.d_data;
+    }
+
+    set(id_elemento = '', alergias = []) {
+        if (!id_elemento) return false;
+
+        const seleccion = this._normalizar(alergias);
+        if (!seleccion.length) {
+            this.delete(id_elemento);
+            return true;
+        }
+
+        this.d_data[id_elemento] = seleccion;
+        return true;
+    }
+
+    set_many(diccionario = {}) {
+        if (!diccionario || typeof diccionario !== 'object') return false;
+        Object.entries(diccionario).forEach(([id, alergias]) => this.set(id, alergias));
+        return true;
+    }
+
+    toggle(id_elemento = '', alergeno = '') {
+        if (!id_elemento || !this.get_alergenos(alergeno)) return false;
+
+        const seleccion = new Set(this.get(id_elemento));
+        if (seleccion.has(alergeno)) seleccion.delete(alergeno);
+        else seleccion.add(alergeno);
+
+        return this.set(id_elemento, Array.from(seleccion));
+    }
+
+    delete(id_elemento = '') {
+        if (!id_elemento) return false;
+        delete this.d_data[id_elemento];
+        return true;
+    }
+
+    has(id_elemento = '') {
+        return this.get(id_elemento).length > 0;
+    }
+
+    reset() {
+        this.d_data = {};
+    }
+
+    // Compatibilidad temporal con llamadas antiguas.
+    api_alergias() {
+        return this.get_all();
+    }
+
+    update(id_elemento = '', alergias = []) {
+        return this.set(id_elemento, alergias);
+    }
+
+    _reset_alergias() {
+        this.reset();
+    }
+
+	render(data_logica){
+		// console.log('render alergia:', data_logica);
+		
+		data_logica.nombre;			// Nombre pestaña(No en render)
+		data_logica.content;		// Es el diccionario de alergias para el rol.
+		data_logica.css;			// clase css que se aplica. 
+
+		// Tengo que devolver un objeto Node
+		return JSON.stringify(data_logica, null, 2);
+
+	}
+}
+
 // Métodos importantes:
 // 		show(), hide(), toggle() , update(), dispose()
 class Motor_Mensajes {
@@ -20,7 +298,7 @@ class Motor_Mensajes {
 	 * 'silla_4': {usuario: 'usu', fecha: '25/8/2025', hora: '21:43:02', mensaje: 'gluten'},
 	 * 'silla_7': {usuario: 'usu', fecha: '25/8/2025', hora: '21:47:22', mensaje: 'marisco'}, }
 	 *  ```	 */
-	diccionario_datos = {};		
+	d_data = {};		
 
 	/** ## control del popOver. Se usa para saber si es el primer click sobre una MESA. */
 	b_primera_vez = false; 		
@@ -135,7 +413,7 @@ class Motor_Mensajes {
 		// ┌■ 🧠 Inicializamos el resto de las variables de la aplicación.
 		this.id_elemento = null;
 		this.el = null;
-		this.diccionario_datos = {};
+		this.d_data = {};
 
 		// ┌■ Inicializar reconocimiento de voz
 		this._initSpeechRecognition();
@@ -425,7 +703,7 @@ class Motor_Mensajes {
 	
 	/** ### • Devuelve los ids afectados por el cambio de alergias, 
 	 * ### dependiendo del tipo de popover (single o multiple) y la reserva actual.
-	 * ### • llamado desde {@link _abrir_alergias_desde_popover}*/
+	 * */
 	_get_ids_afectados_alergias(id_elemento = '') {
 		if (!id_elemento) return [];
 		if (this.is_single) return [id_elemento];
@@ -526,7 +804,7 @@ class Motor_Mensajes {
 		$sumatorio.textContent = '';	// RESET contenedor
 
 		for (const id_mesa of arr_mesas_reserva) {
-			const fila = this.diccionario_datos[id_mesa] || { mensaje: '' };
+			const fila = this.d_data[id_mesa] || { mensaje: '' };
 			const msg  = fila.mensaje || '';
 
 			// ■■■ Cada-Fila ► id_mesa | mensaje ■ un div contenedor(row) y columnna izquierda y columna derecha.
@@ -569,7 +847,7 @@ class Motor_Mensajes {
 	_set_caja_texto( $caja_texto, id_elemento_dom){		
 		// ■■ TEXTAREA - MENSAJE
 		if ($caja_texto) {
-			$caja_texto.value = this.diccionario_datos[id_elemento_dom]?.mensaje || "";
+			$caja_texto.value = this.d_data[id_elemento_dom]?.mensaje || "";
 		}
 	}	
 	
@@ -578,27 +856,27 @@ class Motor_Mensajes {
 	// ■■■■■■■■ CRUD ■■■■■■■■
 	// ■■■■■■■■■■■■■■■■■■■■■■
 	/**
-	 * ###	Muestra por consola el diccionario_datos.
+	 * ###	Muestra por consola el d_data.
 	 */
 	read_popover() {
 		let retorno = '';			
 		// Validacion
-		if(Object.keys(this.diccionario_datos).length <=0) return;
+		if(Object.keys(this.d_data).length <=0) return;
 		// Cabecera
 		console.log('📋 CONTENIDO DEL DICCIONARIO POPOVER:');
 		console.log('═'.repeat(50));		
 		// Contenido
-		const key_value = Object.entries(this.diccionario_datos);
+		const key_value = Object.entries(this.d_data);
 		key_value.forEach(([key, value]) => {
 			console.log(`📍${key}]:`, value);
 			retorno += `📍${key}]: ${JSON.stringify(value)}\n`;
 		});		
-		console.log(`Total mensajes: ${Object.keys(this.diccionario_datos).length}`);
+		console.log(`Total mensajes: ${Object.keys(this.d_data).length}`);
 		return retorno; 
 	}
 
 	/**
-	 * ###	 Guardar MENSAJE en diccionario_datos 
+	 * ###	 Guardar MENSAJE en d_data 
 	 * @param {}
 	 */
 	accion_save() {
@@ -611,7 +889,7 @@ class Motor_Mensajes {
 			this.bs_popover.hide();
 			return;
 		}
-		// ■■■■■■■■■■■■■■■■■■■■■■■■ diccionario que se asigna a a diccionario_datos
+		// ■■■■■■■■■■■■■■■■■■■■■■■■ diccionario que se asigna a a d_data
 		const now   = new Date();
 		const new_ficha = { ...Motor_Mensajes._FICHA_VACIA };
 
@@ -621,19 +899,19 @@ class Motor_Mensajes {
 		new_ficha.mensaje = mensaje_to_save;		
 		// ████████████████████████
 		// ► Estructura
-		this.diccionario_datos[this.id_elemento] = new_ficha;
+		this.d_data[this.id_elemento] = new_ficha;
 
 		// ✅ Indicador visual por mensaje/alergias
 		this._actualizar_markador_elemento(this.id_elemento);
 
 		console.log(`💾 Guardado en ${this.index_reserva != null ? `reserva[${this.index_reserva}]` :  ''} ${this.id_elemento}:`, 
 						this.index_reserva != null 
-						? this.diccionario_datos[this.index_reserva][this.id_elemento] 
-						: this.diccionario_datos[this.id_elemento]);
+						? this.d_data[this.index_reserva][this.id_elemento] 
+						: this.d_data[this.id_elemento]);
 	}
 
 	/**
-	 * ## Borra la clave con 'Silla_X' en el diccionario_datos
+	 * ## Borra la clave con 'Silla_X' en el d_data
 	 * @param {String|null} key_dicc_msgs 
 	 * 	### ► null: Si es null, borra this.id_elemento  
 	 * 	### ► SI es string ('Silla_X'), borra la clave con 'Silla_X' en el dicc
@@ -642,8 +920,8 @@ class Motor_Mensajes {
 		if (!key_dicc_msgs) 
 			key_dicc_msgs = this.id_elemento;
 		try {
-			if (this.diccionario_datos[key_dicc_msgs]) {
-				delete this.diccionario_datos[key_dicc_msgs];
+			if (this.d_data[key_dicc_msgs]) {
+				delete this.d_data[key_dicc_msgs];
 				console.log(`🗑 Mensaje eliminado para ${key_dicc_msgs}`);
 
 				// ✅ Recalcula indicador visual por mensaje/alergias
@@ -701,10 +979,10 @@ class Motor_Mensajes {
 		try {
 			// Si no existe la clave, LA CREA.
 
-			if (!this.diccionario_datos[id_elemento]) this.diccionario_datos[id_elemento] = { ...Motor_Mensajes._FICHA_VACIA };
+			if (!this.d_data[id_elemento]) this.d_data[id_elemento] = { ...Motor_Mensajes._FICHA_VACIA };
 
 			// Actualizo el mensaje si no es null
-			if (valor_mensaje !== null) this.diccionario_datos[id_elemento].mensaje = valor_mensaje;
+			if (valor_mensaje !== null) this.d_data[id_elemento].mensaje = valor_mensaje;
 			
 			// Pongo o quito la marca visual según mensaje/alergias
 			this._actualizar_markador_elemento(id_elemento);
@@ -787,14 +1065,14 @@ class Motor_Mensajes {
 	 *		}
 	 * ```
 	 */
-	get diccionario_datos(){
-		return this.diccionario_datos || {};
+	get d_data(){
+		return this.d_data || {};
 	}	
 	get datos(){
-		return this.diccionario_datos || {};
+		return this.d_data || {};
 	}
 	get d_mensajes(){
-		return this.diccionario_datos || {};
+		return this.d_data || {};
 	}
 	get is_single(){
 		if (typeof(this.is_single) != 'boolean') 
@@ -807,7 +1085,7 @@ class Motor_Mensajes {
 	}
 
 	_tiene_mensaje(id_elemento_dom = '') {
-		const mensaje = this.diccionario_datos[id_elemento_dom]?.mensaje || '';
+		const mensaje = this.d_data[id_elemento_dom]?.mensaje || '';
 		return typeof mensaje === 'string' && mensaje.trim() !== '';
 	}
 
@@ -892,7 +1170,7 @@ class Motor_Mensajes {
 	 * ### Resetea el diccionario de datos del popover.
 	 * {@link Configuracion_Salon. limpiar_Salon}  */
 	reset_all_data(){
-		this.diccionario_datos = {};
+		this.d_data = {};
 	}	
 	
 	/**

@@ -2386,10 +2386,11 @@ class e_Salon extends Tablero_Touch {
 	LogIn = null;	
 	/** ### Clase que Hace el CRUD sobre la Base de Datos. */
 	crud = null; 
-	/** ### Clase Se encarga de gestionar los mensajes de las sillas */
-	MSG_S=null;
-	/** ### Clase Se encarga de gestionar los mensajes de las mesas-reservas */
+	/** ### Alergias */
+	MSG_A=null;
+	/** ### Mensajes */
 	MSG_M=null;
+	
 	/** ### Diccionario principal de configuración. Se valida en el constructor de e-Salon. Contiene los datos de la app. */
 	dicc_config = null;	
 	/** ### Array de diccionarios de reservas. LOGICA DEL NEGOCIO DE SALON ► reservas = [ {'mesas':[], 'sillas':[]} , {...} ] */
@@ -2550,10 +2551,14 @@ class e_Salon extends Tablero_Touch {
 		this.LOGIC = new Logica_Catalogo(this.dicc_config.catalogo);
 		
 		// Asocia el Catalogo a la Logica ... y viceversa.
-		const motor_mensajes = new Motor_Mensajes();
-		const motor_alergias = new Motor_Alergias();
+		const motor_mensajes = new Motor_M();
+		const motor_alergias = new Motor_A();		
 		Catalogo.set_motor('motor_mensajes', motor_mensajes);
 		Catalogo.set_motor('motor_alergias', motor_alergias);
+		// ┌■ a partir de este momento Recupero los motores a través del Catalogo.
+		// const MA = Catalogo.get_motor('motor_alergias');
+		this.MSG_M = motor_mensajes;
+		this.MSG_A = motor_alergias;
 		
 		// ┌••• LOGIN Y REGISTRO: 
         // this.LogIn = new Login_Modal('[data-action-nav="conn"]');
@@ -2591,27 +2596,9 @@ class e_Salon extends Tablero_Touch {
 			console.log('✅ ACCIONES BOTON NAV • • • • • Loaded ✔️');
 		}		
 		
-		// 💥💥💥💥💥💥💥💥
-		// ┌••• BOOTSTRAP PopOver para MENSAJES DE SILLAS(single=true).
-		this.MSG_S = new Motor_Mensajes( 'pastel', true, true);
-		if (this.MSG_S) 
-			console.log('✅ MOTOR MENSAJES DE SILLAS MSG_S • • • • • Loaded ✔️');
-		else 
-			console.log('❌ ERROR MOTOR MENSAJES DE SILLAS  :(');
-		
-		// 💥💥💥💥💥💥💥💥
-		// ┌••• BOOTSTRAP PopOver para MENSAJES DE MESAS(single=false)[Reservas]
-		this.MSG_M = new Motor_Mensajes('moderno'  , false, false);			
-		if (this.MSG_M) 
-			console.log('✅ MOTOR MENSAJES DE RESERVAS MSG_M  • • • Loaded ✔️');
-		else 
-			console.log('❌ ERROR MOTOR MENSAJES DE RESERVAS  :(');
-		
-		// 💥💥💥💥💥💥💥💥
 		// ┌•• ​👂​👂 'desactivar__modo_reserva'
 		this.contenedor_div_x_div.addEventListener("dblclick", this._desactivar_modo_reserva.bind(this));
-		
-		// 💥💥💥💥💥💥💥💥
+
 		// ┌•• Inicia el MODO RESERVA a false.
 		this.is_mode_reserva = false;	
 
@@ -2628,15 +2615,18 @@ class e_Salon extends Tablero_Touch {
 		// 💥💥💥💥💥💥💥💥
 		const d_indices_mock = {silla_0: 8, mesa_0: 9, silla_1: 12, mesa_1: 13, silla_2: 14 };
 		const d_mensajs_mock = {silla_0: "Nadie", mesa_0: 'Sabe', silla_2: 'Nada' };
-		const d_alergias_mock = {silla_0: ['soja', 'lacteos'], silla_1: ['cereal'], };
+		const d_alergias_mock = {silla_0: ['soja', 'lacteos'], silla_1: ['huevos'], };
 		this._load_elementos_en_Salon(d_indices_mock);
 		this.RegisteR();
+
+		const MA = Catalogo.get_motor('motor_alergias');
 		// this.CFG.api_re_posicionar();				
-		// this._load_alergias_en_Salon(d_alergias_mock);		
-		// console.log(JSON.stringify(this.MSG_S.d_alergias, null, 2)); 
+		this._load_alergias_en_Salon(d_alergias_mock);		
+		console.log(JSON.stringify(MA.d_data, null, 2)); 
 		
-		// this._load_mensajes_en_Salon(d_mensajs_mock);
-		// console.log(JSON.stringify(this.MSG_S.d_mensajes, null, 2)); 
+		const MM = Catalogo.get_motor('motor_mensajes');
+		this._load_mensajes_en_Salon(d_mensajs_mock);
+		console.log(JSON.stringify(MM.d_data, null, 2)); 
 		
 
 	}
@@ -2665,7 +2655,6 @@ class e_Salon extends Tablero_Touch {
 		return [entorno, dimension, limites];
 	}
 
-	// █████████████████████████████████████████████████████████████████████████████████████████████
 	/**  ✒️✒️
 	 * #### SOBRE-ESCRIBE EL MÉTODO DE TABLERO_DROP Y AÑADE LAS RESERVAS
 	 * @param {*} ev   evento de soltar objeto en un salon.
@@ -2693,14 +2682,16 @@ class e_Salon extends Tablero_Touch {
 		this.RegisteR();	
 		
 		// ■■ Elimino el mensaje del popover de clientes
-		this.MSG_S.accion_borrar(this.objeto_drag.id);
-		this.MSG_M.accion_borrar(this.objeto_drag.id);
+		// this.motor_mensajes.accion_borrar(this.objeto_drag.id);
+		this.MSG_A.delete(this.objeto_drag.id);
+		this.MSG_M.delete(this.objeto_drag.id);
 
 		this.  _set_exit_toast_bs(this.objeto_drag.id);
-		
 	}
 
-
+	/** ### El 'click' sobre un elemento da paso a la Lógica sobre el Salon definida en Catálogo 
+	 * ### La Lógica es un offcanvas que tiene tantas pestañas como Motores(acciones) tiene el elemento en Catalogo.
+	*/
 	_elemento_onplay_click(ev) {
 		ev.preventDefault();
 		// ┌■ Datos sobre el elemento clickado.
@@ -2712,7 +2703,7 @@ class e_Salon extends Tablero_Touch {
 		
 		// ┌■ Calcula el indice de la reserva a la que pertenece el elemento clickado.
 		// ┌■ Lo necesito para los cambios en el rol(2º click y color)
-		const index_reserva = this._get_indice_en_reserva_s(id_el);
+		const index_reserva = this.#get_indice_en_reserva_s(id_el);
 		if (index_reserva == -1) return;
 		this.index_reserva = index_reserva;			
 
@@ -2724,7 +2715,7 @@ class e_Salon extends Tablero_Touch {
 			// ┌•• Cambio de reserva ...2 clicks 
 			if (index_reserva != this.last_reserva_clicked){
 				this.last_reserva_clicked = index_reserva;
-				return;
+				// return;
 			}
 			// ┌■■ 🌈 🪑 CAMBIO DEL COLOR DE LOS ELEMENTOS DE LA RESERVA. 
 			this._reset_color_reserva();					
@@ -2739,83 +2730,12 @@ class e_Salon extends Tablero_Touch {
 
 	}
 
-	_get_indice_en_reserva_s(id_elemento){	
+	#get_indice_en_reserva_s(id_elemento){	
 		// ■■ BUSCA EN EL ARRAY DE RESERVAS el indice del elemento
 		const index_reserva = this.reservas.findIndex(dicc => {
 			return Object.values(dicc).flat().includes(id_elemento);
 		});		
 		return index_reserva;
-	}
-	
-	/**
-	 * ####  Maneja el evento click en una silla. */
-	silla_click_handler(ev) {
-		ev.preventDefault();
-		
-		//•••••••••••••••••••••••••••••••••••••••••••••••••••••
-		this._elemento_onplay_click(ev);
-
-		const id = ev.currentTarget.id;               
-		
-		// ■■ BUSCA EN EL ARRAY DE RESERVAS el indice de la silla
-		const index_reserva = this.reservas.findIndex(dicc => { return dicc.clientes.includes(id); });
-		if (index_reserva == -1) return;        	
-		
-		// ► para accion__save()
-		this.index_reserva = index_reserva;   
-
-		// const arr_mesas_reserva_flat = Object.values(this.reservas[index_reserva].mesas).flat();		
-
-		// ■■ Muestro el popover, tenga o no tenga datos.
-		this.MSG_S.api_mostrar(id);
-
-		// ■■■■■■ LOG 🖥️
-		// console.log(`Elemento ${id} clickada. Tipo: ${tipo} className: ${document.getElementById(id).className} `);
-	}
-	
-	/**
-	 * #### Listener cuando se hace click sobre una mesa_onplay
-	 *  *  Quiero Seleccionar todos los objetos de una **reserva** y ponerlos de color distinto.
-	 *  *  Cuando se hace 2 veces click sobre una mesa, **muestra** un popOver bootstrap para escribir o hablar mensajes.
-	 * ```javascript
-	 * const mesas_onplay  = document.querySelectorAll(".mesa_onplay");
-	 * const sillas_onplay = document.querySelectorAll(".silla_onplay");
-	 * ``` 	*/
-	mesa_click_handler(ev) {
-		
-		ev.preventDefault();
-		this._reset_color_reserva();		
-
-		this._elemento_onplay_click(ev);
-
-		// ■■ Siempre hace click el elemento con el listener(div contenedor), no la imagen 
-		const id_reserver = ev.currentTarget.id;                    
-		
-		// ■■ Busca en el array de diccionario de reserva el indice de la reserva que contiene la mesa clickada.
-		const index_reserva = this.reservas.findIndex(dicc => {	return dicc.reservers.includes(id_reserver); });
-		if (index_reserva == -1) return;       	
-
-		this.index_reserva = index_reserva; 	
-
-		// ┌•• Cambio de reserva ...Lo Reinicio en this.desactivar__modo_reserva()
-		if (index_reserva != this.last_reserva_clicked){
-			// console.log(`cambio de reserva de ${this.last_reserva_clicked} a ${index_reserva}`)
-			this.last_reserva_clicked = index_reserva;
-			return;
-		}
-		// ■■ 🌈 🪑 CAMBIO DEL COLOR DE LOS ELEMENTOS DE LA RESERVA. 
-		this._set_color_reserva(this.index_reserva);
-
-		// ■■ APLANA las mesas de la reserva de cuya mesa está nuestra reserva.
-		// const dicc_reserva_flat = Object.values(this.reservas[index_reserva]).flat();	
-		const d_reserva = this.reservas[index_reserva];		
-		const arr_mesas_reserva_flat = Object.values(d_reserva.reservers).flat();		
-		this.MSG_M.id = id_reserver;    // mesa actual (clave para guardar)
-		// ■■ Si is_single=true, no se pinta el sumatorio.
-		this.MSG_M.api_mostrar(id_reserver ,  arr_mesas_reserva_flat);
-
-		// ■■ SE ACTIVA EL MODO RESERVA CUAANDO SE HACE CLICK SOBRE UNA MESA.
-		this.is_mode_reserva = true;
 	}
 	
 	/** ✒️✒️
@@ -2843,13 +2763,9 @@ class e_Salon extends Tablero_Touch {
 			return new_onplay;
 		}
 	}
-	
-	
 
-	
-
-	// ◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘ RESERVAS • • • array_rsv_mesas
-	// ██████████████████████████████████████████████████████████████████████████████████ 
+	// ◘◘◘◘ RESERVAS • • • LOGICA BASE DEL SALON
+	// ██████████████████████████████████████████
 
 	/** 
 	 * #### GENERA las RESERVAS del Salón...
@@ -2895,7 +2811,6 @@ class e_Salon extends Tablero_Touch {
 	}
 
 	/** 
-	 * ###  Obtiene un array de dicc DATA (id_contenido, objeto myDiv , indice_baldosa) de los contenidos que empiezan con un prefijo específico en el id.
 	 * ####	Lo uso para tener información de un tipo de objeto('mesa') sobre el Salón. POR ID.
 	 * ```javascript  
 	 * const lista_mesas = this.crear_fichas_onplay('reserver');
@@ -2952,32 +2867,7 @@ class e_Salon extends Tablero_Touch {
 		return rol || null;
 	}
 
-	/** 🚫 
-	 * ### ■■■■ RESERVAS ► Obtiene el array de dicc (mesas:[], sillas:[]) de objetos myDivs de las reservas en base a reservas.
-	 * @example ► Log de reservas con objetos.
-	 *      const arraydicc_mydivs_reservas  = _get_arraydicc_mydivs_reservas();
-			arraydicc_mydivs_reservas.forEach(dicc_mydivs => {
-				const arr_indice_mesas  = dicc_mydivs.mesas.map(m => this.__get_indice_baldosa_byId(m.elemento_div.id)).join(', ');
-				const arr_indice_sillas = dicc_mydivs.sillas.map(s => this.__get_indice_baldosa_byId(s.elemento_div.id)).join(', ');
-				console.log(` indices: Mesas:  ${arr_indice_mesas} | Sillas: ${arr_indice_sillas}`);
-			});
-	*/ 
-	_get_arraydicc_mydivs_reservas() {
-		if ( !this.reservas || this.reservas.length <= 0 ) 
-			return false;
-
-		const array_myDiv_reservas = [];
-		this.reservas.forEach(d => {
-			const reservers_mydiv = d.reservers.map(m => this.get_myDiv_byContenido(m));
-			const clientes_mydiv = d.clientes.map(s => this.get_myDiv_byContenido(s));
-			array_myDiv_reservas.push({
-				reservers: reservers_mydiv,
-				clientes: clientes_mydiv
-			});
-			// console.log(`objetos Reserva • • • Mesas:  ${reservers_mydiv}    ··· Sillas:  ${clientes_mydiv}`);
-		});
-		return array_myDiv_reservas || [];
-	}
+	
 
 	
 	/**  
@@ -3039,9 +2929,7 @@ class e_Salon extends Tablero_Touch {
 
 	}
 
-	/** ■■■■■■■■■■■■■■■■■ MESAS
-	 * ###     Obtiene un array de array de mesas que represetan reservas, a partir de una lista Total de mesas del Salon.
-	 *                  Llamada desde modulo__reservas, función motor que gestiona las reservas.
+	/** 
 	 * @param {Array}  lista_mapdata, array flat de ids de todas las Mesas del Salon.
 	 * @returns {Array} array de array de reservas de mesas ► [ ['Mesa_1'] , ['Mesa_2'] , ['Mesa_0', 'Mesa_3'] ]
 	*/ 
@@ -3064,9 +2952,6 @@ class e_Salon extends Tablero_Touch {
 				matriz_reservas.push(array_reserva);
 			}
 		});
-		// console.log('Numero de Reservas de mesa encontradas:', matriz_reservas.length);
-		// console.log('Num Elementos + Reservas:', ...matriz_reservas);
-		// console.log('');
 		return matriz_reservas;
 	}
 
@@ -3103,7 +2988,6 @@ class e_Salon extends Tablero_Touch {
 		}
 		// Convertimos el conjunto a un array y lo retornamos
 		return Array.from(set_retorno);
-		// return [...set_retorno];
 	}
 
 
@@ -3158,7 +3042,7 @@ class e_Salon extends Tablero_Touch {
 			arraydicc_rsrvs.push(dicc_reservas);
 		});
 			
-		// ■■■■■■■■■■■■ Sillas Ronin
+		// ■ Sillas Ronin
 		const clientes_sin_reserva = this.#get_clientes_sin_reserva(clientes_visited);	
 		if (clientes_sin_reserva && clientes_sin_reserva.length > 0) {
 			arraydicc_rsrvs.push(...clientes_sin_reserva);
@@ -3175,7 +3059,7 @@ class e_Salon extends Tablero_Touch {
 	 */
 	#get_clientes_sin_reserva(clientes_visited=null){
 		let clientes_ronin = [];
-		// ■■■■■■■■■■■■ Sillas Ronin
+		// ■ Sillas Ronin
 		const clientes = this._get_ids_onplay('cliente');
 		const clientes_sin_reserva = clientes.filter(id_cliente => !clientes_visited?.has(id_cliente));
 
@@ -3227,7 +3111,7 @@ class e_Salon extends Tablero_Touch {
 			}
 		});
 	}
-	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	// ■■
 	/** ## 🌈 🪑 CAMBIO DEL COLOR DE LOS ELEMENTOS DE LA RESERVA.  */
 	_set_color_reserva(index_reserva){
 
@@ -3267,10 +3151,12 @@ class e_Salon extends Tablero_Touch {
 		}
 
 	}
+	// ◘◘◘◘ FIN RESERVAS • • • LOGICA BASE DEL SALON
+	// ██████████████████████████████████████████████
 	
-
-	// ◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘ ACCIONES SOBRE LOS ICONOS DEL NAV-BAR (MENU SUPERIOR)
-
+	
+	// ◘◘◘◘ ACCIONES SOBRE LOS ICONOS DEL NAV-BAR (MENU SUPERIOR)
+	// ███████████████████████████████████████████████████████████
 	/**
 	 * ### Reinicia el Salon. Da Opción Previa de Guardar.
 	 */
@@ -3323,13 +3209,11 @@ class e_Salon extends Tablero_Touch {
 	accion_re_posicionar(){
 		this.CFG.api_re_posicionar();
 	}
+
+	// ◘◘◘◘ API'S O LLAMADAS DIRECTAS 
+	// ███████████████████████████████
 		
 	/**
-	 * ### crea un ARRAY DE dicc con toda la info SOBRE las reservas.
-	 *              Junta:
-	 *                • this.reservas  (estructura de reservas: ids de mesas/sillas por reserva)
-	 *                • this.MSG_M.diccionario_datos  (mensajes por mesa — clave = id_mesa_*)
-	 *                • this.MSG_S.diccionario_datos  (mensajes por silla — clave = id_silla_*)
 	 * @returns {Array} 
 	 * ```javascript
 	 * [{mesas:{"mesa_22":{usuario:'usu', fecha:"3/11/2025",hora:"23:51:31",mensaje:""},
@@ -3346,8 +3230,8 @@ class e_Salon extends Tablero_Touch {
 		try {			
 			// Orígenes seguros
 			const reservas = Array.isArray(this.reservas) ? this.reservas : [];
-			const msg_sillas   = this.MSG_S?.diccionario_datos  ?? {};
-			const msg_mesas  = this.MSG_M?.diccionario_datos  ?? {};
+			const msg_sillas   = this.MSG_A?.d_data  ?? {};
+			const msg_mesas  = this.MSG_M?.d_data  ?? {};
 	
 			// Normalizador
 			const ficha = (d = {}) => ({
@@ -3411,7 +3295,7 @@ class e_Salon extends Tablero_Touch {
 	 * @see {@link Configuracion_Salon.api_ver_informacion_Salon}
 	 * ### Diccionario de mensajes de cada mesa y silla onplay del salon.
 	 * ```javascript
-	 *	dicc_popo_mesas = {
+	 *	d_mensajes = {
 	 *  	mesa_22: {usuario: "usu",fecha: "4/11/2025",hora: "10:35:37",mensaje: "",  },
 	 *   	mesa_6: {usuario: "usu", fecha: "4/11/2025", hora: "10:35:41", mensaje: "niños",  }
 	 * 	}
@@ -3427,18 +3311,25 @@ class e_Salon extends Tablero_Touch {
 	 * ```
 	 */
 	api_mensajes(){
-		const dicc_popo_mesas  = this.MSG_M.diccionario_datos;
-		const dicc_popo_sillas = this.MSG_S.diccionario_datos;
-		const dicc_popo = { ...dicc_popo_mesas, ...dicc_popo_sillas }; 
+		const d_mensajes  = this.MSG_M.d_data;
+		// const dicc_popo_sillas = this.MSG_A.d_data;
+		// const dicc_popo = { ...d_mensajes, ...dicc_popo_sillas }; 
 		const resultado = {};
-		for (const id in dicc_popo) {
-			const mensaje = dicc_popo[id]?.mensaje;
+		for (const id in d_mensajes) {
+			const mensaje = d_mensajes[id]?.mensaje;
 			if (mensaje) {
 				resultado[id] = mensaje;
 			}
 		}
   		return resultado;
 	}
+	
+	api_alergias(){
+		const d_alergias  = this.MSG_A.d_data;
+  		return d_alergias;
+	}
+
+
 
 	/** 🚫
 	 * ### Genera una \"foto\" del salón fusionando reservas con posiciones y la configuración limpia.
@@ -3538,7 +3429,7 @@ class e_Salon extends Tablero_Touch {
 
 		const dicc_api_indices   = this.api_indices() || {};
 		const dicc_api_mensajes  = this.api_mensajes() || {};
-		const dicc_api_alergias  = this.MSG_S.api_alergias() || {};
+		const dicc_api_alergias  = this.MSG_A?.api_alergias() || {};
 
 		// ■■■■■■ RETORNO FINAL
 		return {
@@ -3634,21 +3525,19 @@ class e_Salon extends Tablero_Touch {
 	_load_mensajes_en_Salon(dicc_api_mensajes){
 		if (!dicc_api_mensajes || Object.keys(dicc_api_mensajes).length === 0) return;
         const id_keys = Catalogo.get_keys();
+		const MM = Catalogo.get_motor('motor_mensajes');
 
-		// 2. Iteramos directamente sobre los mensajes recibidos
         Object.entries(dicc_api_mensajes).forEach(([id, mensaje]) => {
-            // Buscamos la clave base en el catálogo para este ID
-            const key_elemento = id_keys.find(k => id.startsWith(k));
-            const item_catalogo = key_elemento ? Catalogo.get(key_elemento) : null;
-            // Validamos que exista en el catálogo y que tenga el motor de mensajes activo
+            const id_key = id_keys.find(k => id.startsWith(k));
+            const item_catalogo = id_key ? Catalogo.get(id_key) : null;
+
+			// Validamos que exista en el catálogo y que tenga el motor de mensajes activo
             if (!item_catalogo || !item_catalogo.logica || !item_catalogo.logica.motor_mensajes) {
                 return; // Ignoramos si no tiene el motor encendido
             }
-            // Obtenemos el elemento utilizando el método estático
             const elemento = e_Salon._to_element(id);
-            // Si el elemento está en el DOM, actualizamos su mensaje usando el gestor unificado
             if (elemento) {
-                this.MSG_S.update_mensaje(id, mensaje);
+                MM.update(id, mensaje);
             }
         });
 	}
@@ -3659,26 +3548,22 @@ class e_Salon extends Tablero_Touch {
 	 */
 	_load_alergias_en_Salon(dicc_api_alergias){
 		if (!dicc_api_alergias || Object.keys(dicc_api_alergias).length === 0) return;
-
-        // ■ Obtenemos las claves del catálogo una sola vez por rendimiento
         const id_keys = Catalogo.get_keys();
+		const MA = Catalogo.get_motor('motor_alergias');
 
         // ■ Iteramos directamente sobre las alergias recibidas (o del mock)
         Object.entries(dicc_api_alergias).forEach(([id, alergia_s]) => {
-            
             // ■ Buscamos la clave base en el catálogo para este ID
-            const key_elemento = id_keys.find(k => id.startsWith(k));
-            const item_catalogo = key_elemento ? Catalogo.get(key_elemento) : null;
+            const id_key = id_keys.find(k => id.startsWith(k));
+            const item_catalogo = id_key ? Catalogo.get(id_key) : null;
 
             // ■ Validamos si el elemento existe en el catálogo y tiene activo el motor de alergias
             if (!item_catalogo || !item_catalogo.logica || !item_catalogo.logica.motor_alergias ) {
-                return; // Si no tiene el motor activo, ignoramos este elemento
+                return; 	// Si no tiene el motor activo, ignoramos este elemento
             }
             const elemento = e_Salon._to_element(id);
-            if (!elemento) return;
-			
-            // CAMBIAR O ELIMINAR.
-			this.MSG_S.update_alergia(id, alergia_s);
+            if (!elemento) return;	// Si el elemento No Existe en el Salon(tiene que estar pre-cargado).
+			MA.update(id, alergia_s);
         });
 	}
 	
@@ -3703,6 +3588,9 @@ class e_Salon extends Tablero_Touch {
 			}
 		});
 	}
+
+	// ◘◘◘◘ METODOS AXILIARES HELPER's
+	// ████████████████████████████████
 
 	/**	​👂​​👂​  -   ✒️✒️
 	 * ### Sobre-Escribe ✏️ el método de Tablero_Drop.
@@ -3836,7 +3724,8 @@ class e_Salon extends Tablero_Touch {
 	}
 
 	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-	/** ### Entra un id de mesa o silla pej: 'mesa_2' desde un rango y devuelve el elemento del menu equivalente (div mesa menu) 
+	/** 
+	 * ### Entra un id de mesa o silla pej: 'mesa_2' desde un rango y devuelve el elemento del menu equivalente (div mesa menu) 
 	 * @param {String|object} el, puede ser id(string) u objeto ya que uso _to_element para unificar.
 	 * ```javascript
 	 * const $el_menu = this._what_player_menu('silla_0')
@@ -4078,7 +3967,7 @@ class Configuracion_Salon {
 			}		
 
 			// ■■■■■■■■■■■■■■■ ALERGIAS
-			const dicc_alergias = this.Salon.MSG_S.api_alergias() || {};
+			const dicc_alergias = this.Salon.MSG_A.api_alergias() || {};
 			if (!Object.keys(dicc_alergias).length) {
 				msgs.alergias = '<b>■ No hay Alergias.</b>\n';
 			} else {
@@ -4972,9 +4861,8 @@ class Configuracion_Salon {
 		// console.log("🧹 🧹 Limpiando mesas, sillas y decoración...");
 		this.Salon.clean_elementos_Salon('todo');	// reset elementos.
 		this.Salon.reservas = [];					// reset reservas.
-		this.Salon.MSG_S?.reset_all_data();		// reset mensajes de sillas.
-		this.Salon.MSG_M?.reset_all_data();		// reset mensajes de mesas.
-		this.Salon.MSG_S._reset_alergias();		// reset diccionario de alergias(solo sillas-clientes).
+		this.Salon.MSG_M?.reset();		// reset mensajes de mesas.
+		this.Salon.MSG_A?.reset();		// reset diccionario de alergias(solo sillas-clientes).
 		console.log("┌■■ Salon Limpio 🚿. Preparado para Cargar Foto . . . ✔️");		
 	}
 	
@@ -7021,8 +6909,8 @@ class Foto_CRUD{
 		
 		// ┌■ Cacha los Datos
 		const reservas = this.Salon?._get_array_reservas_flat?.() || [];
-		const mensajes = this.Salon?.api_mensajes?.() || {};
-		const alergias = this.Salon?.MSG_S.api_alergias() || {};
+		const mensajes = this.Salon?.MSG_M.api_mensajes?.() || {};
+		const alergias = this.Salon?.MSG_A.api_alergias() || {};
 		
 		// ┌■ Reservas
 		if ($reservas) {
