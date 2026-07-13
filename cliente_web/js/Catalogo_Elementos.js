@@ -293,7 +293,7 @@ class Logica_Catalogo  {
         $offcanvas_logica.dataset.logica = 'true'; 
         $offcanvas_logica.style.backgroundColor = 'var(--color-egg-white)'; 
         $offcanvas_logica.style.height = 'auto'; 
-        $offcanvas_logica.style.minHeight = '35vh'; 
+        $offcanvas_logica.style.minHeight = '20vh'; 
 
         // ■ Header del offcanvas
         const header = document.createElement('div');

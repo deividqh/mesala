@@ -2550,9 +2550,9 @@ class e_Salon extends Tablero_Touch {
 		// ┌••• Relaciona Acciones con los Elementos del catalogo.
 		this.LOGIC = new Logica_Catalogo(this.dicc_config.catalogo);
 		
-		// Asocia el Catalogo a la Logica ... y viceversa.
-		const motor_mensajes = new Motor_M();
-		const motor_alergias = new Motor_A();		
+		// ┌■ Asocia el Catalogo a la Logica ... y viceversa.
+		const motor_mensajes = new Motor_Mensajes();
+		const motor_alergias = new Motor_Alertas();		
 		Catalogo.set_motor('motor_mensajes', motor_mensajes);
 		Catalogo.set_motor('motor_alergias', motor_alergias);
 		// ┌■ a partir de este momento Recupero los motores a través del Catalogo.
@@ -2681,10 +2681,11 @@ class e_Salon extends Tablero_Touch {
 		// ■■ Actualizo las Reservas:
 		this.RegisteR();	
 		
-		// ■■ Elimino el mensaje del popover de clientes
+		// ■■ 
 		this.MSG_A.delete(this.objeto_drag.id);
 		this.MSG_M.delete(this.objeto_drag.id);
-
+		
+		// ■■ 
 		this._set_exit_toast_bs(this.objeto_drag.id);
 	}
 
@@ -2711,38 +2712,52 @@ class e_Salon extends Tablero_Touch {
 		if (!ctlg_el || ctlg_el.grupo !== 'player') 
 			return;
 		
-		this._set_elemento_onplay_seleccionado(elemento_clickado);
+		// this._set_elemento_onplay_seleccionado(elemento_clickado);
 
-		// ┌■ Rol. esto lo quiero cambiar.
+		// ┌■ Rol. color de la reserva en el click.
 		if (ctlg_el.rol === 'reserver'){
-			// ┌•• Cambio de reserva ...2 clicks 
 			if (index_reserva != this.last_reserva_clicked){
 				this.last_reserva_clicked = index_reserva;
-				// return;
 			}
 			// ┌■■ 🌈 🪑 CAMBIO DEL COLOR DE LOS ELEMENTOS DE LA RESERVA. 
 			this._reset_color_reserva();					
 			this._set_color_reserva(this.index_reserva);
 		}
 		
-		// ┌■ Logica
+		// ┌■ Lógica: la selección visual solo vive mientras el offcanvas de lógica está abierto.
 		const logica = ctlg_el.logica;
 		if(logica?.motor_mensajes || logica?.motor_alergias){
 			const ids_reserva = Object.values(this.reservas[index_reserva] || {}).flat();
 			
 			this.MSG_M.set_contexto(id_el, ids_reserva);
 			this.MSG_A.set_contexto(id_el);
+			// this.LOGIC.abrir_offcanvas(elemento_clickado);		
 
-			this.LOGIC.abrir_offcanvas(elemento_clickado);			
+			const offcanvas_logica = this.LOGIC.abrir_offcanvas(elemento_clickado);
+			if (offcanvas_logica) {
+				this._set_elemento_onplay_seleccionado(elemento_clickado);
+				offcanvas_logica.addEventListener('hidden.bs.offcanvas', () => {
+					this._reset_elemento_onplay_seleccionado();
+				}, { once: true });
+			}
+		} else {
+			this._reset_elemento_onplay_seleccionado();	
 		}
 
 	}
-	
+
 	/** ### Marca visualmente el player seleccionado y limpia la selección anterior. */
 	_set_elemento_onplay_seleccionado(elemento_seleccionado) {
 		const player = e_Salon._to_element(elemento_seleccionado);
 		if (!player) return;
 
+		this._reset_elemento_onplay_seleccionado();
+		player.classList.add('elemento_onplay_seleccionado');
+		player.closest('.estiloBaldosas')?.classList.add('baldosa_onplay_seleccionada');
+	}
+
+	/** ### Devuelve el borde y el tamaño del elemento seleccionado al estado original. */
+	_reset_elemento_onplay_seleccionado() {
 		document.querySelectorAll('.class_onplay.elemento_onplay_seleccionado').forEach((elemento) => {
 			elemento.classList.remove('elemento_onplay_seleccionado');
 		});
@@ -2750,8 +2765,8 @@ class e_Salon extends Tablero_Touch {
 			baldosa.classList.remove('baldosa_onplay_seleccionada');
 		});
 
-		player.classList.add('elemento_onplay_seleccionado');
-		player.closest('.estiloBaldosas')?.classList.add('baldosa_onplay_seleccionada');
+		// player.classList.add('elemento_onplay_seleccionado');
+		// player.closest('.estiloBaldosas')?.classList.add('baldosa_onplay_seleccionada');
 	}
 
 	#get_indice_en_reserva_s(id_elemento){	
