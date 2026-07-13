@@ -2710,6 +2710,9 @@ class e_Salon extends Tablero_Touch {
 		const ctlg_el = Catalogo.get(id_key_el);
 		if (!ctlg_el || ctlg_el.grupo !== 'player') 
 			return;
+		
+		this._set_elemento_onplay_seleccionado(elemento_clickado);
+
 		// ┌■ Rol. esto lo quiero cambiar.
 		if (ctlg_el.rol === 'reserver'){
 			// ┌•• Cambio de reserva ...2 clicks 
@@ -2733,6 +2736,22 @@ class e_Salon extends Tablero_Touch {
 			this.LOGIC.abrir_offcanvas(elemento_clickado);			
 		}
 
+	}
+	
+	/** ### Marca visualmente el player seleccionado y limpia la selección anterior. */
+	_set_elemento_onplay_seleccionado(elemento_seleccionado) {
+		const player = e_Salon._to_element(elemento_seleccionado);
+		if (!player) return;
+
+		document.querySelectorAll('.class_onplay.elemento_onplay_seleccionado').forEach((elemento) => {
+			elemento.classList.remove('elemento_onplay_seleccionado');
+		});
+		document.querySelectorAll('.estiloBaldosas.baldosa_onplay_seleccionada').forEach((baldosa) => {
+			baldosa.classList.remove('baldosa_onplay_seleccionada');
+		});
+
+		player.classList.add('elemento_onplay_seleccionado');
+		player.closest('.estiloBaldosas')?.classList.add('baldosa_onplay_seleccionada');
 	}
 
 	#get_indice_en_reserva_s(id_elemento){	

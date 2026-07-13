@@ -77,13 +77,18 @@ class Motor_M {
         }
 
         this.d_data[id_elemento] = this._crear_ficha(texto, ficha_base);
+		this._actualizar_markador_elemento(id_elemento);
         return true;
     }
 
     set_ficha(id_elemento = '', ficha = {}) {
         if (!id_elemento) return false;
         this.d_data[id_elemento] = this._normalizar_ficha(ficha);
-        if (!this.d_data[id_elemento].mensaje.trim()) this.delete(id_elemento);
+        if (!this.d_data[id_elemento].mensaje.trim()) 
+			this.delete(id_elemento);
+
+		this._actualizar_markador_elemento(id_elemento);
+
         return true;
     }
 
@@ -99,6 +104,8 @@ class Motor_M {
     delete(id_elemento = '') {
         if (!id_elemento) return false;
         delete this.d_data[id_elemento];
+
+		this._actualizar_markador_elemento(id_elemento);
         return true;
     }
 
@@ -107,6 +114,7 @@ class Motor_M {
     }
 
     reset() {
+		Object.keys(this.d_data).forEach((id) => this.__ocultar_markador(id));
         this.d_data = {};
         this.id_elemento = '';
         this.ids_reserva_actual = [];
@@ -131,6 +139,7 @@ class Motor_M {
             if (!this.d_data[id_elemento]) {
                 this.d_data[id_elemento] = { ...Motor_M.FICHA_VACIA };
             }
+			this._actualizar_markador_elemento(id_elemento);
             return true;
         }
         return this.set(id_elemento, valor_mensaje);
@@ -146,15 +155,39 @@ class Motor_M {
         this.reset();
     }
 
-	// render(data_logica){
-	// 	// console.log('render motor: ', data_logica);
-	// 	data_logica.nombre;			// Nombre pestaña
-	// 	data_logica.content;		// en Mensajes es single o sumatorio. Logica del renderizado.
-	// 	data_logica.css;			// clase css que se aplica. tiene que estar en .css
+	_actualizar_markador_elemento(id_elemento = '') {
+        if (!id_elemento) return;
+        if (this.has(id_elemento)) this.__mostrar_markador(id_elemento);
+        else this.__ocultar_markador(id_elemento);
+    }
 
-	// 	// Tengo que devolver un objeto Node
-	// 	return JSON.stringify(data_logica, null, 2);
-	// }
+    __mostrar_markador(id_elemento = '') {
+        const elemento_dom = document.getElementById(id_elemento);
+        if (!elemento_dom) return;
+
+        elemento_dom.classList.add('elemento_con_mensaje');
+
+        let markador = elemento_dom.querySelector('.markador_mensaje');
+        if (!markador) {
+            markador = document.createElement('i');
+            markador.className = 'bi bi-chat-quote markador_mensaje';
+            markador.setAttribute('aria-hidden', 'true');
+            elemento_dom.appendChild(markador);
+        }
+
+        markador.style.color = '#16a34a';
+        markador.style.display = 'block';
+    }
+
+    __ocultar_markador(id_elemento = '') {
+        const elemento_dom = document.getElementById(id_elemento);
+        if (!elemento_dom) return;
+
+        const markador = elemento_dom.querySelector('.markador_mensaje');
+        if (markador) markador.remove();
+        elemento_dom.classList.remove('elemento_con_mensaje');
+    }
+
 
 	_crear_botones_accion() {
 		const toolbar = document.createElement('div');

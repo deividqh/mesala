@@ -314,3 +314,15 @@ EXIT-PAPELERA
   transition: transform 0.1s ease; /* Opcional: suaviza el cambio si lo activas con hover */
   opacity: 1;
 }
+
+/* Selección del elemento del salón: baldosa destacada + player más grande. */
+.estiloBaldosas.baldosa_onplay_seleccionada {
+    border: calc(4px * var(--scale-factor)) solid #0b4d22;
+    z-index: 3;
+}
+
+.estiloBaldosas > .class_onplay.elemento_onplay_seleccionado {
+    transform: scale(1.3);
+    transform-origin: center;
+    transition: transform 0.15s ease;
+}

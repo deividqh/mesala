@@ -670,7 +670,7 @@ Tema DARK (RESERVAS)
 /* Alerta visual persistente para elementos del salón con alergias. */
 .elemento_con_alergia {
   background: rgba(239, 68, 68, 0.22) !important;
-  border-radius: 0.45rem;
+  /* border-radius: 0.45rem; */
   box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.28);
 }
 
