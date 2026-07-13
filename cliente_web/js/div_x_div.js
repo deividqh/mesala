@@ -2666,7 +2666,7 @@ class e_Salon extends Tablero_Touch {
 		super.drop_over_matriz(ev);
 		
 		// ■■ Registramos los elementos en el salon
-		const ok = this.RegisteR();			
+		const ok = this.RegisteR();
 		if(ok) return true;
 	}
 	/** ✒️✒️ 
@@ -2682,11 +2682,10 @@ class e_Salon extends Tablero_Touch {
 		this.RegisteR();	
 		
 		// ■■ Elimino el mensaje del popover de clientes
-		// this.motor_mensajes.accion_borrar(this.objeto_drag.id);
 		this.MSG_A.delete(this.objeto_drag.id);
 		this.MSG_M.delete(this.objeto_drag.id);
 
-		this.  _set_exit_toast_bs(this.objeto_drag.id);
+		this._set_exit_toast_bs(this.objeto_drag.id);
 	}
 
 	/** ### El 'click' sobre un elemento da paso a la Lógica sobre el Salon definida en Catálogo 
@@ -2725,6 +2724,10 @@ class e_Salon extends Tablero_Touch {
 		// ┌■ Logica
 		const logica = ctlg_el.logica;
 		if(logica?.motor_mensajes || logica?.motor_alergias){
+			const ids_reserva = Object.values(this.reservas[index_reserva] || {}).flat();
+			
+			this.MSG_M.set_contexto(id_el, ids_reserva);
+
 			this.LOGIC.abrir_offcanvas(elemento_clickado);			
 		}
 

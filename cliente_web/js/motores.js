@@ -146,14 +146,137 @@ class Motor_M {
         this.reset();
     }
 
-	render(data_logica){
-		// console.log('render motor: ', data_logica);
-		data_logica.nombre;			// Nombre pestaña
-		data_logica.content;		// en Mensajes es single o sumatorio. Logica del renderizado.
-		data_logica.css;			// clase css que se aplica. tiene que estar en .css
+	// render(data_logica){
+	// 	// console.log('render motor: ', data_logica);
+	// 	data_logica.nombre;			// Nombre pestaña
+	// 	data_logica.content;		// en Mensajes es single o sumatorio. Logica del renderizado.
+	// 	data_logica.css;			// clase css que se aplica. tiene que estar en .css
 
-		// Tengo que devolver un objeto Node
-		return JSON.stringify(data_logica, null, 2);
+	// 	// Tengo que devolver un objeto Node
+	// 	return JSON.stringify(data_logica, null, 2);
+	// }
+
+	_crear_botones_accion() {
+		const toolbar = document.createElement('div');
+		toolbar.className = 'd-flex gap-2 motor-mensajes-acciones';
+
+		const botones = [
+			{ action: 'grabar', texto: '🎤', title: 'Grabación de Voz', className: 'btn-grabar' },
+			{ action: 'guardar', texto: '💾', title: 'Guardar mensaje', className: 'btn-guardar' },
+			{ action: 'reset', texto: '🔁', title: 'Limpiar texto', className: 'btn-reset' },
+			{ action: 'eliminar', texto: '🗑', title: 'Eliminar mensaje', className: 'btn-delete' }
+		];
+
+		botones.forEach((boton) => {
+			const button = document.createElement('button');
+			button.type = 'button';
+			button.className = `btn btn-sm ${boton.className}`;
+			button.dataset.action = boton.action;
+			button.title = boton.title;
+			button.textContent = boton.texto;
+			toolbar.appendChild(button);
+		});
+		return toolbar;
+	}
+
+	_crear_sumatorio(textarea) {
+		const sumatorio = document.createElement('div');
+		sumatorio.className = 'motor-mensajes-sumatorio';
+		sumatorio.setAttribute('role', 'note');
+		sumatorio.setAttribute('aria-live', 'polite');
+
+		this.ids_reserva_actual.forEach((id) => {
+			const row = document.createElement('div');
+			const colId = document.createElement('span');
+			const colMsg = document.createElement('span');
+
+			const es_actual = id === this.id_elemento;
+			row.className = es_actual ? 'sumatorio-row-ppal' : 'sumatorio-row';
+			colId.className = es_actual ? 'sumatorio-id-ppal' : 'sumatorio-id';
+			colMsg.className = es_actual ? 'sumatorio-msg-ppal' : 'sumatorio-msg';
+			colId.textContent = `${id}: `;
+			colMsg.textContent = this.get_mensaje(id);
+
+			if (es_actual && textarea) {
+				const sincronizar = () => { colMsg.textContent = textarea.value || ''; };
+				textarea.addEventListener('input', sincronizar, { passive: true });
+				sincronizar();
+			}
+
+			row.appendChild(colId);
+			row.appendChild(colMsg);
+			sumatorio.appendChild(row);
+		});
+
+		return sumatorio;
+	}
+
+	_accion_grabar(textarea, button) {
+		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+		if (!SpeechRecognition || !textarea) {
+			console.warn('🎙️ Reconocimiento de voz no disponible en este navegador.');
+			return;
+		}
+
+		const recognition = new SpeechRecognition();
+		recognition.lang = 'es-ES';
+		recognition.continuous = false;
+		recognition.interimResults = false;
+		recognition.maxAlternatives = 1;
+
+		recognition.onstart = () => { button.textContent = '■'; };
+		recognition.onend = () => { button.textContent = '🎤'; };
+		recognition.onresult = (event) => {
+			const texto = event?.results?.[0]?.[0]?.transcript || '';
+			if (!texto) return;
+			const espacio = textarea.value && !/\s$/.test(textarea.value) ? ' ' : '';
+			textarea.value = `${textarea.value}${espacio}${texto}`.trimStart();
+			textarea.dispatchEvent(new Event('input', { bubbles: true }));
+			textarea.focus();
+		};
+
+		recognition.start();
+	}
+
+	// Dibuja el codigo HTML de Mensajes según la Lógica.
+	render(data_logica = {}){
+		const tipo_render = data_logica.content === 'sumatorio' ? 'sumatorio' : 'single';
+		const contenedor = document.createElement('div');
+		contenedor.className = ['contenedor_motor_mensajes', data_logica.css || ''].filter(Boolean).join(' ');
+
+		const textarea = document.createElement('textarea');
+		textarea.className = 'form-control mb-2';
+		textarea.rows = 2;
+		textarea.placeholder = 'Escribe aquí...';
+		textarea.value = this.get_mensaje(this.id_elemento);
+
+		if (tipo_render === 'sumatorio') {
+			contenedor.appendChild(this._crear_sumatorio(textarea));
+		}
+
+		contenedor.appendChild(textarea);
+		contenedor.appendChild(this._crear_botones_accion());
+
+		contenedor.addEventListener('click', (ev) => {
+			const button = ev.target.closest('[data-action]');
+			if (!button) return;
+
+			const action = button.dataset.action;
+			if (action === 'guardar') this.set(this.id_elemento, textarea.value);
+			if (action === 'eliminar') {
+				this.delete(this.id_elemento);
+				textarea.value = '';
+				textarea.dispatchEvent(new Event('input', { bubbles: true }));
+			}
+			if (action === 'reset') {
+				textarea.value = '';
+				textarea.dispatchEvent(new Event('input', { bubbles: true }));
+				textarea.focus();
+			}
+			if (action === 'grabar') this._accion_grabar(textarea, button);
+		});
+
+		return contenedor;
 	}
 
     get datos() {
