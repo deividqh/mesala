@@ -2727,6 +2727,7 @@ class e_Salon extends Tablero_Touch {
 			const ids_reserva = Object.values(this.reservas[index_reserva] || {}).flat();
 			
 			this.MSG_M.set_contexto(id_el, ids_reserva);
+			this.MSG_A.set_contexto(id_el);
 
 			this.LOGIC.abrir_offcanvas(elemento_clickado);			
 		}
@@ -3567,6 +3568,7 @@ class e_Salon extends Tablero_Touch {
             const elemento = e_Salon._to_element(id);
             if (!elemento) return;	// Si el elemento No Existe en el Salon(tiene que estar pre-cargado).
 			MA.update(id, alergia_s);
+			MA._set_alerta_elemento(id);
         });
 	}
 	

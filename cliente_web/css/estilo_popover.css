@@ -666,3 +666,35 @@ Tema DARK (RESERVAS)
   font-size: 0.72rem;
   text-transform: capitalize;
 }
+
+/* Alerta visual persistente para elementos del salón con alergias. */
+.elemento_con_alergia {
+  background: rgba(239, 68, 68, 0.22) !important;
+  border-radius: 0.45rem;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.28);
+}
+
+.contenedor_motor_alergias .labels-alergias-pop {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.6rem;
+}
+
+.contenedor_motor_alergias .labels-alergias-pop.is-empty {
+  color: #6b7280;
+  font-size: 0.82rem;
+}
+
+.contenedor_motor_alergias .alergia-tag-pop {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.12rem 0.5rem;
+  font-size: 0.68rem;
+  line-height: 1.1;
+  text-transform: capitalize;
+  border: 1px solid #86efac;
+  background: #dcfce7;
+  color: #14532d;
+}
