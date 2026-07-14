@@ -391,6 +391,7 @@ class Motor_Alergias {
 
         this.d_data[id_elemento] = seleccion;
 		this._set_alerta_elemento(id_elemento);
+		this._emitir_cambio(id_elemento);
         return true;
     }
 
@@ -419,6 +420,7 @@ class Motor_Alergias {
         if (!id_elemento) return false;
         delete this.d_data[id_elemento];
 		this._set_alerta_elemento(id_elemento);
+		this._emitir_cambio(id_elemento);
         return true;
     }
 
@@ -455,21 +457,41 @@ class Motor_Alergias {
 		const tiene_alergias = forzar === null ? this.has(id_elemento) : Boolean(forzar);
 		elemento.classList.toggle('elemento_con_alergia', tiene_alergias);
 	}
-	_actualizar_resumen($resumen, alergias = []) {
+	
+	_emitir_cambio(id_elemento = '') {
+		if (!id_elemento) return;
+		document.dispatchEvent(new CustomEvent('motor_alergias:change', {
+			detail: { id_elemento, alergias: this.get(id_elemento) }
+		}));
+	}
+
+	_actualizar_resumen($resumen, alergias = [], opciones = {}) {
 		if (!$resumen) return;
 		$resumen.innerHTML = '';
 		$resumen.classList.toggle('is-empty', alergias.length === 0);
 
 		if (!alergias.length) {
-			$resumen.textContent = 'Sin alergias seleccionadas.';
+			// $resumen.textContent = 'Sin alergias seleccionadas.';
+			$resumen.textContent = opciones.texto_vacio || 'Sin alergias seleccionadas.';
 			return;
 		}
 
 		alergias.forEach((alergia) => {
-			const tag = document.createElement('span');
-			tag.className = 'alergia-tag-pop';
-			tag.textContent = alergia;
-			$resumen.appendChild(tag);
+			const $tag = document.createElement('span');
+			$tag.className = 'alergia-tag-pop';
+			$tag.textContent = alergia;
+
+			if (opciones.editable) {
+				const cerrar = document.createElement('button');
+				cerrar.type = 'button';
+				cerrar.className = 'alergia-tag-close';
+				cerrar.dataset.alergia = alergia;
+				cerrar.setAttribute('aria-label', `Eliminar alergia ${alergia}`);
+				cerrar.textContent = '×';
+				$tag.appendChild(cerrar);
+			}
+			
+			$resumen.appendChild($tag);
 		});
 	}
 
@@ -563,28 +585,69 @@ class Motor_Alergias {
 	}
 	// Dibuja el HTML de Alergias según la lógica. Devuelve un Node.
 	render(data_logica = {}, elemento_dom=null, contenedor_dom=null){
+		const id_elemento = elemento_dom?.id || this.id_elemento;
+		const es_news = data_logica.news === true;
+
 		const $contenedor = document.createElement('div');
-		$contenedor.className = ['contenedor_motor_alergias', data_logica.css || ''].filter(Boolean).join(' ');
+		// $contenedor.className = ['contenedor_motor_alergias', data_logica.css || ''].filter(Boolean).join(' ');
+		$contenedor.className = ['contenedor_motor_alergias', es_news ? 'is-news' : '', data_logica.css || ''].filter(Boolean).join(' ');
 
 		const resumen = document.createElement('div');
 		resumen.className = 'labels-alergias-pop';
-		this._actualizar_resumen(resumen, this.get(this.id_elemento));
 
-		const button = document.createElement('button');
-		button.type = 'button';
-		button.className = 'btn btn-sm btn-alergias-pop';
-		button.textContent = 'Alergias';
+		// this._actualizar_resumen(resumen, this.get(this.id_elemento));
 
-		button.addEventListener('click', () => {
-			const alergenos = this._get_alergenos_render(data_logica);
-			this.abrir(this.get(this.id_elemento), (seleccion) => {
-				this.set(this.id_elemento, seleccion);
-				this._actualizar_resumen(resumen, this.get(this.id_elemento));
-			}, alergenos);
-		});
+		// const button = document.createElement('button');
+		// button.type = 'button';
+		// button.className = 'btn btn-sm btn-alergias-pop';
+		// button.textContent = 'Alergias';
+
+		// button.addEventListener('click', () => {
+		// 	const alergenos = this._get_alergenos_render(data_logica);
+		// 	this.abrir(this.get(this.id_elemento), (seleccion) => {
+		// 		this.set(this.id_elemento, seleccion);
+		// 		this._actualizar_resumen(resumen, this.get(this.id_elemento));
+		// 	}, alergenos);
+		// });
+		const refrescar = () => {
+			const alergias = this.get(id_elemento);
+			$contenedor.classList.toggle('has-alergias', alergias.length > 0);
+			this._actualizar_resumen(resumen, alergias, {
+				editable: es_news,
+				texto_vacio: es_news ? 'Sin alergias.' : 'Sin alergias seleccionadas.'
+			});
+		};
+
+		refrescar();
+
+		const onCambio = (event) => {
+			if (event.detail?.id_elemento === id_elemento) refrescar();
+		};
+		document.addEventListener('motor_alergias:change', onCambio);
+
+		resumen.addEventListener('click', (event) => {
+			const cerrar = event.target.closest('.alergia-tag-close');
+			if (!cerrar) return;
+			const alergias = this.get(id_elemento).filter((alergia) => alergia !== cerrar.dataset.alergia);
+			this.set(id_elemento, alergias);
+		});	
 
 		$contenedor.appendChild(resumen);
-		$contenedor.appendChild(button);
+		// $contenedor.appendChild(button);
+
+		if (!es_news) {
+			const $button = document.createElement('button');
+			$button.type = 'button';
+			$button.className = 'btn btn-sm btn-alergias-pop';
+			$button.textContent = 'Alergias';
+
+			$button.addEventListener('click', () => {
+				const alergenos = this._get_alergenos_render(data_logica);
+				this.abrir(this.get(id_elemento), (seleccion) => this.set(id_elemento, seleccion), alergenos);
+			});
+
+			$contenedor.appendChild($button);
+		}
 
 		if(contenedor_dom) {
 			contenedor_dom.appendChild($contenedor)
