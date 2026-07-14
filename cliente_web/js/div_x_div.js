@@ -2552,7 +2552,7 @@ class e_Salon extends Tablero_Touch {
 		
 		// ┌■ Asocia el Catalogo a la Logica ... y viceversa.
 		const motor_mensajes = new Motor_Mensajes();
-		const motor_alergias = new Motor_Alertas();		
+		const motor_alergias = new Motor_Alergias();		
 		Catalogo.set_motor('motor_mensajes', motor_mensajes);
 		Catalogo.set_motor('motor_alergias', motor_alergias);
 		// ┌■ a partir de este momento Recupero los motores a través del Catalogo.
@@ -2613,7 +2613,14 @@ class e_Salon extends Tablero_Touch {
 		// 💥💥💥💥💥💥💥💥
 		// 💥💥💥💥💥💥💥💥	MOCK'S
 		// 💥💥💥💥💥💥💥💥
-		const d_indices_mock = {silla_0: 8, mesa_0: 9, silla_1: 12, mesa_1: 13, silla_2: 14 };
+		const d_indices_mock = {
+			silla_0: 8, mesa_0: 9, silla_1: 12, mesa_1: 13, silla_2: 14 , 
+			silla_3: 1, silla_6: 10, silla_4: 17, mesa_3: 21, silla_5: 29 , 
+			silla_7: 5, silla_8: 20, silla_9: 22,  
+			mesa_2: 41, mesa_4: 49, silla_10: 33, silla_1: 42, silla_12: 40, silla_17: 50 , silla_18: 48, silla_13: 57,
+			silla_14: 45, silla_16: 54, silla_15: 52, mesa_5: 53, silla_19: 61 , 
+			mesa_6: 75, silla_21: 74, silla_20: 76,  			
+		};
 		const d_mensajs_mock = {silla_0: "Nadie", mesa_0: 'Sabe', silla_2: 'Nada' };
 		const d_alergias_mock = {silla_0: ['soja', 'lacteos'], silla_1: ['huevos'], };
 		this._load_elementos_en_Salon(d_indices_mock);
@@ -2627,8 +2634,6 @@ class e_Salon extends Tablero_Touch {
 		const MM = Catalogo.get_motor('motor_mensajes');
 		this._load_mensajes_en_Salon(d_mensajs_mock);
 		console.log(JSON.stringify(MM.d_data, null, 2)); 
-		
-
 	}
 
 	/** 

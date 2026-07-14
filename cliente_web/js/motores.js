@@ -274,10 +274,11 @@ class Motor_Mensajes {
 	}
 
 	// Dibuja el codigo HTML de Mensajes según la Lógica.
-	render(data_logica = {}){
+	render(data_logica = {}, elemento_dom=null, contenedor_dom=null){
 		const tipo_render = data_logica.content === 'sumatorio' ? 'sumatorio' : 'single';
-		const contenedor = document.createElement('div');
-		contenedor.className = ['contenedor_motor_mensajes', data_logica.css || ''].filter(Boolean).join(' ');
+		// Solo se asigna si se pasa explicitamente.
+		const $contenedor = document.createElement('div');		
+		$contenedor.className = ['contenedor_motor_mensajes', data_logica.css || ''].filter(Boolean).join(' ');
 
 		const textarea = document.createElement('textarea');
 		textarea.className = 'form-control mb-2';
@@ -286,13 +287,13 @@ class Motor_Mensajes {
 		textarea.value = this.get_mensaje(this.id_elemento);
 
 		if (tipo_render === 'sumatorio') {
-			contenedor.appendChild(this._crear_sumatorio(textarea));
+			$contenedor.appendChild(this._crear_sumatorio(textarea));
 		}
 
-		contenedor.appendChild(textarea);
-		contenedor.appendChild(this._crear_botones_accion());
-
-		contenedor.addEventListener('click', (ev) => {
+		$contenedor.appendChild(textarea);
+		$contenedor.appendChild(this._crear_botones_accion());
+		
+		$contenedor.addEventListener('click', (ev) => {
 			const button = ev.target.closest('[data-action]');
 			if (!button) return;
 
@@ -311,8 +312,11 @@ class Motor_Mensajes {
 			}
 			if (action === 'grabar') this._accion_grabar(textarea, button);
 		});
-
-		return contenedor;
+		
+		if(contenedor_dom) {
+			contenedor_dom.appendChild($contenedor)
+		}
+		return $contenedor;
 	}
 
     get datos() {
@@ -336,7 +340,7 @@ class Motor_Mensajes {
  * silla_0: ['soja', 'lacteos']
  * }
  */
-class Motor_Alertas {
+class Motor_Alergias {
     constructor() {
         this.d_data = {};
 
@@ -440,17 +444,6 @@ class Motor_Alertas {
         this.reset();
     }
 
-	// render(data_logica){
-	// 	// console.log('render alergia:', data_logica);
-		
-	// 	data_logica.nombre;			// Nombre pestaña(No en render)
-	// 	data_logica.content;		// Es el diccionario de alergias para el rol.
-	// 	data_logica.css;			// clase css que se aplica. 
-
-	// 	// Tengo que devolver un objeto Node
-	// 	return JSON.stringify(data_logica, null, 2);
-
-	// }
 	_get_alergenos_render(data_logica = {}) {
 		const content = data_logica.content;
 		if (content && typeof content === 'object' && !Array.isArray(content)) return content;
@@ -569,9 +562,9 @@ class Motor_Alertas {
 		this.modalInstancia?.show();
 	}
 	// Dibuja el HTML de Alergias según la lógica. Devuelve un Node.
-	render(data_logica = {}){
-		const contenedor = document.createElement('div');
-		contenedor.className = ['contenedor_motor_alergias', data_logica.css || ''].filter(Boolean).join(' ');
+	render(data_logica = {}, elemento_dom=null, contenedor_dom=null){
+		const $contenedor = document.createElement('div');
+		$contenedor.className = ['contenedor_motor_alergias', data_logica.css || ''].filter(Boolean).join(' ');
 
 		const resumen = document.createElement('div');
 		resumen.className = 'labels-alergias-pop';
@@ -590,9 +583,13 @@ class Motor_Alertas {
 			}, alergenos);
 		});
 
-		contenedor.appendChild(resumen);
-		contenedor.appendChild(button);
-		return contenedor;
+		$contenedor.appendChild(resumen);
+		$contenedor.appendChild(button);
+
+		if(contenedor_dom) {
+			contenedor_dom.appendChild($contenedor)
+		}
+		return $contenedor;
 	}
 
 }

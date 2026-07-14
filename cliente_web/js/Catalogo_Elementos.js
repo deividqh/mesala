@@ -409,35 +409,39 @@ class Logica_Catalogo  {
      * @param {HTMLElement} elemento_dom - Elemento del salón sobre el que se hace clic.
      */
     abrir_offcanvas(elemento_dom) {
+        // ■ Datos iniciales
         const grupo_el = elemento_dom.dataset.id_key;
         const ctlg_el = Catalogo.get(grupo_el);
         if (!ctlg_el || !ctlg_el.logica) return null;
-        
         const $offcanvas_dom = document.getElementById('offcanvas_logica');
         if (!$offcanvas_dom) return null;
 
-        // Utilizamos el nuevo setter para actualizar el título
+        // ■ Actualizar el Título
         this.set_title(`Opciones de ${elemento_dom.id || 'Elemento'} - (${ctlg_el.grupo}) - (${ctlg_el.rol})`);
-
-        const logica_el = ctlg_el.logica;
-
-        const navItems = $offcanvas_dom.querySelectorAll('#logicaTab .nav-item');
         
+        // ■ Cacho la logica del elemento en Catalogo.
+        const logica_el = ctlg_el.logica;
+        
+        // ■ Cacho del contenedor de Pestañas(logicaTab), los Paneles de cada elemento(li).
+        const navItems = $offcanvas_dom.querySelectorAll('#logicaTab .nav-item');
+        const tab_motores = $offcanvas_dom.querySelectorAll('[data-motor]');    // prefiero x dataset
+        
+        // ■ Recorro cada pestaña.
         let primerTabVisible = null;
-        navItems.forEach(item => {
-            const motor = item.dataset.motor;     // 'motor_mensajes' , 'motor_alergias'
-            const data_logica = logica_el[motor];      
+        tab_motores.forEach(item => {
+            const motor = item.dataset.motor;          // dataset establecido al crear offcanvas-logica.
+            const data_logica = logica_el[motor];      // Datos del catalogo del elemento.
             
-            const botonTab = item.querySelector('.nav-link');
-            const idPanel = botonTab.getAttribute('data-bs-target');
+            const botonTab = item.querySelector('.nav-link');           // clase del boton.
+            const idPanel = botonTab.getAttribute('data-bs-target');    // "#panel-motor_mensajes"
             const $panel_dom = $offcanvas_dom.querySelector(idPanel);
-
+            
+            // ■ Resetea el boton y el panel.
             botonTab.classList.remove('active');
             botonTab.setAttribute('aria-selected', 'false');
             if ($panel_dom) $panel_dom.classList.remove('show', 'active');
 
-            // CRITERIO DE VISIBILIDAD: Existe y no es false ni null
-            
+            // ■ Evalua Motores(Logicas)
             if (data_logica !== undefined && data_logica !== false && data_logica !== null) {
                 item.classList.remove('d-none'); 
                 
@@ -445,11 +449,9 @@ class Logica_Catalogo  {
                     primerTabVisible = { boton: botonTab, panel: $panel_dom };
                 }
 
-                // Inyección de contenido según el tipo ❌❌ ???? adaptar a motores. ???? ❌❌
-                // Ahora podemos acceder a valorLogica.content si quisiéramos renderizar el diccionario
+                // ■ ■ Inyección de contenido 
                 const areaContenido = $panel_dom.querySelector('.area-de-contenido');                
-                this.#inyectar_render_motor(motor, data_logica, areaContenido);
-                // ❌❌❌❌❌
+                this.#inyectar_render_motor(motor, data_logica, areaContenido, elemento_dom);
 
             } else {
                 item.classList.add('d-none');
@@ -492,7 +494,7 @@ class Logica_Catalogo  {
      * @param {Object} data_logica - Los datos de configuración de esa lógica para el elemento (ej. el objeto con 'nombre', 'content', etc.)
      * @param {HTMLElement} areaContenido - El contenedor DOM donde se inyectará el resultado
      */
-    #inyectar_render_motor(motor_busca, data_logica, areaContenido) {
+    #inyectar_render_motor(motor_busca, data_logica, areaContenido, elemento_dom=null) {
         // 1. Obtenemos la instancia del motor desde el Catálogo
         const instancia_motor = Catalogo.get_motor(motor_busca);
 
@@ -502,12 +504,10 @@ class Logica_Catalogo  {
             areaContenido.innerHTML = `<span class="text-danger">Motor <strong>${motor_busca}</strong> no instanciado o sin método render().</span>`;
             return;
         }
-        // if (instancia_motor && typeof instancia_motor.render === 'function') {
             
         // Limpiamos el área antes de inyectar lo nuevo
         areaContenido.innerHTML = '';         
-        // Llamamos al render pasándole los datos del catálogo que le corresponden a este elemento
-        const resultado = instancia_motor.render(data_logica);
+        const resultado = instancia_motor.render(data_logica, elemento_dom);
 
         // 3. Evaluamos qué tipo de dato ha devuelto el motor para insertarlo correctamente
         if (typeof resultado === 'string') {
@@ -517,11 +517,6 @@ class Logica_Catalogo  {
         } else {
             console.warn(`El motor ${motor_busca} no ha devuelto ni un String ni un Nodo del DOM.`);
         }
-
-        // } else {
-        //     // Fallback por si el motor no ha sido instanciado con Catalogo.set_motor() previamente
-        //     areaContenido.innerHTML = `<span class="text-danger">Motor <strong>${motor_busca}</strong> no instanciado o sin método render().</span>`;
-        // }
     }
 
 
