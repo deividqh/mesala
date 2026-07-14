@@ -213,30 +213,38 @@ class Motor_Mensajes {
 		});
 		return toolbar;
 	}
+	_es_reserver(id_elemento = '') {
+		const elemento_dom = document.getElementById(id_elemento);
+		const id_catalogo = elemento_dom?.dataset?.id_key || id_elemento.split('_')[0];
+		return Catalogo.get(id_catalogo)?.rol === 'reserver';
+	}
 
-	_crear_sumatorio(textarea) {
+	_get_ids_reservers_de_reserva() {
+		return this.ids_reserva_actual.filter((id) => {
+			if (!id || id === this.id_elemento) return false;
+			return this._es_reserver(id);
+		});
+	}
+	_crear_sumatorio() {
 		const sumatorio = document.createElement('div');
 		sumatorio.className = 'motor-mensajes-sumatorio';
 		sumatorio.setAttribute('role', 'note');
 		sumatorio.setAttribute('aria-live', 'polite');
 
-		this.ids_reserva_actual.forEach((id) => {
+		// this.ids_reserva_actual.forEach((id) => {
+		this._get_ids_reservers_de_reserva().forEach((id) => {
 			const row = document.createElement('div');
 			const colId = document.createElement('span');
 			const colMsg = document.createElement('span');
 
-			const es_actual = id === this.id_elemento;
-			row.className = es_actual ? 'sumatorio-row-ppal' : 'sumatorio-row';
-			colId.className = es_actual ? 'sumatorio-id-ppal' : 'sumatorio-id';
-			colMsg.className = es_actual ? 'sumatorio-msg-ppal' : 'sumatorio-msg';
+			row.className = 'sumatorio-row';
+			colId.className = 'sumatorio-id';
+			colMsg.className = 'sumatorio-msg';
 			colId.textContent = `${id}: `;
 			colMsg.textContent = this.get_mensaje(id);
 
-			if (es_actual && textarea) {
-				const sincronizar = () => { colMsg.textContent = textarea.value || ''; };
-				textarea.addEventListener('input', sincronizar, { passive: true });
-				sincronizar();
-			}
+			colId.textContent = `${id}: `;
+			colMsg.textContent = this.get_mensaje(id);
 
 			row.appendChild(colId);
 			row.appendChild(colMsg);
@@ -287,7 +295,8 @@ class Motor_Mensajes {
 		textarea.value = this.get_mensaje(this.id_elemento);
 
 		if (tipo_render === 'sumatorio') {
-			$contenedor.appendChild(this._crear_sumatorio(textarea));
+			// $contenedor.appendChild(this._crear_sumatorio(textarea));
+			$contenedor.appendChild(this._crear_sumatorio());
 		}
 
 		$contenedor.appendChild(textarea);

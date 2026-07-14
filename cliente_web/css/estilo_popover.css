@@ -1,525 +1,3 @@
-/*  ■■■■■■■■■ POPUP / POPOVER — Archivo UNIFICADO por temas (Bootstrap 5)  ■■■■■■■■■
-    Usa data-theme="pastel" para SILLAS y data-theme="dark" para RESERVAS.
-    Todo el color y efectos se controlan por variables CSS (tokens): no hay "arrastres".
-    ------------------------------------------------------------------------------- */
-
-/* ──────────────────────────────────────────────────────────────
-   1) TOKENS DE TEMA (solo asignan variables, sin pintar nada)
-   ────────────────────────────────────────────────────────────── */
-/* ── TOKENS COMPARTIDOS (para nodos fuera del .popover) ── */
-[data-theme="pastel"] { --msg-indicador-bg: rgba(247, 2, 218, 0.8); }
-[data-theme="dark"]   { --msg-indicador-bg: rgba(50, 50, 50, 0.8); }
-/* Nuevos temas */
-[data-theme="elegant"]   { --msg-indicador-bg: #d4af37; /* Dorado */ }
-[data-theme="corporate"] { --msg-indicador-bg: #ea4335; /* Rojo notificación moderno */ }
-[data-theme="alternant"] { --msg-indicador-bg: #22d3ee; }
-/* Nuevo moderno Metálico: Color Indigo (Azul-Violeta) */
-/* [data-theme="moderno"] { --msg-indicador-bg: #6366f1; } */
-[data-theme="moderno"] { --msg-indicador-bg: #13671e; }
-
-
-
-/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
- PASTEL (SILLAS)
- ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
-.popover[data-theme="pastel"]{
-  /* Popover */
-  --pop-bg:               #ffffff;
-  --pop-fg:               #334155;
-  --pop-border-color:     #e6e9ef;
-  --pop-radius:           12px;
-  --pop-shadow:           0 8px 24px rgba(0,0,0,0.08); /* corrige 0,08 → 0.08 */
-  --pop-max-width:        320px;
-  --pop-arrow-border:     rgb(24, 27, 34);
-  --pop-backdrop-blur:    none;
-
-  /* Header */
-  --head-bg:              #f7f8fc;
-  --head-fg:              #334155;
-  --head-border-bottom:   #e6e9ef;
-  --head-font-size:       0.95rem;
-  --body-bg:              #ffffff;
-  --body-fg:              #334155;
-  --body-font-size:       0.8rem;
-
-  /* Textareas (alias + mensaje) */
-  --ta-bg:                #fafbff;
-  --ta-fg:                #334155;
-  --ta-border:            #e2e8f0;
-  --ta-font-size:         0.8rem;
-  --ta-focus-border:      #93c5fd;            /* uso suave acorde pastel */
-  --ta-focus-glow:        0 0 0 2px rgba(147,197,253,0.25);
-
-  /* Sumatorio (solo lectura) */
-  --sum-bg:               #e3f3ff;
-  --sum-fg:               #334155;
-  --sum-border:           #e2e8f0;
-
-  /* Botones */
-  --btn-guardar-bg:       #e0f2fe;
-  --btn-guardar-border:   #bae6fd;
-  --btn-guardar-bg-hov:   #dbeafe;
-
-  --btn-delete-bg:        #fee2e2;
-  --btn-delete-border:    #fecaca;
-  --btn-delete-bg-hov:    #fecaca;
-
-  --btn-grabar-bg:        #ede9fe;
-  --btn-grabar-border:    #ddd6fe;
-  --btn-grabar-bg-hov:    #d6cdfe;
-
-  /* Botones extra (por compatibilidad con dark) */
-  --btn-parar-bg:         transparent;
-  --btn-parar-fg:         inherit;
-  --btn-parar-glow:       none;
-
-  /* Indicador de mensaje (círculo) */
-  /* --msg-indicador-bg:    rgba(247, 2, 218, 0.8); */
-}
-
-/* ■■■■■■■■■■■■■■■■■■■
-Tema DARK (RESERVAS) 
-■■■■■■■■■■■■■■■■■■■■■■ */
-.popover[data-theme="dark"]{
-  /* Popover */
-  --pop-bg:               rgba(25,25,25,0.75);
-  --pop-fg:               rgb(232,234,237);
-  --pop-border-color:     rgba(255,255,255,0.12);
-  --pop-radius:           0.75rem;
-  --pop-shadow:           0 4px 18px rgba(0,0,0,0.4);
-  --pop-max-width:        260px;
-  --pop-arrow-border:     rgb(24, 27, 34);
-  --pop-backdrop-blur:    blur(6px);
-
-  /* Header */
-  --head-bg:              rgba(80,95,93,0.75);
-  --head-fg:              rgb(232,234,237);
-  --head-border-bottom:   rgba(255,255,255,0.12);
-  --head-font-size:       0.8rem;
-  --body-bg:              transparent;          /* el fondo ya lo aporta el popover */
-  --body-fg:              rgb(186,191,198);
-  --body-font-size:       0.8rem;
-
-  /* Textareas (alias + mensaje) */
-  --ta-bg:                rgba(0,0,0,0.25);
-  --ta-fg:                rgb(232,234,237);
-  --ta-border:            rgba(255,255,255,0.1);
-  --ta-font-size:         0.8rem;
-  --ta-focus-border:      rgba(56,189,149,0.65);
-  --ta-focus-glow:        0 0 0 2px rgba(56,189,149,0.25);
-
-  /* Sumatorio (opcional en dark, valores suaves) */
-  --sum-bg:               rgba(255,255,255,0.06);
-  --sum-fg:               rgb(232,234,237);
-  --sum-border:           rgba(255,255,255,0.12);
-
-  /* Botones */
-  --acento:               rgba(56,189,149,0.8);
-  --acento-suave:         rgba(56,189,149,0.25);
-  --peligro:              rgba(208, 19, 19, 0.8);
-
-  --btn-guardar-bg:       transparent;
-  --btn-guardar-border:   var(--acento);
-  --btn-guardar-bg-hov:   rgba(56,189,149,0.10);
-
-  --btn-delete-bg:        transparent;
-  --btn-delete-border:    var(--peligro);
-  --btn-delete-bg-hov:    rgba(208, 19, 19, 0.10);
-
-  --btn-grabar-bg:        transparent;
-  --btn-grabar-border:    var(--acento);
-  --btn-grabar-bg-hov:    var(--acento-suave);
-
-  --btn-parar-bg:         transparent;
-  --btn-parar-fg:         #fff;
-  --btn-parar-glow:       0 0 0 3px rgba(227, 26, 11, 0.5);
-
-  /* Indicador de mensaje (círculo) */
-  /* --msg-indicador-bg:     rgba(6, 6, 6, 0.8); */
-}
-
-/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-   Tema ELEGANT (VIP / Premium)
-   ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
-.popover[data-theme="elegant"]{
-  /* Popover - Negro mate suave */
-  --pop-bg:               #1a1a1a;
-  --pop-fg:               #f0f0f0;
-  --pop-border-color:     #333333;
-  --pop-radius:           4px; /* Bordes más rectos = más seriedad */
-  --pop-shadow:           0 20px 40px rgba(0,0,0,0.6);
-  --pop-max-width:        300px;
-  --pop-arrow-border:     #333333;
-  --pop-backdrop-blur:    none;
-
-  /* Header - Dorado sutil */
-  --head-bg:              #1a1a1a;
-  --head-fg:              #d4af37; /* Gold */
-  --head-border-bottom:   #333333;
-  --head-font-size:       0.85rem;
-  --head-font-weight:     700;
-  
-  --body-bg:              #1a1a1a;
-  --body-fg:              #cccccc;
-  --body-font-size:       0.8rem;
-
-  /* Textareas - Integrados oscuros */
-  --ta-bg:                #262626;
-  --ta-fg:                #ffffff;
-  --ta-border:            #404040;
-  --ta-font-size:         0.8rem;
-  --ta-focus-border:      #d4af37;
-  --ta-focus-glow:        0 0 0 1px #d4af37;
-
-  /* Sumatorio */
-  --sum-bg:               #222222;
-  --sum-fg:               #d4af37;
-  --sum-border:           #333333;
-
-  /* Botones: Estilo 'Ghost' elegante */
-  --btn-guardar-bg:       transparent;
-  --btn-guardar-border:   #d4af37;
-  --btn-guardar-bg-hov:   #d4af37; /* Al hover se llena de dorado */
-  /* Nota: el texto al hover heredará, asegúrate que se lea bien o ajusta globalmente */
-
-  --btn-delete-bg:        transparent;
-  --btn-delete-border:    #777;
-  --btn-delete-bg-hov:    #444;
-
-  --btn-grabar-bg:        #333;
-  --btn-grabar-border:    #444;
-  --btn-grabar-bg-hov:    #555;
-
-  /* Botones extra */
-  --btn-parar-bg:         transparent;
-  --btn-parar-fg:         #d4af37;
-  --btn-parar-glow:       0 0 10px rgba(212, 175, 55, 0.3);
-  
-  /* Acento para el sumatorio ID */
-  --acento:               #d4af37;
-}
-
-/* Ajuste específico para que el texto sea negro al hacer hover en el botón dorado */
-.popover[data-theme="elegant"] .btn.btn-guardar:hover {
-    color: #000; 
-    font-weight: 600;
-}
-
-/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-   Tema CORPORATE (Modern SaaS)
-   ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
-.popover[data-theme="corporate"]{
-  /* Popover - Blanco puro con mucha sombra */
-  --pop-bg:               #ffffff;
-  --pop-fg:               #1e293b; /* Slate 800 */
-  --pop-border-color:     transparent; /* La sombra define el borde */
-  --pop-radius:           8px;
-  --pop-shadow:           0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --pop-max-width:        320px;
-  --pop-arrow-border:     transparent; 
-  --pop-backdrop-blur:    none;
-
-  /* Header - Acento azul corporativo */
-  --head-bg:              #ffffff;
-  --head-fg:              #3b82f6; /* Azul brillante */
-  --head-border-bottom:   #f1f5f9;
-  --head-font-size:       0.9rem;
-  
-  --body-bg:              #ffffff;
-  --body-fg:              #475569;
-  --body-font-size:       0.8rem;
-
-  /* Textareas - Gris muy pálido */
-  --ta-bg:                #f8fafc;
-  --ta-fg:                #334155;
-  --ta-border:            #cbd5e1;
-  --ta-font-size:         0.8rem;
-  --ta-focus-border:      #3b82f6;
-  --ta-focus-glow:        0 0 0 3px rgba(59, 130, 246, 0.15);
-
-  /* Sumatorio */
-  --sum-bg:               #eff6ff; /* Azul muy suave */
-  --sum-fg:               #1e40af;
-  --sum-border:           #dbeafe;
-
-  /* Botones: Sólidos y limpios */
-  --btn-guardar-bg:       #3b82f6; /* Azul sólido */
-  --btn-guardar-border:   #3b82f6;
-  --btn-guardar-bg-hov:   #2563eb; /* Azul más oscuro */
-
-  --btn-delete-bg:        #ffffff;
-  --btn-delete-border:    #e2e8f0;
-  --btn-delete-bg-hov:    #fee2e2; /* Rojo muy suave al hover */
-
-  --btn-grabar-bg:        #f1f5f9;
-  --btn-grabar-border:    #e2e8f0;
-  --btn-grabar-bg-hov:    #e2e8f0;
-
-  /* Botones extra */
-  --btn-parar-bg:         transparent;
-  --btn-parar-fg:         #64748b;
-  --btn-parar-glow:       none;
-  
-  --acento:               #2563eb;
-}
-
-/* Ajuste específico: texto blanco en botón guardar para este tema */
-.popover[data-theme="corporate"] .btn.btn-guardar {
-    color: #ffffff;
-    font-weight: 500;
-}
-.popover[data-theme="corporate"] .btn.btn-delete {
-    color: #64748b;
-}
-.popover[data-theme="corporate"] .btn.btn-delete:hover {
-    color: #ef4444;
-    border-color: #ef4444;
-}
-
-/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-   Tema ALTERNANT (Graphite / Modern Professional)
-   ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
-.popover[data-theme="alternant"]{
-  /* Popover - Gris Grafito (Ni negro, ni claro) */
-  --pop-bg:               rgba(55, 65, 81, 0.95); /* Gray 700 con toque de transparencia */
-  --pop-fg:               #f3f4f6; /* Blanco hueso, menos agresivo que el blanco puro */
-  --pop-border-color:     rgba(255, 255, 255, 0.1); /* Borde sutil para definir */
-  --pop-radius:           12px;
-  --pop-shadow:           0 10px 25px -5px rgba(0, 0, 0, 0.3); /* Sombra suave pero profunda */
-  --pop-max-width:        320px;
-  --pop-arrow-border:     rgba(55, 65, 81, 1);
-  --pop-backdrop-blur:    blur(8px); /* Efecto vidrio esmerilado */
-
-  /* Header - Ligeramente más claro para separar jerarquía */
-  --head-bg:              rgba(255, 255, 255, 0.05);
-  --head-fg:              #ffffff;
-  --head-border-bottom:   rgba(255, 255, 255, 0.08);
-  --head-font-size:       0.9rem;
-  
-  --body-bg:              transparent;
-  --body-fg:              #d1d5db; /* Gris claro muy legible */
-  --body-font-size:       0.8rem;
-
-  /* Textareas - Fondo oscuro "hundido" para contraste */
-  --ta-bg:                rgba(0, 0, 0, 0.2); 
-  --ta-fg:                #ffffff;
-  --ta-border:            rgba(255, 255, 255, 0.1);
-  --ta-font-size:         0.8rem;
-  --ta-focus-border:      #38bdf8; /* Azul cielo brillante al enfocar */
-  --ta-focus-glow:        0 0 0 2px rgba(56, 189, 248, 0.25);
-
-  /* Sumatorio - Estilo ficha técnica */
-  --sum-bg:               rgba(255, 255, 255, 0.07);
-  --sum-fg:               #e2e8f0;
-  --sum-border:           transparent;
-
-  /* Botones: Estilo moderno y limpio */
-  
-  /* Guardar: Gradiente sutil o color sólido vibrante pero mate */
-  --btn-guardar-bg:       #38bdf8; /* Sky Blue */
-  --btn-guardar-border:   #38bdf8;
-  --btn-guardar-bg-hov:   #0ea5e9;
-
-  /* Eliminar: Rojo desaturado */
-  --btn-delete-bg:        rgba(239, 68, 68, 0.1);
-  --btn-delete-border:    rgba(239, 68, 68, 0.3);
-  --btn-delete-bg-hov:    rgba(239, 68, 68, 0.25);
-
-  /* Grabar: Gris sobre gris */
-  --btn-grabar-bg:        rgba(255, 255, 255, 0.1);
-  --btn-grabar-border:    transparent;
-  --btn-grabar-bg-hov:    rgba(255, 255, 255, 0.2);
-
-  /* Botones extra */
-  --btn-parar-bg:         transparent;
-  --btn-parar-fg:         #9ca3af;
-  --btn-parar-glow:       0 0 0 2px rgba(255,255,255,0.2);
-
-  --acento:               #7dd3fc;
-}
-
-/* Ajustes específicos de texto para botones en Alternant */
-.popover[data-theme="alternant"] .btn.btn-guardar {
-    color: #0f172a; /* Texto oscuro sobre botón azul claro para alto contraste */
-    font-weight: 600;
-}
-.popover[data-theme="alternant"] .btn.btn-delete {
-    color: #fca5a5;
-}
-
-/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-   Tema MODERNO (Aluminio / Metálico)
-   ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
-.popover[data-theme="moderno"]{
-  /* Popover - Base Plateada (Gris muy claro) */
-  --pop-bg:               #e5e7eb; /* Gray 200 */
-  --pop-fg:               #1f2937; /* Dark text for contrast */
-  --pop-border-color:     #d1d5db; /* Gray 300 - Borde sutil */
-  --pop-radius:           8px;     /* Bordes precisos */
-  /* Sombra suave y difusa, simula el brillo en el metal */
-  --pop-shadow:           0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08);
-  --pop-max-width:        320px;
-  --pop-arrow-border:     #d1d5db;
-  --pop-backdrop-blur:    none;
-
-  /* Header - Gris claro 'Brushed Steel' */
-  --head-bg:              #d1d5db;
-  --head-fg:              #111827; /* Casi negro */
-  --head-border-bottom:   #9ca3af; /* Gris medio para el corte */
-  --head-font-size:       0.9rem;
-  
-  --body-bg:              transparent;
-  --body-fg:              #374151; /* Gris oscuro estándar */
-  --body-font-size:       0.8rem;
-
-  /* Textareas - Fondo blanco "Pulido" */
-  --ta-bg:                #ffffff; 
-  --ta-fg:                #1f2937;
-  --ta-border:            #d1d5db;
-  --ta-font-size:         0.8rem;
-  --ta-focus-border:      #6366f1; /* Indigo al foco */
-  --ta-focus-glow:        0 0 0 3px rgba(99, 102, 241, 0.2);
-
-  /* Sumatorio - Panel de información */
-  --sum-bg:               #f3f4f6; /* Off-white */
-  --sum-fg:               #4b5563;
-  --sum-border:           #d1d5db;
-
-  /* Botones: Apariencia mecanizada */
-  --acento:               #6366f1;
-  --peligro:              #dc2626;
-
-  /* Guardar: Indigo sólido con texto blanco */
-  --btn-guardar-bg:       var(--acento);
-  --btn-guardar-border:   var(--acento);
-  --btn-guardar-bg-hov:   #4f46e5; 
-
-  /* Eliminar: Borde rojo alto contraste */
-  --btn-delete-bg:        transparent;
-  --btn-delete-border:    var(--peligro);
-  --btn-delete-bg-hov:    #fee2e2;
-
-  /* Grabar: Gris oscuro (color metal pulido) */
-  --btn-grabar-bg:        #4b5563;
-  --btn-grabar-border:    #4b5563;
-  --btn-grabar-bg-hov:    #374151;
-
-  /* Botones extra */
-  --btn-parar-bg:         transparent;
-  --btn-parar-fg:         var(--pop-fg); /* Hereda el texto oscuro */
-  --btn-parar-glow:       0 0 0 3px rgba(220, 38, 38, 0.3);
-}
-
-/* Ajustes específicos de texto (fundamental para Metallic/Light themes) */
-.popover[data-theme="moderno"] .btn.btn-guardar {
-    color: #ffffff;
-    font-weight: 500;
-}
-.popover[data-theme="moderno"] .btn.btn-delete {
-    color: var(--peligro);
-}
-.popover[data-theme="moderno"] .btn.btn-grabar {
-    color: #ffffff;
-}
-
-/* Hacemos que la flecha sea plateada para que se vea más integrada */
-.popover[data-theme="moderno"] .popover-arrow::before,
-.popover[data-theme="moderno"] .popover-arrow::after{
-  border-color: #d1d5db !important; 
-}
-
-/* ██████████████████████████████████████████████████████████████████████████████████████████████████████ */
-
-/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-   2) ESTILOS COMUNES
-   ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
-
-.popover{
-  background:       var(--pop-bg);
-  color:            var(--pop-fg);
-  border: 1px solid var(--pop-border-color);
-  border-radius:    var(--pop-radius);
-  box-shadow:       var(--pop-shadow);
-  max-width:        var(--pop-max-width);
-  -webkit-backdrop-filter: var(--pop-backdrop-blur);
-  backdrop-filter:  var(--pop-backdrop-blur);
-}
-
-.popover .popover-header{
-  background:   var(--head-bg);
-  color:        var(--head-fg);
-  font-size:    var(--head-font-size);
-  font-weight:  600;
-  border-bottom: 1px solid  var(--head-border-bottom);
-  border-radius: calc(var(--pop-radius) - 0.05rem) calc(var(--pop-radius) - 0.05rem) 0 0;
-}
-
-.popover .popover-body{
-  background:   var(--body-bg);
-  color:        var(--body-fg);
-  font-size:    var(--body-font-size);
-}
-
-/* Flechita del popover */
-.popover .popover-arrow::before,
-.popover .popover-arrow::after{
-  border-color: var(--pop-arrow-border);
-}
-
-/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-   FORM (alias + mensaje) + SUMATORIO
-   ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
-
-.popover .contenedor_popover textarea{
-  border-radius: 10px;
-  border: 1px solid var(--ta-border);
-  background:   var(--ta-bg);
-  color:        var(--ta-fg);
-  font-size:    var(--ta-font-size);
-}
-
-.popover .contenedor_popover textarea:focus{
-  border-color: var(--ta-focus-border);
-  box-shadow:   var(--ta-focus-glow);
-  outline: none;
-}
-
-
-.popover .labels-alergias-pop {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  margin: 0 0 0.6rem;
-  min-height: 0.75rem;
-}
-
-.popover .labels-alergias-pop.is-empty {
-  margin-bottom: 0.25rem;
-}
-
-.popover .alergia-tag-pop {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  padding: 0.12rem 0.5rem;
-  font-size: 0.68rem;
-  line-height: 1.1;
-  text-transform: capitalize;
-  border: 1px solid #86efac;
-  background: #dcfce7;
-  color: #14532d;
-}
-
-/* Sumatorio de mensajes de reserva (solo lectura) */
-.contenedor_popover #sumatorio_mensajes_pop{
-  padding: 4%;
-  margin-bottom: 5px;
-  border-radius: 5%;
-  border: 1px solid var(--sum-border);
-  background:       var(--sum-bg);
-  color:            var(--sum-fg);
-  font-size: 0.7rem;
-}
 
 .sumatorio-id-ppal{ font-weight: bold;  border-color: var(--ta-focus-border); color: var(--acento);}
 
@@ -583,29 +61,6 @@ Tema DARK (RESERVAS)
 /* ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ 
    ■ ■ ■ ■ ■       ALERGIAS:     ■ ■ ■ ■ ■ 
    ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ */
-.popover .popover-header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.popover .btn-alergias-pop {
-  border: 1px solid #22c55e;
-  color: #000000;
-  background: #dcfce7;
-  font-size: 0.72rem;
-  line-height: 1;
-  padding: 0.25rem 0.5rem;
-}
-
-.popover .btn-alergias-pop:hover,
-.popover .btn-alergias-pop.is-open,
-.popover .btn-alergias-pop.has-selection {
-  color: #151414;
-  background: #e1ece5;
-  border-color: #e1ece5;
-}
 
 /* ========== Modal de alergias (Bootstrap 5) ========== */
 #modal_motor_alergias .modal-content {
@@ -678,12 +133,13 @@ Tema DARK (RESERVAS)
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
-  margin-bottom: 0.6rem;
+  /* margin-bottom: 0.6rem; */
 }
 
 .contenedor_motor_alergias .labels-alergias-pop.is-empty {
   color: #6b7280;
   font-size: 0.82rem;
+  margin: 0;
 }
 
 .contenedor_motor_alergias .alergia-tag-pop {
@@ -707,7 +163,8 @@ Tema DARK (RESERVAS)
 }
 
 .offcanvas-logica .nav-tabs {
-  margin-bottom: 0.35rem !important;
+  /* margin-bottom: 0.35rem !important; */
+  margin-bottom: 0.15rem !important;
 }
 
 .offcanvas-logica .nav-link {
@@ -732,7 +189,7 @@ Tema DARK (RESERVAS)
   gap: 0.35rem;
   min-height: 1rem;
   color: #64748b;
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   font-weight: 600;
   line-height: 1;
 }
@@ -753,12 +210,14 @@ Tema DARK (RESERVAS)
 
 .offcanvas-logica-title-news {
   min-height: 0.35rem;
-  border-radius: 0.45rem;
+  /* border-radius: 0.45rem; */
   padding: 0;
   background: transparent;
   color: inherit;
   font-size: 0.75rem;
   line-height: 1.15;
+  margin-top: 10;
+  margin-bottom: 0;
 }
 
 .offcanvas-logica-title-news.has-motor-alergias {
@@ -796,8 +255,8 @@ Tema DARK (RESERVAS)
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 0.9rem;
-  height: 0.9rem;
+  width: 0.8rem;
+  height: 0.8rem;
   border: 0;
   border-radius: 999px;
   padding: 0;
@@ -805,4 +264,50 @@ Tema DARK (RESERVAS)
   color: inherit;
   font-size: 0.78rem;
   line-height: 1;
+}
+/* Ajustes mobile del offcanvas de lógica. */
+.offcanvas-logica.offcanvas-top,
+.offcanvas-logica.offcanvas-bottom {
+  left: 0;
+  right: 0;
+  width: 100vw;
+  max-width: none;
+}
+
+.offcanvas-logica .offcanvas-header,
+.offcanvas-logica .offcanvas-body {
+  width: 100%;
+}
+
+.offcanvas-logica .offcanvas-body {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.offcanvas-logica .tab-content,
+.offcanvas-logica .tab-pane,
+.offcanvas-logica .area-de-contenido {
+  width: 100%;
+}
+
+.offcanvas-logica .area-de-contenido {
+  padding: 0.75rem !important;
+}
+
+.offcanvas-logica-title-info {
+  font-size: 0.9rem;
+}
+
+.offcanvas-logica .contenedor_motor_mensajes,
+.offcanvas-logica .motor-mensajes-sumatorio,
+.offcanvas-logica .contenedor_motor_mensajes textarea {
+  font-size: 0.76rem;
+}
+
+.offcanvas-logica .contenedor_motor_mensajes textarea {
+  min-height: 4.2rem;
+}
+
+.offcanvas-logica .motor-mensajes-acciones {
+  justify-content: flex-end;
 }
