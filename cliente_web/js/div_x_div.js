@@ -2738,10 +2738,12 @@ class e_Salon extends Tablero_Touch {
 			this.MSG_A.set_contexto(id_el);
 			// this.LOGIC.abrir_offcanvas(elemento_clickado);		
 
-			const offcanvas_logica = this.LOGIC.abrir_offcanvas(elemento_clickado);
-			if (offcanvas_logica) {
+			// const offcanvas_logica = this.LOGIC.abrir_offcanvas(elemento_clickado);
+			const posicion_offcanvas_logica = this._get_posicion_offcanvas_logica(elemento_clickado);
+			const $offcanvas_logica = this.LOGIC.abrir_offcanvas(elemento_clickado, posicion_offcanvas_logica);
+			if ($offcanvas_logica) {
 				this._set_elemento_onplay_seleccionado(elemento_clickado);
-				offcanvas_logica.addEventListener('hidden.bs.offcanvas', () => {
+				$offcanvas_logica.addEventListener('hidden.bs.offcanvas', () => {
 					this._reset_elemento_onplay_seleccionado();
 				}, { once: true });
 			}
@@ -2782,6 +2784,22 @@ class e_Salon extends Tablero_Touch {
 		return index_reserva;
 	}
 	
+	/**
+	 * ### Calcula dónde debe abrirse el offcanvas de lógica para no tapar la baldosa clickada.
+	 * @param {HTMLElement} elemento_onplay - Elemento del salón sobre el que se hace click.
+	 * @returns {'up'|'down'} 'up' abre el offcanvas arriba; 'down' lo abre abajo.
+	 */
+	_get_posicion_offcanvas_logica(elemento_onplay) {
+		const elemento = e_Salon._to_element(elemento_onplay);
+		const baldosa = elemento?.closest('.estiloBaldosas');
+		if (!baldosa) return 'down';
+
+		const rect_baldosa = baldosa.getBoundingClientRect();
+		const centro_baldosa_y = rect_baldosa.top + (rect_baldosa.height / 2);
+		const centro_pantalla_y = window.innerHeight / 2;
+
+		return centro_baldosa_y > centro_pantalla_y ? 'up' : 'down';
+	}
 	/** ✒️✒️
 	 * #### SOBRE-ESCRIBE ✒️ EL MÉTODO elemento_nuevo_to__Salon DE DRAG_X_DROP 
 	 * 	* Añade un Event Listener ​👂​👂 para el click en el nuevo elemento.

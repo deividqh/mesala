@@ -287,7 +287,10 @@ class Logica_Catalogo  {
         // ■ Contenedor principal del offcanvas
         $offcanvas_logica = document.createElement('div');
         $offcanvas_logica.id = 'offcanvas_logica';
-        $offcanvas_logica.className = 'offcanvas offcanvas-bottom'; 
+
+        // $offcanvas_logica.className = 'offcanvas offcanvas-bottom'; 
+        $offcanvas_logica.className = 'offcanvas offcanvas-bottom offcanvas-logica';
+
         $offcanvas_logica.tabIndex = -1;
         
         $offcanvas_logica.dataset.logica = 'true'; 
@@ -408,13 +411,17 @@ class Logica_Catalogo  {
      * las lógicas válidas que posea el elemento cliqueado.
      * @param {HTMLElement} elemento_dom - Elemento del salón sobre el que se hace clic.
      */
-    abrir_offcanvas(elemento_dom) {
+    // abrir_offcanvas(elemento_dom) {
+    abrir_offcanvas(elemento_dom, posicion_offcanvas_logica='down') {
         // ■ Datos iniciales
         const grupo_el = elemento_dom.dataset.id_key;
         const ctlg_el = Catalogo.get(grupo_el);
         if (!ctlg_el || !ctlg_el.logica) return null;
         const $offcanvas_dom = document.getElementById('offcanvas_logica');
         if (!$offcanvas_dom) return null;
+        
+        // ■ Posición offcanvas-logica (arriba / abajo)
+        this.#posicionar_offcanvas_logica($offcanvas_dom, posicion_offcanvas_logica);
 
         // ■ Actualizar el Título
         this.set_title(`Opciones de ${elemento_dom.id || 'Elemento'} - (${ctlg_el.grupo}) - (${ctlg_el.rol})`);
@@ -469,6 +476,29 @@ class Logica_Catalogo  {
         const bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance($offcanvas_dom);
         bsOffcanvas.show();
         return $offcanvas_dom;
+    }
+
+    /**
+     * @description Sitúa el offcanvas de lógica arriba o abajo antes de abrirlo.
+     * @param {HTMLElement} $offcanvas_dom
+     * @param {'up'|'down'} posicion_offcanvas_logica
+     */
+    #posicionar_offcanvas_logica($offcanvas_dom, posicion_offcanvas_logica='down') {
+        const posicion = posicion_offcanvas_logica === 'up' ? 'up' : 'down';
+        const clase_actual = posicion === 'up' ? 'offcanvas-top' : 'offcanvas-bottom';
+        const clase_anterior = posicion === 'up' ? 'offcanvas-bottom' : 'offcanvas-top';
+
+        bootstrap.Offcanvas.getInstance($offcanvas_dom)?.dispose();
+
+        // $offcanvas_dom.classList.remove(clase_anterior);
+        $offcanvas_dom.classList.remove('offcanvas-top');
+        $offcanvas_dom.classList.remove('offcanvas-bottom');
+
+        $offcanvas_dom.classList.add(clase_actual);
+        $offcanvas_dom.style.height = 'auto';
+        $offcanvas_dom.style.minHeight = '20vh';
+        $offcanvas_dom.style.maxHeight = '35vh';
+        $offcanvas_dom.dataset.posicionLogica = posicion;
     }
 
     set_title(html_content) {
