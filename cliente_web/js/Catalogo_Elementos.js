@@ -41,11 +41,18 @@ class Catalogo {
             },
         },
     });
+    
+    static #botones_crud_grabar = Object.freeze([
+        { action: 'grabar', texto: '🎤', title: 'Grabación de Voz', className: 'btn-grabar' },
+        { action: 'guardar', texto: '💾', title: 'Guardar mensaje', className: 'btn-guardar' },
+        { action: 'reset', texto: '🔁', title: 'Limpiar texto', className: 'btn-reset' },
+        { action: 'eliminar', texto: '🗑️', title: 'Eliminar mensaje', className: 'btn-delete' }
+	]);
 
     // 
     static #DATA = Object.freeze({
     mesa: {
-        id: 'mesa',
+        slug: 'mesa',
         grupo: 'player',
         rol: 'reserver', // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc)
         fisica: {
@@ -62,7 +69,7 @@ class Catalogo {
         }
     },
     silla: {
-        id: 'silla',
+        slug: 'silla',
         grupo: 'player',
         rol: 'cliente',   // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc) 
         fisica: { ancho: 1, alto: 1, colision: true },
@@ -76,7 +83,7 @@ class Catalogo {
         }
     },
     taburete: {
-        id: 'taburete',
+        slug: 'taburete',
         grupo: 'player',
         rol: 'reserver',   // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc)
         fisica: { ancho: 1, alto: 1, colision: true },
@@ -90,7 +97,7 @@ class Catalogo {
         }
     },
     // planta: {
-    //     id: 'planta',
+    //     slug: 'planta',
     //     grupo: 'decoration',
     //     rol: 'decoracion',   
     //     fisica: { ancho: 1, alto: 1, colision: true },
@@ -100,7 +107,7 @@ class Catalogo {
     //     },
     // },
     // esquina_muro: {
-    //     id: 'esquina_muro',
+    //     slug: 'esquina_muro',
     //     grupo: 'structure',
     //     rol: 'estructura',    
     //     fisica: { ancho: 2, alto: 1, colision: true },
@@ -125,7 +132,10 @@ class Catalogo {
         };
         return d_alergenos;
     }
-
+    static get_btns_crud_grabar(){
+        return this.#botones_crud_grabar;
+    }
+    
     // Diccionario para guardar las instancias de las lógicas (Motores)
     static #MOTORES = {};
 
@@ -267,9 +277,9 @@ class Catalogo {
  * creando pestañas dinámicas por cada tipo de lógica detectada en el catálogo.
  */
 class Logica_Catalogo  {
+    $offcanvas_logica = null;
     
-    constructor() {
-        
+    constructor() {        
         // Creamos el offcanvas en el DOM inmediatamente al instanciar la clase
         this.#crear_offcanvas_logica();
     }
@@ -293,7 +303,7 @@ class Logica_Catalogo  {
 
         $offcanvas_logica.tabIndex = -1;
         
-        $offcanvas_logica.dataset.logica = 'true'; 
+        // $offcanvas_logica.dataset.logica = 'true'; 
         $offcanvas_logica.style.backgroundColor = 'var(--color-egg-white)'; 
         $offcanvas_logica.style.height = 'auto'; 
         $offcanvas_logica.style.minHeight = '20vh'; 
@@ -303,36 +313,27 @@ class Logica_Catalogo  {
         header.className = 'offcanvas-header';
         
         // ■ TITULO
-        // const title = document.createElement('h6');
-        // title.className = 'offcanvas-title';
         const title = document.createElement('div');
-        title.className = 'offcanvas-title offcanvas-logica-title';
-
+        title.className = 'offcanvas-title  offcanvas-logica-title';
         title.id = 'offcanvas_logica_title';
-        // title.innerText = 'THE LOGIC ZONE'; 
-        const titleInfo = document.createElement('div');
-        titleInfo.className = 'offcanvas-logica-title-info';
-        titleInfo.id = 'offcanvas_logica_title_info';
-        titleInfo.textContent = 'THE LOGIC ZONE';
-
-        const titleNews = document.createElement('div');
-        titleNews.className = 'offcanvas-logica-title-news is-empty';
-        titleNews.id = 'offcanvas_logica_title_news';
-        titleNews.textContent = 'Sin novedades.';
-
-        title.appendChild(titleInfo);
-        title.appendChild(titleNews);
-
-        // ■ BOTON CERRAR
+        title.textContent = 'THE LOGIC ZONE';
+                
+        // ■ BOTON CERRAR DEL TITIULO
         const $btn_close = document.createElement('button');
         $btn_close.type = 'button';
         $btn_close.className = 'btn-close text-reset';
         $btn_close.setAttribute('data-bs-dismiss', 'offcanvas');
         $btn_close.setAttribute('aria-label', 'Close');
         
-        // ■ CONSTRUCCION CABECERA.
+        // ■ 
         header.appendChild(title);
         header.appendChild($btn_close);
+        
+        // ■ News verde/rojo/sin color.
+        const news = document.createElement('div');
+        news.className = 'offcanvas-logica-news';
+        news.id = 'offcanvas_logica_news';
+        news.textContent = '■ ZONA NEWS';
         
         // ■ BODY DEL OFFCANVAS 
         const body = document.createElement('div');
@@ -400,15 +401,16 @@ class Logica_Catalogo  {
             
             // ■ Crear el AREA DE CONTENIDO.
             const $content_div = document.createElement('div');
-            $content_div.className = 'p-3 border border-top-0 area-de-contenido';
+            $content_div.className = 'p-3 border border-top-0   area-de-contenido';
             $content_div.textContent = `Cargando datos de ${nombrePestana}...`; 
-
+            
             // 3. Añadir el div interno al panel
             panel.appendChild($content_div);
-
+            
             tabContent.appendChild(panel);
         });
-
+        
+        body.appendChild(news);
         body.appendChild(tabList);
         body.appendChild(tabContent);
 
@@ -429,18 +431,22 @@ class Logica_Catalogo  {
     // abrir_offcanvas(elemento_dom) {
     abrir_offcanvas(elemento_dom, posicion_offcanvas_logica='down') {
         // ■ Datos iniciales
-        const grupo_el = elemento_dom.dataset.id_key;
-        const ctlg_el = Catalogo.get(grupo_el);
+        const id_key = elemento_dom.dataset.id_key;
+        if(!id_key) return null;
+        const ctlg_el = Catalogo.get(id_key);
         if (!ctlg_el || !ctlg_el.logica) return null;
+        
         const $offcanvas_dom = document.getElementById('offcanvas_logica');
+        const $offcanvas_dom_ = document.querySelector('.offcanvas-logica');
+        const $offcanvas_dom__ = e_Salon._to_element('.offcanvas-logica');
+
         if (!$offcanvas_dom) return null;
         
         // ■ Posición offcanvas-logica (arriba / abajo)
         this.#posicionar_offcanvas_logica($offcanvas_dom, posicion_offcanvas_logica);
 
         // ■ Actualizar el Título
-        // this.set_title(`Opciones de ${elemento_dom.id || 'Elemento'} - (${ctlg_el.grupo}) - (${ctlg_el.rol})`);
-        this.set_title(elemento_dom, ctlg_el);
+        this.set_title(`${elemento_dom.id}`);
 
         // ■ Cacho la logica del elemento en Catalogo.
         const logica_el = ctlg_el.logica;
@@ -517,44 +523,29 @@ class Logica_Catalogo  {
         $offcanvas_dom.dataset.posicionLogica = posicion;
     }
 
-    // set_title(html_content) {
-    //     const $title_dom = document.getElementById('offcanvas_logica_title');
-    //     if (!$title_dom) return;
-    //     $title_dom.innerHTML = html_content;
-    // }
-    set_title(elemento_dom = null, ctlg_el = null) {
-        const $info_dom = document.getElementById('offcanvas_logica_title_info');
-        const $news_dom = document.getElementById('offcanvas_logica_title_news');
-        if (!$info_dom || !$news_dom || !elemento_dom || !ctlg_el) return;
-
-        const id_elemento = elemento_dom.id || 'Elemento';
-        const visual = ctlg_el.visual || {};
-
-        $info_dom.innerHTML = '';
-        const icono = document.createElement('span');
-        icono.className = 'offcanvas-logica-title-icon';
-        icono.innerHTML = visual.content || '';
-
-        const texto = document.createElement('span');
-        texto.textContent = `${id_elemento} · ${ctlg_el.grupo || ''} · ${ctlg_el.rol || ''}`;
-
-        $info_dom.appendChild(icono);
-        $info_dom.appendChild(texto);
-
-        $news_dom.innerHTML = '';
-        $news_dom.className = 'offcanvas-logica-title-news is-empty';
-        $news_dom.textContent = '';
-
-        const logica_alergias = ctlg_el.logica?.motor_alergias;
-        if (!logica_alergias) return;
-
-        const motor_alergias = Catalogo.get_motor('motor_alergias');
-        if (!motor_alergias?.render) return;
-
-        $news_dom.innerHTML = '';
-        $news_dom.className = 'offcanvas-logica-title-news has-motor-alergias';
-        motor_alergias.render({ ...logica_alergias, news: true }, elemento_dom, $news_dom);
+    set_title(html_content) {
+        const $title_dom = document.getElementById('offcanvas_logica_title');
+        if (!$title_dom) return;
+        $title_dom.innerHTML = html_content;
     }
+    // set_title(elemento_dom = null, ctlg_el = null) {
+    //     const $info_dom = document.getElementById('offcanvas_logica_title');
+    //     const $el_dom = e_Salon._to_element(elemento_dom);
+    //     if(!$el_dom) return;
+    //     const ctlg = Catalogo.get($el_dom.id);
+    //     const svg_icon = ctlg?.visual.content || '';
+
+    //     const icono = document.createElement('span');
+    //     icono.className = 'offcanvas-logica-title-icon';
+    //     icono.innerHTML = svg_icon || '';
+        
+    //     const texto = document.createElement('span');
+    //     texto.textContent = `${$el_dom.id}`;
+        
+    //     $info_dom.innerHTML = svg_icon +''+ $el_dom.id;
+    //     // $info_dom.appendChild(icono);
+    //     // $info_dom.appendChild(texto);
+    // }
     /**
      * @description Reemplaza TODO el contenido del cuerpo del offcanvas.
      * ADVERTENCIA: Si usas este método, sobrescribirás el widget de pestañas (Tabs). 

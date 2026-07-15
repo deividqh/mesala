@@ -2621,7 +2621,7 @@ class e_Salon extends Tablero_Touch {
 			silla_14: 45, silla_16: 54, silla_15: 52, mesa_5: 53, silla_19: 61 , 
 			mesa_6: 75, silla_21: 74, silla_20: 76,  			
 		};
-		const d_mensajs_mock = {silla_0: "Nadie", mesa_0: 'Sabe', silla_2: 'Nada' };
+		const d_mensajs_mock = {silla_0: "Nadie", mesa_0: 'Sabe', silla_2: 'Nada', mesa_2: 'Mr Smith', mesa_4: 'Miss Smith', };
 		const d_alergias_mock = {silla_0: ['soja', 'lacteos'], silla_1: ['huevos'], };
 		this._load_elementos_en_Salon(d_indices_mock);
 		this.RegisteR();
@@ -2738,12 +2738,11 @@ class e_Salon extends Tablero_Touch {
 			this.MSG_A.set_contexto(id_el);
 			// this.LOGIC.abrir_offcanvas(elemento_clickado);		
 
-			// const offcanvas_logica = this.LOGIC.abrir_offcanvas(elemento_clickado);
 			const posicion_offcanvas_logica = this._get_posicion_offcanvas_logica(elemento_clickado);
-			const $offcanvas_logica = this.LOGIC.abrir_offcanvas(elemento_clickado, posicion_offcanvas_logica);
-			if ($offcanvas_logica) {
+			const offcanvas_logica = this.LOGIC.abrir_offcanvas(elemento_clickado, posicion_offcanvas_logica);
+			if (offcanvas_logica) {
 				this._set_elemento_onplay_seleccionado(elemento_clickado);
-				$offcanvas_logica.addEventListener('hidden.bs.offcanvas', () => {
+				offcanvas_logica.addEventListener('hidden.bs.offcanvas', () => {
 					this._reset_elemento_onplay_seleccionado();
 				}, { once: true });
 			}
@@ -2751,6 +2750,23 @@ class e_Salon extends Tablero_Touch {
 			this._reset_elemento_onplay_seleccionado();	
 		}
 
+	}
+
+	/**
+	 * ### Calcula dónde debe abrirse el offcanvas de lógica para no tapar la baldosa clickada.
+	 * @param {HTMLElement} elemento_onplay - Elemento del salón sobre el que se hace click.
+	 * @returns {'up'|'down'} 'up' abre el offcanvas arriba; 'down' lo abre abajo.
+	 */
+	_get_posicion_offcanvas_logica(elemento_onplay) {
+		const elemento = e_Salon._to_element(elemento_onplay);
+		const baldosa = elemento?.closest('.estiloBaldosas');
+		if (!baldosa) return 'down';
+
+		const rect_baldosa = baldosa.getBoundingClientRect();
+		const centro_baldosa_y = rect_baldosa.top + (rect_baldosa.height / 2);
+		const centro_pantalla_y = window.innerHeight / 2;
+
+		return centro_baldosa_y > centro_pantalla_y ? 'up' : 'down';
 	}
 
 	/** ### Marca visualmente el player seleccionado y limpia la selección anterior. */
@@ -2784,22 +2800,6 @@ class e_Salon extends Tablero_Touch {
 		return index_reserva;
 	}
 	
-	/**
-	 * ### Calcula dónde debe abrirse el offcanvas de lógica para no tapar la baldosa clickada.
-	 * @param {HTMLElement} elemento_onplay - Elemento del salón sobre el que se hace click.
-	 * @returns {'up'|'down'} 'up' abre el offcanvas arriba; 'down' lo abre abajo.
-	 */
-	_get_posicion_offcanvas_logica(elemento_onplay) {
-		const elemento = e_Salon._to_element(elemento_onplay);
-		const baldosa = elemento?.closest('.estiloBaldosas');
-		if (!baldosa) return 'down';
-
-		const rect_baldosa = baldosa.getBoundingClientRect();
-		const centro_baldosa_y = rect_baldosa.top + (rect_baldosa.height / 2);
-		const centro_pantalla_y = window.innerHeight / 2;
-
-		return centro_baldosa_y > centro_pantalla_y ? 'up' : 'down';
-	}
 	/** ✒️✒️
 	 * #### SOBRE-ESCRIBE ✒️ EL MÉTODO elemento_nuevo_to__Salon DE DRAG_X_DROP 
 	 * 	* Añade un Event Listener ​👂​👂 para el click en el nuevo elemento.
@@ -3720,9 +3720,10 @@ class e_Salon extends Tablero_Touch {
 
 	/** 
 	 * ### Crea y muestra un toast de notificación al eliminar un elemento del Salon.
+	 * Se tiene que crear cada vez pq se pueden eliminar 2 elementos en breve espacio
+	 * y tiene que aparecer un toast por cada elemento. En caso contrario bloquearía.
 	 * @param {string} id_elemento - El ID del elemento eliminado. 	 */
 	_set_exit_toast_bs(id_elemento) {
-		// ┌• Cacho la Papelera
 		const $contenedor = e_Salon._to_element('navbar') || null;
 		
 		// Crear el elemento HTML del Toast
@@ -4960,7 +4961,7 @@ class Configuracion_Salon {
      * ### Verifica que cada elemento tenga las propiedades físicas y visual mínimas.     */
     __validar_catalogo_elementos(catalogo) {
 		// Fisica y Visual son obligatorias, la lógica es opcional
-        const campos_obligatorios = ['id', 'fisica', 'visual'];
+        const campos_obligatorios = ['slug', 'fisica', 'visual'];
         
         Object.entries(catalogo).forEach(([key, valor]) => {
             campos_obligatorios.forEach(campo => {

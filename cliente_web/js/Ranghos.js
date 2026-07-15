@@ -4,14 +4,15 @@
  * @example let celda = new Working_Celdas(this, fila, columna);
  */
 class Working_Celdas {
-	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	// ■■
 	// * C L A S E  "Working_Celdas" ► representa una celda en una matriz_plana.
 	// * Permite convertir entre coordenadas (fila, columna) o indice y referencias estilo Excel (A1, B2, etc.)
 	// * example: (Matriz_Plana)  let celda = new Working_Celdas(this, fila, columna);
-	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	// ■■
 	constructor(instancia_Salon = null) {
 		
 		this.ref_Salon = instancia_Salon;
+
 	}
 
 	/**
@@ -51,8 +52,8 @@ class Working_Celdas {
 		return celda || null;
 	}
 
-	// ■■■■■■■■■■■■■■■■■ UTILIDADES
-	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	// ■■ UTILIDADES
+	// ■■
 	/**
 	 * ## Normaliza un valor para que sea un ENTERO POSITIVO (índice válido).
 	 * ### Si introduce un valor no válido, devuelve 0.
@@ -70,8 +71,8 @@ class Working_Celdas {
 		}
 	}
 	
-	// ■■■■■■■■■■■■■■■■■ CONVERSION
-	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	// ■■ CONVERSION
+	// ■■
 	/**
 	 * ## Devuelve el indice en  this.matriz_plana si lo encuentra, o false si no encuentra.
 	 * {@link X_to_indice} ■ 
@@ -334,9 +335,9 @@ class Working_Celdas {
         }
     }
 	
-	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ VALIDADORES
-	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	// ■■
+	// ■■ VALIDADORES
+	// ■■
 	
 	/**
 	 * ### Valida que un indice es Correcto(Entero positivo, en el rango de la matriz.)
@@ -420,9 +421,9 @@ class Working_Celdas {
 		return false;
     }
 
-	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-	// ■■■■■■■■■■■■■■■■■ HERRAMIENTAS DE LA CLASE
-	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	// ■■
+	// ■■ HERRAMIENTAS DE LA CLASE
+	// ■■
 	/**
 	 * ### Añade un valor al índice de la celda pasada como argumento y devuelve el resultado.
 	 * @param {String|Object} arg1, puede ser String 'B2' o Object {3, 2} o number-indice (5)
@@ -478,9 +479,9 @@ class Working_Celdas {
 }
 
 
-// ◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘
-// ◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘ PRUEBAS  CON RANGOS ◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘
-// ◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘
+// ◘◘◘◘◘◘
+// ◘◘◘◘◘◘ PRUEBAS  CON RANGOS 
+// ◘◘◘◘◘◘
 /**
  ```javascript
  ▶️▶️▶️▶️▶️▶️▶️▶️▶️▶️▶️▶️▶️▶️ PRUEBAS CON RANGOS
@@ -568,22 +569,19 @@ RnG.add_rango('rango_prueba', rango_from_reservas_bdd[0]);
 const nombre_ghost = this._ghost({filas:3,columnas:4});
 this.ghost_s[nombre_ghost];
 
-// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-
-
  ▶️▶️▶️▶️▶️▶️▶️▶️▶️▶️▶️▶️▶️▶️ FIN PRUEBAS CON RANGOS
 ```
 */
 class Working_Rangos  extends Working_Celdas{
-        // ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+        // ■■
         // * C L A S E  "Rango"
-        // ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+        // ■■
         constructor(instancia_matriz_plana = null) {			
 			if (!instancia_matriz_plana) return null;
 			
-			// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+			// ■■
 			super(instancia_matriz_plana);	
-			// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+			// ■■
 
 			// this.ref_matriz = instancia_matriz_plana;	// ► Puntero a la clase matriz. 
 			this.d_rangos = {};							// ► Diccionario de rangos
@@ -697,7 +695,7 @@ class Working_Rangos  extends Working_Celdas{
 				return nombres_existentes.includes(nombre_rango) ? false : candidato;
 			}
 
-			// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+			// ■ ■ ■ 
 
 			// ┌■ CASO 2: 'NO' introduce nombre_rango, creo uno dinámicamente con la base 'rango_'.
 			indice = 0;
@@ -1302,12 +1300,9 @@ class Working_Rangos  extends Working_Celdas{
 		return d_values;
 	} 
 
-	
-
-	// ◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘
-	// ◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘ FUNCIONES DE RANGOS ◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘
-	// ◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘
-	
+	// ◘◘◘◘
+	// ◘◘◘◘ FUNCIONES DE RANGOS 
+	// ◘◘◘◘
 	/**
 	 * ## Informa si cada celda de un rango tiene contenido dentro del objeto myDiv.
 	 * ### • Si la celda no pertenece a la matriz devuelve null en su lugar.
@@ -1357,8 +1352,6 @@ class Working_Rangos  extends Working_Celdas{
 		const contenido = myDiv.elemento_div.firstElementChild;
 		return contenido instanceof HTMLElement ? contenido : null;
 	}
-
-	
 
 	/**
 	 * ### Busca un id de contenido dentro de la matriz y devuelve la celda donde se encuentra.
@@ -1434,6 +1427,7 @@ class Working_Rangos  extends Working_Celdas{
 			// ■ Si no se encuentra ningún bloque libre, devuelve null
 			return null;
 	}
+
 	/**
 	 * ### Recorre el rango pasado como argumento y comprueba si todas las celdas estan vacias. 
 	 * ### usado en {@link _busca_dimension_free}
@@ -1484,10 +1478,6 @@ class Working_Rangos  extends Working_Celdas{
 		return Boolean(myDiv.elemento_div.children.length === 0);
 	}
 
-	
-	
-	
-
 	/** ## Devuelve: celda_i | celda_f | geo.delta_x | geo.delta_y | dimension.filas | dimension.columnas | celdas_valor | celdas_baldosa */
 	__print_all_info(nombre_rango){
 		const rango = this.api_read(nombre_rango);
@@ -1502,6 +1492,7 @@ class Working_Rangos  extends Working_Celdas{
 		}
 		console.log(`${ficha.celda_inicio}`)
 	}
+
 	/** 
 	 * ## Genera y Devuelve una ficha de cada reserva, aportando informacion de RANGOS. Fase Previa de RE-POSICIONAR.
 	 * ### • Crea rangos temporales (prev_X) y calcula geometría relativa ( delta ).
@@ -1628,6 +1619,7 @@ class Working_Rangos  extends Working_Celdas{
 		// console.log(" ▶️ Geometría PREV:", arr_retorno);
 		return arr_retorno;
 	}	
+
 	/** ## Devuelve un array de los nombres de las celdas de un rango */
 	_get_celdas(nombre_rango){
 		if(!nombre_rango) nombre_rango = 'rango_matriz';
@@ -1652,8 +1644,6 @@ class Working_Rangos  extends Working_Celdas{
 		const items = this._get_items(nombre_rango);
 		return items ? Object.keys(items) : null;
 	}	
-
-		
 
 	/**	## Entra un 'array de nombres de celda' y devuelve el menor izquierdo y el mayor derecho 
 	 * ### {@link _get_union} devuelve el array de celdas por reserva, esta funcion devuelve celda_inicio y celda_fin de un array.
@@ -1769,6 +1759,7 @@ class Working_Rangos  extends Working_Celdas{
 		return nombre_temporal;
 
 	}
+
 	/** ## Elimina 'rangos temporales'  de [d_rangos] y [rangos.temp] 
 	 * ### [ Se crea un temporal con  {@link crear_temporal} ]
 	 * ### 
@@ -1806,9 +1797,6 @@ class Working_Rangos  extends Working_Celdas{
 		}
 
 	}
-	
-	
-
 
 	// get d_rangos(){ return this.d_rangos || {}; }
 	get diccionario(){ return this.d_rangos || {}; }
@@ -2137,7 +2125,7 @@ class Rango_Ghost extends Working_Rangos{
 
         const g = this.d_ghost;
 
-		// ┌■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ PREPARACIÓN DE DATOS 👻 		
+		// ┌■■ PREPARACIÓN DE DATOS 👻 		
 		// ┌■■ Hay que cachar los datos del Salon y compararlos con los de Ghost:
 
 		// ┌• espacio de separación entre las matrices(La separación dinámica)
@@ -2184,13 +2172,13 @@ class Rango_Ghost extends Working_Rangos{
 			linea_s_to_print.push(linea);
         }
 
-		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ CALCULO DE ANCHOS 👻		
+		// ■■■ CALCULO DE ANCHOS 👻		
 		// ┌■■ Longitud maxima de cada linea que suma de las matrices "Rango + Salon + separacion"
 		let max_l = 0;
 		linea_s_to_print.forEach(linea =>{max_l = Math.max(max_l, get_real_length(linea)) });
 		const x_matriz = Math.floor((max_l - separacion) / 2);
 
-		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ RENDERIZADO 👻        
+		// ■■■ RENDERIZADO 👻        
         const BARRA = '■'.repeat(max_l+4);
 		// ┌• Cabecera (Techo)
         console.log(`${F.bright}${F.green} ${BARRA}👻${F.reset} ► " ${F.red}${accion}${F.reset} "`);
@@ -2349,8 +2337,7 @@ class Rango_Ghost extends Working_Rangos{
 	/** ## CORTA los 'Valores de Salon' donde está posicionado el ghost	 
 	 * ### • Es responsabilidad del programador mover el cursor con 'mover_cursor' para CORTAR valores distintos.
 	 * ### • VOY A INTENTAR 'CORTAR' LOS ELEMENTOS DIRECTAMENTE PORQUE GHOST VIVE EN EL DOM. NO SE GUARDA.
-	*/
-	
+	*/	
 	cut_ghost() {
 		const ghost_name = this._nombrar_rango_anonimo(this.d_ghost);
 		try {
@@ -2516,6 +2503,8 @@ class Rango_Ghost extends Working_Rangos{
 				if(!menu_element) return; 	// . . . continue 	
 				const idkey_menu = menu_element.dataset.id_key;
 				if(!idkey_menu) return; 	// . . . continue 	
+
+				const id_key = Catalogo.get(id_player_fantasma);
 				
 				// ┌■■ Cut o Copy ??  🧠🧠									
 				if(Cut && !Copy){
@@ -2774,10 +2763,9 @@ class Rango_Ghost extends Working_Rangos{
 		}
 	}
 	
-	
 }
 
-/** ◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘
+/** ◘ ◘ ◘ ◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘
  * ### CLASE HIJA DE RANGOS. Operaciones Especiales. 
  *  ◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘◘
 */
@@ -2795,8 +2783,6 @@ class Wedding_Rangos extends Rango_Ghost{
 		// this.rangos_temp = {};		/** ## Diccionario de rangos temporales. Normalmente se crean y destruyen. Son is_basic = false */
 		// this.rangos_basic = {};		/** ## Diccionario basicos(filas, columnas, rango_matriz, pares, nones) generados en el padre. is_basic = true */
 		// this.rangos_ghost = {};		/** ## Diccionario fantasma(solo tiene dimension y geo)  */
-
-		
     }	
 	
 	/**
@@ -2922,9 +2908,6 @@ class Wedding_Rangos extends Rango_Ghost{
 		}
 		return true;
 	}
-
-	
-	
 
 	/** ### Devuelve celdas_comunes, celdas_no_comunes, celdas_totales(celdas implicadas) de dos rangos */
     _celdas_comunes(rango_a, rango_b) {
@@ -3151,7 +3134,7 @@ class El_Rango_del_Salon extends Wedding_Rangos{
 		if (!instancia_Salon) return null;		
 		// ┌■ 
 		super(instancia_Salon);	
-		this.instancia_Salon = instancia_Salon;
+		// this.instancia_Salon = instancia_Salon;
 		
 		// this._init_rangos_basicos(true, true, true, true, true);
 		

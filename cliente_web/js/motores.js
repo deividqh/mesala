@@ -159,34 +159,43 @@ class Motor_Mensajes {
 
 	_actualizar_markador_elemento(id_elemento = '') {
         if (!id_elemento) return;
-        if (this.has(id_elemento)) this.__mostrar_markador(id_elemento);
-        else this.__ocultar_markador(id_elemento);
+        if (this.has(id_elemento)) 
+			this.__mostrar_markador(id_elemento);
+        else 
+			this.__ocultar_markador(id_elemento);
     }
 
     __mostrar_markador(id_elemento = '') {
-        const elemento_dom = document.getElementById(id_elemento);
+        const elemento_dom = e_Salon._to_element(id_elemento);
         if (!elemento_dom) return;
 
         elemento_dom.classList.add('elemento_con_mensaje');
 
-        let markador = elemento_dom.querySelector('.markador_mensaje');
-        if (!markador) {
-            markador = document.createElement('i');
-            markador.className = 'bi bi-chat-quote markador_mensaje';
-            markador.setAttribute('aria-hidden', 'true');
-            elemento_dom.appendChild(markador);
+        let $markador = elemento_dom.querySelector('.markador_mensaje');
+        if (!$markador) {
+            $markador = document.createElement('i');
+            // $markador.className = 'bi bi-brightness-low-fill markador_mensaje';
+            $markador.className = 'bi bi-check-square-fill markador_mensaje';
+            $markador.setAttribute('aria-hidden', 'true');
+            elemento_dom.appendChild($markador);
         }
 
-        markador.style.color = '#16a34a';
-        markador.style.display = 'block';
+        // $markador.style.color = '#5727a5';
+        $markador.style.display = 'block';
     }
 
+	// markador_mensaje
+	// elemento_con_mensaje
     __ocultar_markador(id_elemento = '') {
-        const elemento_dom = document.getElementById(id_elemento);
+        // const elemento_dom = document.getElementById(id_elemento);
+        const elemento_dom = e_Salon._to_element(id_elemento);
+
         if (!elemento_dom) return;
 
-        const markador = elemento_dom.querySelector('.markador_mensaje');
-        if (markador) markador.remove();
+        const $markador = elemento_dom.querySelector('.markador_mensaje');
+		// Si existe, lo elimino y elimino la clase
+        if ($markador) 
+			$markador.remove();
         elemento_dom.classList.remove('elemento_con_mensaje');
     }
 
@@ -194,15 +203,9 @@ class Motor_Mensajes {
 	_crear_botones_accion() {
 		const toolbar = document.createElement('div');
 		toolbar.className = 'd-flex gap-2 motor-mensajes-acciones';
-
-		const botones = [
-			{ action: 'grabar', texto: '🎤', title: 'Grabación de Voz', className: 'btn-grabar' },
-			{ action: 'guardar', texto: '💾', title: 'Guardar mensaje', className: 'btn-guardar' },
-			{ action: 'reset', texto: '🔁', title: 'Limpiar texto', className: 'btn-reset' },
-			{ action: 'eliminar', texto: '🗑', title: 'Eliminar mensaje', className: 'btn-delete' }
-		];
-
-		botones.forEach((boton) => {
+		// Error: cachar los botones de Catalogo. ya está preparado.(#botones_crud_grabar)
+		const btns = Catalogo.get_btns_crud_grabar()
+		btns.forEach((boton) => {
 			const button = document.createElement('button');
 			button.type = 'button';
 			button.className = `btn btn-sm ${boton.className}`;
@@ -213,16 +216,18 @@ class Motor_Mensajes {
 		});
 		return toolbar;
 	}
-	_es_reserver(id_elemento = '') {
-		const elemento_dom = document.getElementById(id_elemento);
+
+	_es_rol(id_elemento = '' , rol_busca='reserver') {
+		const elemento_dom = e_Salon._to_element(id_elemento);
 		const id_catalogo = elemento_dom?.dataset?.id_key || id_elemento.split('_')[0];
-		return Catalogo.get(id_catalogo)?.rol === 'reserver';
+		const match_rol = Catalogo.get(id_catalogo)?.rol === rol_busca;
+		return match_rol
 	}
 
 	_get_ids_reservers_de_reserva() {
 		return this.ids_reserva_actual.filter((id) => {
 			if (!id || id === this.id_elemento) return false;
-			return this._es_reserver(id);
+			return this._es_rol(id, 'reserver');
 		});
 	}
 	_crear_sumatorio() {
@@ -598,8 +603,8 @@ class Motor_Alergias {
 		const es_news = data_logica.news === true;
 
 		const $contenedor = document.createElement('div');
-		// $contenedor.className = ['contenedor_motor_alergias', data_logica.css || ''].filter(Boolean).join(' ');
-		$contenedor.className = ['contenedor_motor_alergias', es_news ? 'is-news' : '', data_logica.css || ''].filter(Boolean).join(' ');
+		$contenedor.className = ['contenedor_motor_alergias', data_logica.css || ''].filter(Boolean).join(' ');
+		// $contenedor.className = ['contenedor_motor_alergias', es_news ? 'is-news' : '', data_logica.css || ''].filter(Boolean).join(' ');
 
 		const resumen = document.createElement('div');
 		resumen.className = 'labels-alergias-pop';

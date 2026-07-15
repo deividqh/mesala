@@ -114,10 +114,7 @@ CONTENEDOR
 
     /* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
     Opcional: mejorar “scrolling” en iOS */
-    /* -webkit-overflow-scrolling: touch; */
-    
-    
-    
+    /* -webkit-overflow-scrolling: touch; */  
     
   }
 
@@ -149,6 +146,8 @@ CONTENEDOR
   /* padding: calc(25px * var(--scale-factor)); */
   padding: 15%;                       /*Set del espacio interior de la baldosa.... la imagen se hace mas pequeña.*/
   border: calc(1px * var(--scale-factor)) solid var(--color-baldosas-border);
+  
+  
   /* Opcional: mejorar “scrolling” en iOS */
   margin: 0;
   background: var(--color-baldosas-bg);
@@ -165,9 +164,7 @@ CONTENEDOR
     z-index: 2;                 /* ■ Asegura que la baldosa resaltada esté encima de la imagen */
 }
 
-/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
-CONTENIDO DE LAS BALDOSAS (mesas, sillas, etc) 
-■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
+/* ■ ■ ■ CONTENIDO DE LAS BALDOSAS (mesas, sillas, etc)  */
 .estiloBaldosas img {
     max-width: 90%;    /* nunca ocupa más del 90% del ancho de la baldosa */
     max-height: 90%;   /* nunca ocupa más del 90% del alto de la baldosa */
@@ -175,9 +172,7 @@ CONTENIDO DE LAS BALDOSAS (mesas, sillas, etc)
     min-width: 0;                 /* Permite que se reduzcan */
     min-height: 0;                /* Permite que se reduzcan */
 }
-/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
-CONTENIDO DE BALDOSAS (SVG/IMG) 
-■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
+/* ■ ■ ■ CONTENIDO DE BALDOSAS (SVG/IMG)  */
 /* Wrapper del clon dentro de la baldosa (centrado y sin estirar) */
 .estiloBaldosas > .class_onplay {
     /* Asegura centrado del hijo real (svg/img) */
@@ -188,7 +183,7 @@ CONTENIDO DE BALDOSAS (SVG/IMG)
     height: 100%;
 }
 
-/* Ajuste de tamaño del icono real (soporta SVG e IMG) */
+/* ■ ■ ■ Ajuste de tamaño del icono real (soporta SVG e IMG) */
 .estiloBaldosas > .class_onplay > svg,
 .estiloBaldosas > .class_onplay > img {
     max-width: 90%;   /* ⇦ cambia a 60%/80% si prefieres */
@@ -200,9 +195,7 @@ CONTENIDO DE BALDOSAS (SVG/IMG)
 }
 
 
-/* ■■■■■■■■ 
-NAV-BAR 
-■■■■■■■■■■ */
+/* ■ ■ ■ NAV-BAR  */
 /* fondo translúcido + blur (efecto glass) y sombra sutil */
 .navbar {  -webkit-backdrop-filter: blur(6px); background: linear-gradient(180deg, rgba(var(--surface), 0.28), rgba(var(--surface), 0.16)); 
   backdrop-filter: blur(6px); box-shadow: 0 6px 20px rgba(0,0,0,0.25);border-bottom: 1px solid rgba(255,255,255,0.03);          
@@ -214,8 +207,7 @@ NAV-BAR
 .navbar .navbar-toggler:focus {   outline: 3px solid rgba(var(--accent-rgb), 0.18); box-shadow: 0 4px 18px rgba(var(--accent-rgb), 0.08);     /* sombra en foco */
   transform: translateY(-1px);                              /* pequeño levantamiento */
 }
-/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-Sobre la agrupación de los iconos en el nav-bar */
+/* ■ ■ ■ Sobre la agrupación de los iconos en el nav-bar */
 .navbar .navbar-groups {  justify-content: flex-start;  gap: 1.2rem;}
 .navbar .navbar-left {  gap: 1.2rem; }
 .navbar .navbar-elementos {  flex: 1;  justify-content: center; font-size: 3rem;}
@@ -231,9 +223,7 @@ button[data-action-nav="elementos"] svg { width: 40px;  height: 40px; font-size:
 /* Un poco de feedback visual al usuario */
 button[data-action-nav="elementos"]:hover img { transform: scale(1.4); }
 
-/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
-MENÚ NAVBAR....CONTENEDOR de la imagen .imagen_menu. 
- ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
+/* ■ ■ ■ MENÚ NAVBAR....CONTENEDOR de la imagen .imagen_menu.  */
 .menu_to_clone {
   width: 100%;
   height: 100%;
@@ -250,22 +240,23 @@ MENÚ NAVBAR....CONTENEDOR de la imagen .imagen_menu.
 /* HOVER SOBRE LAS IMAGENES DEL MENU.... (cae en cascada). */
 .menu_to_clone:hover .imagen_menu .st0{ fill: rgb(159, 153, 148);  cursor: pointer;  /* transform: scale(1.08);  */ }
 
-/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-   clase común para las dos imagenes del menu nav: silla y mesa del menu nav */
+/* ■ clase común para las dos imagenes del menu nav: silla y mesa del menu nav */
  .imagen_menu {
    width: 28px;
    height: 28px;
   }
-/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-   clases especifica para cada objeto del menu nav. */
+/* ■    clases especifica para cada objeto del menu nav. */
 .navbar .botones_accion {   font-size: var(--navbar-action-size) !important; color: rgb(var(--navbar-icon-rgb)); margin: 0 !important; padding: 0; }
 .navbar .botones_accion + .botones_accion { margin-left: var(--navbar-action-gap) !important; }
 .navbar .botones_accion:hover { color: rgb(var(--navbar-icon-rgb)); }
-/* la imagen.... No se manipula, se manipula su contenedor */
+/* ■ la imagen.... No se manipula, se manipula su contenedor */
 .imagen_menu--mesa  .st0, .imagen_menu--silla .st0 {   fill: rgb(var(--navbar-icon-rgb)); }
 
-/* ■■■
-El contenedor que mueve la imagen de la mesa */
+/* ■ El contenedor que mueve la imagen de la mesa 
+
+
+ Cambiar por data-grupo="player" para abarcar todos de una.
+*/
 [data-id_key="mesa"] {
   /* Evita que el navegador use gestos predeterminados en este elemento */
     touch-action: none;
@@ -273,8 +264,7 @@ El contenedor que mueve la imagen de la mesa */
     -webkit-user-select: none;
     user-select: none;
 }
-/* ■■■
-El contenedor que mueve la imagen de la silla */
+/* ■ El contenedor que mueve la imagen de la silla */
 [data-id_key="silla"] {
   /* Evita que el navegador use gestos predeterminados en este elemento */
     touch-action: none;    
@@ -284,10 +274,9 @@ El contenedor que mueve la imagen de la silla */
 }
 
 
-/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-ON_PLAY ► LOGICA DE NEGOCIO DE LA CLASE e_Salon.
+/* ■ ■ ■ ON_PLAY ► LOGICA DE NEGOCIO DE LA CLASE e_Salon.
 estas Clases SE CREAN cuando desde NavBar se Arrastran(D&D) hasta el Salón. 
-■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
+■ ■ ■  */
 .class_onplay {  touch-action: none; }
 
 .mesa_onplay  .st0 {   fill: rgb(60,60,60); }
@@ -295,9 +284,7 @@ estas Clases SE CREAN cuando desde NavBar se Arrastran(D&D) hasta el Salón.
 .silla_onplay .st0 {   fill: rgb(171, 102, 56); }
 .silla_onplay:hover .st0 { fill: rgb(117, 115, 122); cursor:pointer; }
 
-/* ■■■■■■■■■■■■ 
-EXIT-PAPELERA 
-■■■■■■■■■■■■■■■ */
+/* ■ ■ ■ EXIT-PAPELERA  */
 [data-id_key="exit"] {
   /* Evita que el navegador use gestos predeterminados en este elemento */
     touch-action: none;    
@@ -315,7 +302,7 @@ EXIT-PAPELERA
   opacity: 1;
 }
 
-/* Selección del elemento del salón: baldosa destacada + player más grande. */
+/* ■ ■ ■ Selección del elemento del salón: baldosa destacada + player más grande. */
 .estiloBaldosas.baldosa_onplay_seleccionada {
     border: calc(4px * var(--scale-factor)) solid #0b4d22;
     z-index: 3;
