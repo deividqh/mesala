@@ -1,87 +1,82 @@
 class Alertas_UI {
 
     /**
-     * Muestra un modal de confirmación y devuelve una promesa.
-     * @param {string} texto - Mensaje de la pregunta.
-     * @param {string} encabezado - Título del modal.
-     * @param {string} tipo - Color del botón principal ('danger', 'success', 'warning').
-     * @returns {Promise<boolean>} - True si confirma, False si cancela o cierra.
-     */
-    async ConfirM(encabezado, texto, tipo = 'danger') {
-        const id_modal = `modal_${Date.now()}`;
-        
-        // Mapeo de colores para el botón de acción
-        const clases_btn = {
-            'success': 'btn-success',
-            'danger':  'btn-danger',
-            'warning': 'btn-warning text-dark'
-        };
-        const clase_accion = clases_btn[tipo] || clases_btn['danger'];
+ * Muestra un modal de confirmación y devuelve una promesa.
+ * @param {string} encabezado - Título del modal.
+ * @param {string} texto - Mensaje de la pregunta.
+ * @param {string} tipo - Color del botón principal ('danger', 'success', 'warning').
+ * @returns {Promise<boolean>} - True si confirma, False si cancela o cierra.
+ */
+static async ConfirM(encabezado, texto, tipo = 'danger') {
+    const id_modal = `modal_${Date.now()}`;
+    
+    // Mapeo de colores para el botón de acción
+    const clases_btn = {
+        'success': 'btn-success',
+        'danger':  'btn-danger',
+        'warning': 'btn-warning text-dark'
+    };
+    const clase_accion = clases_btn[tipo] || clases_btn['danger'];
 
-		const mensaje_Salida = `<br><br>¿Estás Seguro de que Quieres Cntinuar?`;
+    const mensaje_Salida = `<br><br>¿Estás Seguro de que Quieres Continuar?`;
+    texto += mensaje_Salida; 
 
-		texto += mensaje_Salida; 
-
-        // Estructura del Modal compatible con Bootstrap 5
-        const html_modal = `
-            <div class="modal fade" id="${id_modal}" tabindex="-1" aria-hidden="true" data-tipo-bs="offcanvas-rud">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">${encabezado}</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            ${texto}
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary"   id="${id_modal}_cancelar" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="button" class="btn ${clase_accion}" id="${id_modal}_confirmar">Confirmar</button>
-                        </div>
+    // Estructura del Modal compatible con Bootstrap 5
+    const html_modal = `
+        <div class="modal fade" id="${id_modal}" tabindex="-1" aria-hidden="true" data-tipo-bs="offcanvas-rud">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">${encabezado}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        ${texto}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="${id_modal}_cancelar" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn ${clase_accion}" id="${id_modal}_confirmar">Confirmar</button>
                     </div>
                 </div>
-            </div>`;
+            </div>
+        </div>`;
 
-        // Inyectamos el modal al final del body
-        document.body.insertAdjacentHTML('beforeend', html_modal);
+    // Inyectamos el modal al final del body
+    document.body.insertAdjacentHTML('beforeend', html_modal);
 
-        const elemento_modal = document.getElementById(id_modal);
-        const instancia_bs = new bootstrap.Modal(elemento_modal);
-        
-        instancia_bs.show();
+    const elemento_modal = document.getElementById(id_modal);
+    const instancia_bs = new bootstrap.Modal(elemento_modal);
+    
+    instancia_bs.show();
 
-        // Retornamos una Promesa para manejar la respuesta de forma asíncrona
-        return new Promise((resolve) => {
-            const btn_confirmar = document.getElementById(`${id_modal}_confirmar`);
-            
-            // Caso 1: El usuario confirma
-            btn_confirmar.addEventListener('click', () => {
-                instancia_bs.hide();
-                resolve(true);
-            });
+    // Retornamos una Promesa para manejar la respuesta de forma asíncrona
+    return new Promise((resolve) => {
+        const btn_confirmar = document.getElementById(`${id_modal}_confirmar`);
+        let usuario_confirmo = false; // Bandera de control
 
-            // Caso 2: El usuario cierra el modal (por botón cancelar, X o clic fuera)
-            elemento_modal.addEventListener('hidden.bs.toast', () => {
-                resolve(false);
-                elemento_modal.remove(); // Limpieza del DOM
-            });
-
-            // Comentario técnico: Bootstrap usa el evento 'hidden.bs.modal' para modales
-            elemento_modal.addEventListener('hidden.bs.modal', () => {
-                resolve(false);
-                elemento_modal.remove();
-            });
+        // Caso 1: El usuario confirma (solo cambia la bandera y cierra)
+        btn_confirmar.addEventListener('click', () => {
+            usuario_confirmo = true;
+            instancia_bs.hide();
         });
-    }
 
-    // ... (Mantengo los métodos de Toasts anteriores si los necesitas)
+        // Caso 2: El modal se oculta (por cualquier motivo: confirmar, cancelar, X, clic fuera o tecla ESC)
+        elemento_modal.addEventListener('hidden.bs.modal', () => {
+            resolve(usuario_confirmo); // Resuelve true o false según la bandera
+            elemento_modal.remove();   // Elimina el elemento del DOM de forma segura
+        });
+    });
+}
+
+
+    
 	/**
      * Muestra una notificación tipo Toast.
      * @param {string} texto - Cuerpo del mensaje.
      * @param {string} encabezado - Título.
      * @param {string} tipo - Categoría: 'success', 'danger', 'warning'. Por defecto 'success'.
      */
-    _NotA(encabezado, texto, tipo = 'success') {
+    static _NotA(encabezado, texto, tipo = 'success') {
         const id_contenedor = 'contenedor_toasts';
         let contenedor = document.getElementById(id_contenedor);
 

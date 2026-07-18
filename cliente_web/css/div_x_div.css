@@ -12,17 +12,17 @@
   --color-body-bg:       rgb(255, 255, 255);
   --color-text:          #813737;
   --color-salon-border:  rgb(35, 118, 12);
+  
   --color-salon-bg:      rgb(243, 243, 243);
-   --color-baldosas-bg:   rgb(251, 251, 251);
-  --color-egg-white:     #ffffff;
-  /* --color-baldosas-bg:   #ff000080; */
-  /* --color-baldosas-border: rgb(177, 179, 144); */
-  --color-hover:         #0a885e;
-  /* --color-salon-bg:      var(--color-egg-white); */
-  /* --color-baldosas-bg:   var(--color-egg-white); */
-  --color-baldosas-border: transparent;
-  --color-hover:         #0a885e;
-
+  
+  --color-baldosas-bg:      rgb(236, 222, 167);
+   /* --color-baldosas-bg:   rgb(251, 251, 251); */
+   --color-baldosas-border: transparent;
+   --color-hover:         #0a885e;  
+   
+   /* --color-offcanvas-logica:     rgb(255, 239, 175); */
+   --color-offcanvas-logica:     rgb(253, 247, 223);
+   
   /* sobre el nav-bar */
   --navbar-icon-rgb:     rgb(129, 55, 55);
   --navbar-action-size:  1.25rem;

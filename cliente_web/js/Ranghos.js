@@ -3144,6 +3144,7 @@ class El_Rango_del_Salon extends Wedding_Rangos{
 	}
 
 	
+	
 	/**
 	 * ## Convierte reserva_s en rangos ({celda_inicio, celda_fin, dimension}).
 	 * ###	Si la reserva no tiene mesas, devuelve únicamente las celdas ocupadas por sus sillas.

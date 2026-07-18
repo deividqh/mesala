@@ -1,5 +1,4 @@
 
-.sumatorio-id-ppal{ font-weight: bold;  border-color: var(--ta-focus-border); color: var(--acento);}
 
 /* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
    BOTONES (guardar / reset / eliminar / grabar / parar)
@@ -40,9 +39,7 @@
   box-shadow: var(--btn-parar-glow);
 }
 
-/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-   CÍRCULO INDICADOR DEL MENSAJE (común, color por tema)
-   ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
+/* ■ ■ ■ CÍRCULO INDICADOR DEL MENSAJE (común, color por tema) */
 .elemento_con_mensaje{ position: relative; }
 .markador_mensaje{
     position: absolute;
@@ -156,9 +153,12 @@
   color: #14532d;
 }
 
-/* 
-Cabecera del offcanvas de lógica: línea de identidad + línea de noticias. 
-*/
+/* ■ ■ ■ ■
+  ■ ■ ■ ■ Cabecera del offcanvas de lógica: línea de identidad + línea de noticias. 
+  ■ ■ ■ ■ */
+.offcanvas-logica {
+  background: var(--color-offcanvas-logica);
+}
 .offcanvas-logica .offcanvas-header {
   align-items: flex-start;
   gap: 0.45rem;
@@ -173,17 +173,20 @@ Cabecera del offcanvas de lógica: línea de identidad + línea de noticias.
 
 .offcanvas-logica .nav-link {
   padding: 0.35rem 0.85rem;
-  font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
-  font-size: 0.84rem;
+  font-family: "Verdana", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+  font-size: 0.8rem;
   font-weight: 600;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.1em;
 }
 
 .offcanvas-logica-title {
-  display: grid;
+  font-family: "Verdana", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+  display: flex;
+  align-items: center;       /* Centra verticalmente el icono y el texto */
   flex: 1;
-  gap: 0.22rem;
+  gap: 0.42rem;
   margin: 0;
+  margin-bottom: 0.5rem;
   min-width: 0;
 }
 
@@ -209,13 +212,23 @@ Cabecera del offcanvas de lógica: línea de identidad + línea de noticias.
   padding: 0; 
   background: rgba(127, 29, 29, 0.14);  color: inherit; font-size: 0.78rem; line-height: 1;
 }
-/* Ajustes mobile del offcanvas de lógica. */
-.offcanvas-logica.offcanvas-top,
+
+/* ■■ Logica Arriba */
+.offcanvas-logica.offcanvas-top {
+  height: auto !important;
+  max-height: 35vh; 
+  bottom: auto !important; /* Rompe el estiramiento vertical de Bootstrap */
+}
+/* ■■ Logica Abajo */
 .offcanvas-logica.offcanvas-bottom {
-  left: 0;
-  right: 0;
-  width: 100vw;
-  max-width: none;
+  --bs-offcanvas-height: 35vh; 
+  
+  /* Si prefieres que mida menos de 35vh si hay poco texto, usa esto en su lugar: */
+  /*
+  height: auto !important;
+  max-height: 35vh;
+  top: auto !important;
+  */
 }
 
 .offcanvas-logica .offcanvas-header,
@@ -243,7 +256,7 @@ Cabecera del offcanvas de lógica: línea de identidad + línea de noticias.
 } */
 
 .offcanvas-logica .contenedor_motor_mensajes,
-.offcanvas-logica .motor-mensajes-sumatorio,
+.offcanvas-logica .sumatorio,
 .offcanvas-logica .contenedor_motor_mensajes textarea {
   font-size: 0.76rem;
 }
@@ -254,4 +267,63 @@ Cabecera del offcanvas de lógica: línea de identidad + línea de noticias.
 
 .offcanvas-logica .motor-mensajes-acciones {
   justify-content: flex-end;
+}
+
+/* Contenedor principal que envuelve todas las reservas 
+Los elementos se van  a mostrar en la disposicion:  icono + id_elemento : mensaje_elemento
+uno detras de otro con un espacio 
+*/
+.sumatorio {
+    display: flex;
+    flex-wrap: wrap; /* Permite que los elementos salten a la siguiente línea si no caben */
+    gap: 1rem; /* Espacio horizontal y vertical entre cada bloque de reserva */
+    padding: 0.5rem 0;
+    /* margin-bottom: 0.85rem; */
+    /* margin-top: 0.2rem; */
+}
+
+/* Contenedor de la fila para alinear los elementos horizontalmente */
+/* .sumatorio-row {
+    display: flex;
+    Centra verticalmente el icono con el texto
+    align-items: center;    
+    Espacio entre el icono, el ID y el mensaje
+    gap: 0.5rem;            
+    Separación entre cada fila
+    margin-bottom: 0.4rem;  
+} */
+
+/* Fila individual (ahora se comporta como un bloque en línea) */
+.sumatorio-row {
+    display: inline-flex; /* ¡La clave! Permite que se coloquen uno al lado del otro */
+    align-items: center; 
+    gap: 0.3rem; /* Espacio interno entre el icono, el ID y el mensaje */
+}
+
+/* Contenedor del icono */
+.sumatorio-ico {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Regla para el SVG inyectado dentro de col_ico */
+.sumatorio-ico svg {
+    width: 1.1em; /* Hace que el ancho sea proporcional al tamaño de la fuente */
+    height: 1.1em; /* Hace que el alto sea proporcional al tamaño de la fuente */
+    fill: currentColor; /* Permite que el SVG herede el color del texto si aplica */
+}
+
+/* Estilo para el ID de la mesa/elemento */
+.sumatorio-id {
+    font-weight: 600; /* Pone el texto en negrita para resaltarlo */
+    color: #495057; /* Un gris oscuro (puedes ajustarlo a tu paleta) */
+    white-space: nowrap; /* Evita que el ID salte de línea */
+}
+
+/* Estilo para el mensaje */
+.sumatorio-msg {
+    color: #6c757d; /* Un gris más claro para diferenciarlo del ID */
+    flex: 1; /* Ocupa el espacio restante de la fila */
+    white-space: nowrap; /* Mantiene el mensaje en la misma línea que su ID e icono */
 }

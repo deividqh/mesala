@@ -2551,8 +2551,9 @@ class e_Salon extends Tablero_Touch {
 		this.LOGIC = new Logica_Catalogo(this.dicc_config.catalogo);
 		
 		// ┌■ Asocia el Catalogo a la Logica ... y viceversa.
-		const motor_mensajes = new Motor_Mensajes();
+		const motor_mensajes = new Motor_Mensajes(this);
 		const motor_alergias = new Motor_Alergias();		
+		// 🈴🈴
 		Catalogo.set_motor('motor_mensajes', motor_mensajes);
 		Catalogo.set_motor('motor_alergias', motor_alergias);
 		// ┌■ a partir de este momento Recupero los motores a través del Catalogo.
@@ -2610,30 +2611,34 @@ class e_Salon extends Tablero_Touch {
 		// ■ MENSAJE FINAL DE CARGA
 		console.log(`${'█ '.repeat(20)}  • • •  FINALIZADA LA CARGA DE SALON  • • •`);
 		
-		// 💥💥💥💥💥💥💥💥
-		// 💥💥💥💥💥💥💥💥	MOCK'S
-		// 💥💥💥💥💥💥💥💥
+		// 💥💥💥💥💥💥💥💥		 	 💥💥💥💥💥💥💥
+		// 💥💥💥💥💥💥💥💥	 MOCK'S	 💥💥💥💥💥💥💥
+		// 💥💥💥💥💥💥💥💥			 💥💥💥💥💥💥💥
 		const d_indices_mock = {
 			silla_0: 8, mesa_0: 9, silla_1: 12, mesa_1: 13, silla_2: 14 , 
 			silla_3: 1, silla_6: 10, silla_4: 17, mesa_3: 21, silla_5: 29 , 
 			silla_7: 5, silla_8: 20, silla_9: 22,  
-			mesa_2: 41, mesa_4: 49, silla_10: 33, silla_1: 42, silla_12: 40, silla_17: 50 , silla_18: 48, silla_13: 57,
+			mesa_2: 41, mesa_4: 49, mesa_7: 57, silla_10: 33, silla_1: 42, silla_12: 40, silla_17: 50 , silla_18: 48, silla_13: 57,
 			silla_14: 45, silla_16: 54, silla_15: 52, mesa_5: 53, silla_19: 61 , 
 			mesa_6: 75, silla_21: 74, silla_20: 76,  			
 		};
 		const d_mensajs_mock = {silla_0: "Nadie", mesa_0: 'Sabe', silla_2: 'Nada', mesa_2: 'Mr Smith', mesa_4: 'Miss Smith', };
-		const d_alergias_mock = {silla_0: ['soja', 'lacteos'], silla_1: ['huevos'], };
-		this._load_elementos_en_Salon(d_indices_mock);
+		const d_alergias_mock = {silla_0: ['soja', 'lacteos'], silla_1: ['huevos'], silla_21:['pescado']};
+		
+		const ok_elements = this._load_elementos_en_Salon(d_indices_mock);
 		this.RegisteR();
 
 		const MA = Catalogo.get_motor('motor_alergias');
 		// this.CFG.api_re_posicionar();				
-		this._load_alergias_en_Salon(d_alergias_mock);		
+		const ok_alerg = this._load_alergias_en_Salon(d_alergias_mock);		
 		console.log(JSON.stringify(MA.d_data, null, 2)); 
 		
 		const MM = Catalogo.get_motor('motor_mensajes');
-		this._load_mensajes_en_Salon(d_mensajs_mock);
+		const ok_msg = this._load_mensajes_en_Salon(d_mensajs_mock);
 		console.log(JSON.stringify(MM.d_data, null, 2)); 
+
+		// Alertas_UI._NotA('Encabezado', 'texto del mensaje');
+
 	}
 
 	/** 
@@ -2686,7 +2691,10 @@ class e_Salon extends Tablero_Touch {
 		// ■■ Actualizo las Reservas:
 		this.RegisteR();	
 		
-		// ■■ 
+		// ■■ 🈴🈴
+		const MA = Catalogo.get_motor('motor_alergias');
+		const MM = Catalogo.get_motor('motor_mensajes');
+
 		this.MSG_A.delete(this.objeto_drag.id);
 		this.MSG_M.delete(this.objeto_drag.id);
 		
@@ -2707,8 +2715,8 @@ class e_Salon extends Tablero_Touch {
 		// const clases_el = elemento_clickado.classList;	// clases css([class_onplay , silla_onplay])
 		
 		// ┌■ Calcula el indice de la reserva a la que pertenece el elemento clickado.
-		// ┌■ Lo necesito para los cambios en el rol(2º click y color)
-		const index_reserva = this.#get_indice_en_reserva_s(id_el);
+		// ┌■ Lo necesito para los cambios en el color(2º click y color)
+		const index_reserva = this._get_indice_en_reserva_s(id_el);
 		if (index_reserva == -1) return;
 		this.index_reserva = index_reserva;			
 
@@ -2721,25 +2729,25 @@ class e_Salon extends Tablero_Touch {
 
 		// ┌■ Rol. color de la reserva en el click.
 		if (ctlg_el.rol === 'reserver'){
-			if (index_reserva != this.last_reserva_clicked){
+			if (index_reserva != this.last_reserva_clicked)
 				this.last_reserva_clicked = index_reserva;
-			}
-			// ┌■■ 🌈 🪑 CAMBIO DEL COLOR DE LOS ELEMENTOS DE LA RESERVA. 
-			this._reset_color_reserva();					
+			// ┌■■ 🌈 🪑 CAMBIO DEL COLOR DE LOS ELEMENTOS DE LA RESERVA. 			
 			this._set_color_reserva(this.index_reserva);
 		}
 		
-		// ┌■ Lógica: la selección visual solo vive mientras el offcanvas de lógica está abierto.
+		// ┌■ ■ ■ Lógica: la selección visual solo vive mientras el offcanvas de lógica está abierto.
 		const logica = ctlg_el.logica;
-		if(logica?.motor_mensajes || logica?.motor_alergias){
+		// if(logica?.motor_mensajes || logica?.motor_alergias){
+		if(logica){
 			const ids_reserva = Object.values(this.reservas[index_reserva] || {}).flat();
-			
-			this.MSG_M.set_contexto(id_el, ids_reserva);
-			this.MSG_A.set_contexto(id_el);
-			// this.LOGIC.abrir_offcanvas(elemento_clickado);		
+			// 🈴🈴
+			const MA = Catalogo.get_motor('motor_alergias');
+			const MM = Catalogo.get_motor('motor_mensajes');
 
 			const posicion_offcanvas_logica = this._get_posicion_offcanvas_logica(elemento_clickado);
+
 			const offcanvas_logica = this.LOGIC.abrir_offcanvas(elemento_clickado, posicion_offcanvas_logica);
+
 			if (offcanvas_logica) {
 				this._set_elemento_onplay_seleccionado(elemento_clickado);
 				offcanvas_logica.addEventListener('hidden.bs.offcanvas', () => {
@@ -2792,7 +2800,7 @@ class e_Salon extends Tablero_Touch {
 		// player.closest('.estiloBaldosas')?.classList.add('baldosa_onplay_seleccionada');
 	}
 
-	#get_indice_en_reserva_s(id_elemento){	
+	_get_indice_en_reserva_s(id_elemento){	
 		// ■■ BUSCA EN EL ARRAY DE RESERVAS el indice del elemento
 		const index_reserva = this.reservas.findIndex(dicc => {
 			return Object.values(dicc).flat().includes(id_elemento);
@@ -2840,7 +2848,6 @@ class e_Salon extends Tablero_Touch {
 	 * ```javascript
 	 * scanner = {'id':'mesa_4', 'n':null, 's':'silla_1', 'e':'mesa_2', 'w':'silla_0', 'ne':null, 'nw':null, 'se':null, 'sw':null}
 	 * ```
-	 * @see {@link drop_over_matriz} - {@link drop_exit}
 	*/
 	_modulo_reservas( rol_busca='reserver' , b_registro=true) {
 		try {
@@ -3177,6 +3184,8 @@ class e_Salon extends Tablero_Touch {
 	/** ## 🌈 🪑 CAMBIO DEL COLOR DE LOS ELEMENTOS DE LA RESERVA.  */
 	_set_color_reserva(index_reserva){
 
+		this._reset_color_reserva();					
+		
 		// ┌•• APLANA LA RESERVA(Junta Mesas y Sillas en un array) 
 		const elementos_flat = Object.values(this.reservas[index_reserva]).flat();
 		// ┌•• TRANSFORMA LOS IDS DEL ARRAY elementos_flat EN OBJETOS 
@@ -3184,7 +3193,7 @@ class e_Salon extends Tablero_Touch {
 
 		const color_random = Herramientas.randomColor();
 		obj_elementos.forEach(el => {       
-			const path = el.querySelector("svg path");
+			const path = el.querySelector("svg path", "svg");
 			if (path) {
 				path.style.setProperty("fill", color_random, "important");
 			}
@@ -3292,6 +3301,10 @@ class e_Salon extends Tablero_Touch {
 		try {			
 			// Orígenes seguros
 			const reservas = Array.isArray(this.reservas) ? this.reservas : [];
+			// 🈴🈴
+			const MA = Catalogo.get_motor('motor_alergias');
+			const MM = Catalogo.get_motor('motor_mensajes');
+			
 			const msg_sillas   = this.MSG_A?.d_data  ?? {};
 			const msg_mesas  = this.MSG_M?.d_data  ?? {};
 	
@@ -3373,6 +3386,9 @@ class e_Salon extends Tablero_Touch {
 	 * ```
 	 */
 	api_mensajes(){
+		// 🈴🈴
+		const MA = Catalogo.get_motor('motor_alergias');
+
 		const d_mensajes  = this.MSG_M.d_data;
 		// const dicc_popo_sillas = this.MSG_A.d_data;
 		// const dicc_popo = { ...d_mensajes, ...dicc_popo_sillas }; 
@@ -3577,7 +3593,8 @@ class e_Salon extends Tablero_Touch {
 			});		
 		} catch (error) {
 			console.log('ERROR en Posicionar '+ error.message)
-		}	
+		} 
+		return true;	
 	}
 	
 	/** 
@@ -3602,6 +3619,7 @@ class e_Salon extends Tablero_Touch {
                 MM.update(id, mensaje);
             }
         });
+		return true;
 	}
 	
 	/**
@@ -3628,6 +3646,7 @@ class e_Salon extends Tablero_Touch {
 			MA.update(id, alergia_s);
 			MA._set_alerta_elemento(id);
         });
+		return true;
 	}
 	
 	/**
@@ -4371,7 +4390,8 @@ class Configuracion_Salon {
 					this.$columnas.value 	 = rescate.cols;
 					this.$filas.value 	 	 = rescate.fils;
 					this.$nombre_salon.value = rescate.name;
-					this.UI._NotA("❌ Operacion Anulada", "No se Puede Cambiar la Dimension del Salón cuando Tiene elementos", "danger");
+					// this.UI._NotA("❌ Operacion Anulada", "No se Puede Cambiar la Dimension del Salón cuando Tiene elementos", "danger");
+					console.log("❌ Operacion Anulada", "No se Puede Cambiar la Dimension del Salón cuando Tiene elementos", "danger");
 				}else{
 					this.accion_submit_offcanvas_configuracion(this.$filas.value, this.$columnas.value, this.$nombre_salon, true);
 					// ┌• ENTORNO MOVIL, cierra el offcanvas tras guardar.
@@ -8044,7 +8064,7 @@ class Side_Elementos {
 		
 		/** ### El botoncito de abajo del sidebar para moverlo */
 		this._drag_handle = null;
-		
+		// $body
 		/** Offset para el arrastre (por el desfase de los puntos del dedo)*/
 		this._offset = {
 			x: 0,
@@ -8100,10 +8120,10 @@ class Side_Elementos {
 		contenedor_elementos.className = 'side_lista_elementos';
 
         for (const key in elementos_catalogo) {
-			const el = elementos_catalogo[key];		// X cada elemento del dicc.	
+			const ctlg = elementos_catalogo[key];		// X cada elemento del dicc.	
 
             // ■ Opcional: Aquí pongo un Malecon... only players.
-            if (el.grupo !== 'player') continue; 
+            if (ctlg.grupo !== 'player') continue; 
 
             // ■ Construir el contenedor del ítem
             const div_item = document.createElement('div');
@@ -8112,12 +8132,12 @@ class Side_Elementos {
             div_item.className = 'menu_to_clone';             
             
 			div_item.dataset.id_key = key;       
-            div_item.dataset.grupo = el.grupo;   
-            div_item.dataset.rol = el.rol;   
+            div_item.dataset.grupo = ctlg.grupo;   
+            div_item.dataset.rol = ctlg.rol;   
             
 			// Asignar el contenido visual definido en el catálogo (el string SVG)
-            if (el.visual && el.visual.content) {
-                div_item.innerHTML = el.visual.content;
+            if (ctlg.visual && ctlg.visual.content) {
+                div_item.innerHTML = ctlg.visual.content;
             }
             div_item.setAttribute('draggable', 'true'); 			
 			this.dragCallback(div_item);	// Listenners de drag de raton y point.

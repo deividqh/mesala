@@ -61,6 +61,7 @@ class Catalogo {
             colision: true // true = colisiona, false = no colisiona (ej: fondo)
         },
         visual: {
+            nombre: 'Titulo de la Mesa',
             content: `<svg class="imagen_menu imagen_menu--mesa"fill="currentColor" viewBox="0 0 50 50" width="30" height="30"xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"><path class="st0" d="M10.585938 11L0.38085938 21.205078 A 1.0001 1.0001 0 0 0 0.18945312 21.396484L0 21.585938L0 21.832031 A 1.0001 1.0001 0 0 0 0 22.158203L0 28L3 28L3 50L9 50L9 28L11 28L11 43L17 43L17 28L33 28L33 43L39 43L39 28L41 28L41 50L47 50L47 28L50 28L50 22.167969 A 1.0001 1.0001 0 0 0 50 21.841797L50 21.585938L49.806641 21.392578 A 1.0001 1.0001 0 0 0 49.623047 21.207031 A 1.0001 1.0001 0 0 0 49.617188 21.203125L39.414062 11L39 11L10.585938 11 z M 11.414062 13L38.585938 13L46.585938 21L3.4140625 21L11.414062 13 z M 2 23L48 23L48 26L46.167969 26 A 1.0001 1.0001 0 0 0 45.841797 26L42.154297 26 A 1.0001 1.0001 0 0 0 41.984375 25.986328 A 1.0001 1.0001 0 0 0 41.839844 26L38.167969 26 A 1.0001 1.0001 0 0 0 37.841797 26L34.154297 26 A 1.0001 1.0001 0 0 0 33.984375 25.986328 A 1.0001 1.0001 0 0 0 33.839844 26L16.167969 26 A 1.0001 1.0001 0 0 0 15.841797 26L12.154297 26 A 1.0001 1.0001 0 0 0 11.984375 25.986328 A 1.0001 1.0001 0 0 0 11.839844 26L8.1679688 26 A 1.0001 1.0001 0 0 0 7.8417969 26L4.1542969 26 A 1.0001 1.0001 0 0 0 3.984375 25.986328 A 1.0001 1.0001 0 0 0 3.8398438 26L2 26L2 23 z M 5 28L7 28L7 48L5 48L5 28 z M 13 28L15 28L15 41L13 41L13 28 z M 35 28L37 28L37 41L35 41L35 28 z M 43 28L45 28L45 48L43 48L43 28 z"/></svg>`,
             css: 'style_visual_reserver'
         },
@@ -74,6 +75,7 @@ class Catalogo {
         rol: 'cliente',   // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc) 
         fisica: { ancho: 1, alto: 1, colision: true },
         visual: {
+            nombre: 'Titulo de la Silla',
             content: `<svg class="imagen_menu imagen_menu--silla st0"fill="currentColor" viewBox="0 0 512 512" width="30" height="30"xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"><g><rect x="262.97" y="298.368" class="st0" width="33.329" height="155.344"/><path class="st0" d="M243.216,23.156l-50.788,201.47h-42.233l-89.148,13.431v36.624l10.08,1.437h-10.08v177.595h33.329V279.441l55.819,7.952V512h41.146V287.392h158.98V512h41.137V259.523L450.953,0L243.216,23.156z M349.317,224.626H225.884l43.386-172.06l122.188-11.116L349.317,224.626z"/></g></svg>`,
             css: 'style_visual_cliente'
         },
@@ -88,6 +90,7 @@ class Catalogo {
         rol: 'reserver',   // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc)
         fisica: { ancho: 1, alto: 1, colision: true },
         visual: {
+            nombre: 'Titulo del Taburete',
             content: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50"><g fill="#8B4513"><rect x="12" y="25" width="4" height="20" rx="1" /><rect x="34" y="25" width="4" height="20" rx="1" /><rect x="18" y="20" width="4" height="15" rx="1" opacity="0.8" /><rect x="28" y="20" width="4" height="15" rx="1" opacity="0.8" /><ellipse cx="25" cy="20" rx="18" ry="12" /><path d="M7,20 Q7,30 25,30 Q43,30 43,20 L43,22 Q43,32 25,32 Q7,32 7,22 Z" /></g></svg>',
             css: 'style_visual_cliente'
         },
@@ -101,21 +104,14 @@ class Catalogo {
     //     grupo: 'decoration',
     //     rol: 'decoracion',   
     //     fisica: { ancho: 1, alto: 1, colision: true },
-    //     visual: {
-    //         content: '',
-    //         css: 'estiloPlanta'
-    //     },
+    //     visual: { nombre: 'Titulo del Taburete', content: '', css: 'estiloPlanta' },
     // },
     // esquina_muro: {
     //     slug: 'esquina_muro',
     //     grupo: 'structure',
     //     rol: 'estructura',    
     //     fisica: { ancho: 2, alto: 1, colision: true },
-    //     visual: { 
-    //         content: '',
-    //         css: 'estiloEsquinaMuro'
-    //     },
-    //     logica: { motor_alergias: false, motor_mensajes: null }
+    //     visual: { nombre: 'Titulo del Taburete',  content: '', css: 'estiloEsquinaMuro' },
     // }
     });
     
@@ -281,7 +277,7 @@ class Logica_Catalogo  {
     
     constructor() {        
         // Creamos el offcanvas en el DOM inmediatamente al instanciar la clase
-        this.#crear_offcanvas_logica();
+        this.$offcanvas_logica = this.#crear_offcanvas_logica();
     }
 
     // ■■■ MÉTODOS INTERNOS Y CORE ■■■
@@ -300,14 +296,9 @@ class Logica_Catalogo  {
 
         // $offcanvas_logica.className = 'offcanvas offcanvas-bottom'; 
         $offcanvas_logica.className = 'offcanvas offcanvas-bottom offcanvas-logica';
-
         $offcanvas_logica.tabIndex = -1;
-        
-        // $offcanvas_logica.dataset.logica = 'true'; 
-        $offcanvas_logica.style.backgroundColor = 'var(--color-egg-white)'; 
-        $offcanvas_logica.style.height = 'auto'; 
-        $offcanvas_logica.style.minHeight = '20vh'; 
-
+        $offcanvas_logica.dataset.logica = 'logica';    // para identificar por dataset.
+    
         // ■ Header del offcanvas
         const header = document.createElement('div');
         header.className = 'offcanvas-header';
@@ -316,8 +307,20 @@ class Logica_Catalogo  {
         const title = document.createElement('div');
         title.className = 'offcanvas-title  offcanvas-logica-title';
         title.id = 'offcanvas_logica_title';
-        title.textContent = 'THE LOGIC ZONE';
-                
+        // title.textContent = 'THE LOGIC ZONE';
+        
+        // ■ ESPACIO DEL ICONO
+        const title_icon = document.createElement('span');
+        title_icon.id = 'offcanvas_logica_title_icon';
+        title_icon.className = 'offcanvas-logica-title-icon';
+        // ■ ESPACIO DEL TEXTO
+        const title_text = document.createElement('span');
+        title_text.id = 'offcanvas_logica_title_text';
+        title_text.textContent = 'THE LOGIC ZONE';
+               
+        title.appendChild(title_icon);
+        title.appendChild(title_text);
+
         // ■ BOTON CERRAR DEL TITIULO
         const $btn_close = document.createElement('button');
         $btn_close.type = 'button';
@@ -334,29 +337,31 @@ class Logica_Catalogo  {
         news.className = 'offcanvas-logica-news';
         news.id = 'offcanvas_logica_news';
         news.textContent = '■ ZONA NEWS';
+        news.dataset.logica = 'news';
         
         // ■ BODY DEL OFFCANVAS 
-        const body = document.createElement('div');
-        body.className = 'offcanvas-body';
-        body.id = 'offcanvas_logica_body';
+        const $body = document.createElement('div');
+        $body.className = 'offcanvas-body';
+        $body.id = 'offcanvas_logica_body';
 
-        // 4. DETECTAR LÓGICAS DISTINTAS Y GENERAR WIDGET DE PESTAÑAS (BOOTSTRAP TABS)
+        // DETECTAR TODAS LAS LÓGICAS DISTINTAS Y GENERAR WIDGET DE PESTAÑAS (BOOTSTRAP TABS)
         // Extraemos todos los objetos 'logica' del catálogo usando la clase Catalogo
-        const objetos_logica = Catalogo.get_distinto_s('logica');
+        const logicas_distintas = Catalogo.get_distinto_s('logica');
         
         // Recopilamos las llaves únicas y buscamos su propiedad 'nombre'
         const claves_logica_unicas = new Map(); // Usamos Map para guardar la clave y su nombre
-        
-        objetos_logica.forEach(obj => {
-            if (obj && typeof obj === 'object') {
-                Object.keys(obj).forEach(key => {
-                    const valorLogica = obj[key];
-                    // Si la lógica tiene un objeto con "nombre", lo guardamos.
-                    if (valorLogica && typeof valorLogica === 'object' && valorLogica.nombre) {
-                        claves_logica_unicas.set(key, valorLogica.nombre);
-                    } 
-                });
-            }
+        logicas_distintas.forEach(item_logica => {
+            if(!item_logica || typeof item_logica != 'object') 
+                return;
+            // if (item_logica && typeof item_logica === 'object') {
+            Object.keys(item_logica).forEach(key => {
+                const valorLogica = item_logica[key];
+                // Si la lógica tiene un objeto con "nombre", lo guardamos.
+                if (valorLogica && typeof valorLogica === 'object' && valorLogica.nombre) {
+                    claves_logica_unicas.set(key, valorLogica.nombre);
+                } 
+            });
+            // }
         });
 
         // ■ Contenedor de la lista de pestañas
@@ -371,51 +376,61 @@ class Logica_Catalogo  {
         tabContent.id = 'logicaTabContent';
 
         // ■ Generamos Dinámicamente cada pestaña
-        claves_logica_unicas.forEach((nombrePestana, motor_key) => {
+        claves_logica_unicas.forEach((nombre_pestana, key_motor) => {
             // --- Estructura del Botón/Pestaña ---
             const navItem = document.createElement('li');
             navItem.className = 'nav-item';
             navItem.role = 'presentation';
-            navItem.dataset.motor = motor_key; 
+            navItem.dataset.motor = key_motor; 
 
             const $tabButton = document.createElement('button');
             $tabButton.className = 'nav-link';
-            $tabButton.id = `tab-${motor_key}`;
+            $tabButton.id = `tab-${key_motor}`;     // tab-motor_mensajes
             $tabButton.setAttribute('data-bs-toggle', 'tab');
-            $tabButton.setAttribute('data-bs-target', `#panel-${motor_key}`);
+            $tabButton.setAttribute('data-bs-target', `#panel-${key_motor}`);
             $tabButton.type = 'button';
             $tabButton.role = 'tab';
-            $tabButton.setAttribute('aria-controls', `panel-${motor_key}`);
+            $tabButton.setAttribute('aria-controls', `panel-${key_motor}`);
             $tabButton.setAttribute('aria-selected', 'false');
-            $tabButton.innerText = nombrePestana; // Usamos el nombre detectado del JSON
+            $tabButton.innerText = nombre_pestana; // Usamos el nombre detectado del JSON
 
             navItem.appendChild($tabButton);
             tabList.appendChild(navItem);
 
             // --- PANEL(DIV) DE CONTENIDO ---
-            const panel = document.createElement('div');
-            panel.className = 'tab-pane fade';
-            panel.id = `panel-${motor_key}`;
-            panel.role = 'tabpanel';
-            panel.setAttribute('aria-labelledby', `tab-${motor_key}`);
+            const $panel = document.createElement('div');
+            $panel.className = 'tab-pane fade';
+            $panel.id = `panel-${key_motor}`;
+            $panel.role = 'tabpanel';
+            $panel.setAttribute('aria-labelledby', `tab-${key_motor}`);
             
             // ■ Crear el AREA DE CONTENIDO.
             const $content_div = document.createElement('div');
-            $content_div.className = 'p-3 border border-top-0   area-de-contenido';
-            $content_div.textContent = `Cargando datos de ${nombrePestana}...`; 
+            $content_div.className = 'p-3 border border-top-0    area-de-contenido';
+            $content_div.textContent = `Cargando datos de ${nombre_pestana}...`; 
             
             // 3. Añadir el div interno al panel
-            panel.appendChild($content_div);
+            $panel.appendChild($content_div);
             
-            tabContent.appendChild(panel);
+            tabContent.appendChild($panel);
         });
+
+        // ■ Foot del Body.
+        const $foot = document.createElement('div');
+        $foot.className = 'offcanvas-logica-foot';
+        $foot.id = 'offcanvas_logica_foot';
+        $foot.textContent = '■ ZONA FOOT';
+        $foot.dataset.logica = 'foot';
         
-        body.appendChild(news);
-        body.appendChild(tabList);
-        body.appendChild(tabContent);
+        $body.appendChild(news);
+        $body.appendChild(tabList);
+        $body.appendChild(tabContent);
+        $body.appendChild($foot);            // Esto sería un foot del body
 
         $offcanvas_logica.appendChild(header);
-        $offcanvas_logica.appendChild(body);
+        $offcanvas_logica.appendChild($body);
+        // $offcanvas_logica.appendChild($foot);   
+        
         document.body.appendChild($offcanvas_logica);
 
         return $offcanvas_logica;
@@ -430,23 +445,31 @@ class Logica_Catalogo  {
      */
     // abrir_offcanvas(elemento_dom) {
     abrir_offcanvas(elemento_dom, posicion_offcanvas_logica='down') {
-        // ■ Datos iniciales
-        const id_key = elemento_dom.dataset.id_key;
+        if(!['up','down'].includes(posicion_offcanvas_logica)) return;
+        const $el_dom = e_Salon._to_element(elemento_dom);
+        if(!$el_dom) return;
+        
+        const id_key = $el_dom.dataset.id_key;
         if(!id_key) return null;
+
         const ctlg_el = Catalogo.get(id_key);
         if (!ctlg_el || !ctlg_el.logica) return null;
         
-        const $offcanvas_dom = document.getElementById('offcanvas_logica');
-        const $offcanvas_dom_ = document.querySelector('.offcanvas-logica');
-        const $offcanvas_dom__ = e_Salon._to_element('.offcanvas-logica');
-
+        const $offcanvas_dom = document.getElementById('offcanvas_logica');     // x id 
+        const $offcanvas_dom_ = document.querySelector('.offcanvas-logica');    // x className
+        const $offcanvas_dom__ = e_Salon._to_element('.offcanvas-logica');      // x className custom
+        const $offcanvas_dom___ = e_Salon._to_element('[data-logica=logica]');  // x dataset custom
         if (!$offcanvas_dom) return null;
+        const offc = this.$offcanvas_logica;
         
         // ■ Posición offcanvas-logica (arriba / abajo)
         this.#posicionar_offcanvas_logica($offcanvas_dom, posicion_offcanvas_logica);
-
-        // ■ Actualizar el Título
-        this.set_title(`${elemento_dom.id}`);
+        
+        // ■ Obtenemos el icono del elemento.
+        const svg_icon = this.#get_icono(id_key);
+        
+        // ■ ■ Establecemos el titulo (icono + id)
+        this.set_title($el_dom.id, svg_icon);
 
         // ■ Cacho la logica del elemento en Catalogo.
         const logica_el = ctlg_el.logica;
@@ -455,36 +478,43 @@ class Logica_Catalogo  {
         const navItems = $offcanvas_dom.querySelectorAll('#logicaTab .nav-item');
         const tab_motores = $offcanvas_dom.querySelectorAll('[data-motor]');    // prefiero x dataset
         
-        // ■ Recorro cada pestaña.
         let primerTabVisible = null;
+        // ■ Recorro cada pestaña.
         tab_motores.forEach(item => {
             const motor = item.dataset.motor;          // dataset establecido al crear offcanvas-logica.
             const data_logica = logica_el[motor];      // Datos del catalogo del elemento.
             
-            const botonTab = item.querySelector('.nav-link');           // clase del boton.
-            const idPanel = botonTab.getAttribute('data-bs-target');    // "#panel-motor_mensajes"
-            const $panel_dom = $offcanvas_dom.querySelector(idPanel);
+            const $pestana = item.querySelector('.nav-link');           // clase del boton.
+            const id_panel = $pestana.getAttribute('data-bs-target');    // de cada pestaña saco su "#panel-motor_mensajes"
+            const $panel_dom = $offcanvas_dom.querySelector(id_panel);
             
             // ■ Resetea el boton y el panel.
-            botonTab.classList.remove('active');
-            botonTab.setAttribute('aria-selected', 'false');
+            $pestana.classList.remove('active');
+            $pestana.setAttribute('aria-selected', 'false');
             if ($panel_dom) $panel_dom.classList.remove('show', 'active');
 
             // ■ Evalua Motores(Logicas)
-            if (data_logica !== undefined && data_logica !== false && data_logica !== null) {
+            if (!data_logica){
+                item.classList.add('d-none');
+            }else{
                 item.classList.remove('d-none'); 
                 
                 if (!primerTabVisible) {
-                    primerTabVisible = { boton: botonTab, panel: $panel_dom };
+                    primerTabVisible = { boton: $pestana, panel: $panel_dom };
                 }
-
+    
                 // ■ ■ Inyección de contenido 
-                const areaContenido = $panel_dom.querySelector('.area-de-contenido');                
-                this.#inyectar_render_motor(motor, data_logica, areaContenido, elemento_dom);
+                const areaContenido = $panel_dom.querySelector('.area-de-contenido');   
+                             
+                this.#inyectar_render_motor($el_dom , motor, data_logica, areaContenido );
 
-            } else {
-                item.classList.add('d-none');
             }
+
+            // if (data_logica !== undefined && data_logica !== false && data_logica !== null) {
+
+            // } else {
+            //     item.classList.add('d-none');
+            // }
         });
 
         if (primerTabVisible) {
@@ -507,6 +537,8 @@ class Logica_Catalogo  {
      */
     #posicionar_offcanvas_logica($offcanvas_dom, posicion_offcanvas_logica='down') {
         const posicion = posicion_offcanvas_logica === 'up' ? 'up' : 'down';
+
+        // ❓❓ quiero otra forma de conseguir la clase. Teniendo offcanvas_dom lo consigo.
         const clase_actual = posicion === 'up' ? 'offcanvas-top' : 'offcanvas-bottom';
         const clase_anterior = posicion === 'up' ? 'offcanvas-bottom' : 'offcanvas-top';
 
@@ -523,29 +555,25 @@ class Logica_Catalogo  {
         $offcanvas_dom.dataset.posicionLogica = posicion;
     }
 
-    set_title(html_content) {
-        const $title_dom = document.getElementById('offcanvas_logica_title');
-        if (!$title_dom) return;
-        $title_dom.innerHTML = html_content;
-    }
-    // set_title(elemento_dom = null, ctlg_el = null) {
-    //     const $info_dom = document.getElementById('offcanvas_logica_title');
-    //     const $el_dom = e_Salon._to_element(elemento_dom);
-    //     if(!$el_dom) return;
-    //     const ctlg = Catalogo.get($el_dom.id);
-    //     const svg_icon = ctlg?.visual.content || '';
+    // set_title(html_content) {
+    //     const $title_dom = document.getElementById('offcanvas_logica_title');
+    //     if (!$title_dom) return;
 
-    //     const icono = document.createElement('span');
-    //     icono.className = 'offcanvas-logica-title-icon';
-    //     icono.innerHTML = svg_icon || '';
-        
-    //     const texto = document.createElement('span');
-    //     texto.textContent = `${$el_dom.id}`;
-        
-    //     $info_dom.innerHTML = svg_icon +''+ $el_dom.id;
-    //     // $info_dom.appendChild(icono);
-    //     // $info_dom.appendChild(texto);
+    //     $title_dom.innerHTML = html_content;
     // }
+    /**
+     * @description Establece el título y el icono en el offcanvas.
+     * @param {String} texto - El identificador o texto a mostrar.
+     * @param {String} icono_html - (Opcional) El string SVG que se inyectará.
+     */
+    set_title(texto, icono_html = '') {
+        const $icon_dom = document.getElementById('offcanvas_logica_title_icon');
+        const $text_dom = document.getElementById('offcanvas_logica_title_text');
+
+        if ($icon_dom) $icon_dom.innerHTML = icono_html;
+        if ($text_dom) $text_dom.textContent = texto;
+    }
+    
     /**
      * @description Reemplaza TODO el contenido del cuerpo del offcanvas.
      * ADVERTENCIA: Si usas este método, sobrescribirás el widget de pestañas (Tabs). 
@@ -559,16 +587,25 @@ class Logica_Catalogo  {
     }
 
     /**
+     * @description Obtiene el icono (SVG/HTML) asociado al elemento desde el catálogo.
+     * @param {String} id_key - ID o clave del elemento en el catálogo.
+     * @returns {String} - String con el contenido visual (SVG/HTML) o cadena vacía.
+     */
+    #get_icono(id_key) {
+        if (!id_key) return '';
+        const ctlg_el = Catalogo.get(id_key);
+        return ctlg_el?.visual?.content || '';
+    }
+
+    /**
      * @description Ejecuta el método render del motor correspondiente e inyecta el resultado.
      * @param {String} motor_busca - La clave del motor (ej. 'motor_mensajes', 'motor_alergias')
      * @param {Object} data_logica - Los datos de configuración de esa lógica para el elemento (ej. el objeto con 'nombre', 'content', etc.)
      * @param {HTMLElement} areaContenido - El contenedor DOM donde se inyectará el resultado
      */
-    #inyectar_render_motor(motor_busca, data_logica, areaContenido, elemento_dom=null) {
+    #inyectar_render_motor(elemento_dom , motor_busca, data_logica, areaContenido) {
         // 1. Obtenemos la instancia del motor desde el Catálogo
         const instancia_motor = Catalogo.get_motor(motor_busca);
-
-        // 2. Verificamos que exista y tenga un método render()
         if(!instancia_motor || !instancia_motor.render) {
             // Fallback por si el motor no ha sido instanciado con Catalogo.set_motor() previamente
             areaContenido.innerHTML = `<span class="text-danger">Motor <strong>${motor_busca}</strong> no instanciado o sin método render().</span>`;
