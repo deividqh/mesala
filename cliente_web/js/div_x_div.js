@@ -2637,8 +2637,7 @@ class e_Salon extends Tablero_Touch {
 		const ok_msg = this._load_mensajes_en_Salon(d_mensajs_mock);
 		console.log(JSON.stringify(MM.d_data, null, 2)); 
 
-		// Alertas_UI._NotA('Encabezado', 'texto del mensaje');
-		Alertas_UI._NotA('App Cargada con Exito', 'Listo para empezar!');
+		Alertas_UI._NotA('App Cargada con Exito', 'Listo para empezar!', 'success', 1500);
 
 	}
 
@@ -4391,7 +4390,7 @@ class Configuracion_Salon {
 					this.$columnas.value 	 = rescate.cols;
 					this.$filas.value 	 	 = rescate.fils;
 					this.$nombre_salon.value = rescate.name;
-					// this.UI._NotA("❌ Operacion Anulada", "No se Puede Cambiar la Dimension del Salón cuando Tiene elementos", "danger");
+					// Alertas_UI._NotA("❌ Operacion Anulada", "No se Puede Cambiar la Dimension del Salón cuando Tiene elementos", "danger");
 					console.log("❌ Operacion Anulada", "No se Puede Cambiar la Dimension del Salón cuando Tiene elementos", "danger");
 				}else{
 					this.accion_submit_offcanvas_configuracion(this.$filas.value, this.$columnas.value, this.$nombre_salon, true);
@@ -7255,7 +7254,7 @@ class Foto_CRUD{
 			// ┌•• Si el token expiró o no existe, el servidor devolverá 401 o 403
 			if (response.status === 401 || response.status === 403) {
 				// alert("Sesión expirada. Por favor, vuelve a iniciar sesión.");
-				UI._NotA("Sesion Expirada", "Por favor, vuelve a Iniciar Sesión.", "danger");
+				Alertas_UI._NotA("Sesion Expirada", "Por favor, vuelve a Iniciar Sesión.", "danger");
 				window.location.href = 'login.html'; // Redirección humana
 				return;
 			}
@@ -7403,7 +7402,7 @@ class Foto_CRUD{
 		const puedo_pasar = this._logica_match_dimensiones(foto);				
 		if (puedo_pasar === false){
 			const msg = `<br>■ Dimension <b>Salon:</b> ${Salon.filas}x${Salon.columnas}<br> ■ Dimension <b>Foto:</b> ${foto.filas}x${foto.columnas}`;
-			// UI._NotA("Operacion Anulada", `${msg}<br><br>🟥 🟥 🟥 🟥 QUITO EL RETURN PARA PRUEBAS....VOLVER A PONER!!!!!`, "danger");
+			// Alertas_UI._NotA("Operacion Anulada", `${msg}<br><br>🟥 🟥 🟥 🟥 QUITO EL RETURN PARA PRUEBAS....VOLVER A PONER!!!!!`, "danger");
 			// const retorno = await UI.DatIN("Advertencia: Dimensiones Distintas!", `${msg}`, `<br><br>Escribe la Celda de Inicio del que vas a Importar:`, "warning");
 			return true;
 		}
@@ -7503,7 +7502,7 @@ class Foto_CRUD{
 		if (puedo_pasar === false){
 			// ┌• de Mayor Dimension en BD a Menor Dimension en Salon.
 			
-			// UI._NotA("Operacion Anulada", `${msg}<br><br>🟥 🟥 🟥 🟥 QUITO EL RETURN PARA PRUEBAS....VOLVER A PONER!!!!!`, "danger");
+			// Alertas_UI._NotA("Operacion Anulada", `${msg}<br><br>🟥 🟥 🟥 🟥 QUITO EL RETURN PARA PRUEBAS....VOLVER A PONER!!!!!`, "danger");
 			const titulo = "Advertencia: Dimensiones Distintas!";
 			let msg = `<br>■ Dimension <b>Salon:</b> ${Salon.filas}x${Salon.columnas}<br> ■ Dimension <b>Foto:</b> ${photo.filas}x${photo.columnas}<br>`;
 			msg += `<br><br><h5>Al cargar este salón se perderá el trabajo actual no guardado.</h5>`;				
@@ -7951,7 +7950,7 @@ class Foto_CRUD{
 			// ■■ Si el token expiró o no existe, el servidor devolverá 401 o 403
 			if (response.status === 401 || response.status === 403) {
 				// alert("Sesión expirada. Por favor, vuelve a iniciar sesión.");
-				this.Salon.CFG.UI._NotA("Sesion Expirada", "Por favor, vuelve a Iniciar Sesión.", "danger");
+				Alertas_UI._NotA("Sesion Expirada", "Por favor, vuelve a Iniciar Sesión.", "danger");
 				window.location.href = 'login.html'; // Redirección humana
 				return;
 			}

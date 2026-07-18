@@ -230,24 +230,69 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
     }
 
 	/*  */
-	_crear_botones_accion() {
-		const $botonera = document.createElement('div');
-		$botonera.className = 'd-flex gap-4   motor-mensajes-botonera';
-		
-		// Los Botones los cojo de Catalogo
-		const btns = Catalogo.get_btns_crud_grabar();
-		btns.forEach((boton) => {
-			const button = document.createElement('button');
-			button.type = 'button';
-			// Le aplicamos la clase de Catalogo
-			button.className = `btn btn-sm   ${boton.className}`;
-			button.dataset.action = boton.action;
-			button.title = boton.title;
-			button.textContent = boton.texto;
-			$botonera.appendChild(button);
-		});
-		return $botonera;
-	}
+    _crear_botones_accion(id_elemento, textarea) {
+        const $botonera = document.createElement('div');
+        $botonera.className = 'd-flex gap-4   motor-mensajes-botonera';
+        
+        // Los Botones los cojo de Catalogo
+        const btns = Catalogo.get_btns_crud_grabar();
+        btns.forEach((boton) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            // Le aplicamos la clase de Catalogo
+            button.className = `btn btn-sm   ${boton.className}`;
+            button.dataset.action = boton.action;
+            button.title = boton.title;
+            button.textContent = boton.texto;
+            $botonera.appendChild(button);
+        });
+
+        // Delegación de eventos en el contenedor de la botonera
+        $botonera.addEventListener('click', async (ev) => {
+            const button = ev.target.closest('[data-action]');
+            if (!button) return;
+
+            const action = button.dataset.action;
+            
+            if (action === 'guardar') {
+                const ret_ok = this.set(id_elemento, textarea.value);
+				if(ret_ok)
+                	Alertas_UI._NotA('Accion Guardar', 'Ejecutada con Exito');
+				else
+                	Alertas_UI._NotA('Accion Guardar', '❌ Error Al Guardar', 'danger');
+            }
+            
+            if (action === 'eliminar') {
+                try {
+                    const confirm = await Alertas_UI.ConfirM('Accion Eliminar', 'Estas Seguro?', 'warning');
+                    if (confirm === true) {
+                        const ret_ok = this.delete(id_elemento);
+						if (ret_ok){
+							textarea.value = '';
+							Alertas_UI._NotA('Eliminar Mensaje', `Mensaje de ${id_elemento} Eliminado con éxito`, 'success');
+						}else{
+							Alertas_UI._NotA('Eliminar Mensaje', `❌ Error al Eliminar el Mensaje de ${id_elemento}`, 'danger');
+						}
+                    }
+                } catch (error) {
+                    console.error("Fallo crítico en el modal de confirmación:", error);
+                    Alertas_UI._NotA('Error de Sistema', 'No se pudo procesar la eliminación', 'danger');
+                }
+            }
+
+            if (action === 'reset') {
+                textarea.value = '';
+                textarea.focus();
+            }
+            
+            if (action === 'grabar') {
+                this._accion_grabar(textarea, button);
+                // Alertas_UI._NotA('Accion Grabar Audio', 'Ejecutada con Exito');
+            }
+        });
+
+        return $botonera;
+    }
 
 	/*### Sin Uso  */
 	_es_rol(id_elemento = '' , rol_busca='reserver') {
@@ -337,19 +382,74 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 		recognition.start();
 	}
 
-	// Dibuja el codigo HTML de Mensajes según la Lógica.
+	/** ### Dibuja el codigo HTML de Mensajes según la Lógica. */
 	render(data_logica = {}, elemento_dom=null){
 		const $el_dom = e_Salon._to_element(elemento_dom);
 		if(!$el_dom) return null;
+		const id_key_el = $el_dom.dataset.id_key;
+		const grupo_el = $el_dom.dataset.grupo;
+		const rol_el = $el_dom.dataset.rol;
+		
+		if(grupo_el != 'player') return;
 
-		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ zona News!!
 		// Logica de Alergias desde la Logica de Mensajes.
 		// Necesito esto para la ZONA NEWS. en caso de que haya alergias en la reserva
 		const MA = Catalogo.get_motor('motor_alergias');
-		console.log('■ ■ ■ Motor Alergias.d_data desde Motor__Mensajes.!!')
-		console.log(JSON.stringify(MA.d_data, null, 2)); 
-
 		const reservas = this.Salon.reservas;
+		const $news = e_Salon._to_element('[data-logica = news]'); 
+		if(!$news) 
+			console.log('no news');
+		$news.textContent = '';
+		$news.style.background = 'none';
+		$news.style.color = 'white';
+
+		if(rol_el === 'cliente'){
+			if(MA){
+				console.log('■ ■ ■ Motor Alergias.d_data desde Motor__Mensajes.!!')
+				// console.log(JSON.stringify(MA.d_data, null, 2)); 
+				const alergias_elemento = MA.d_data[$el_dom.id] || [];
+				const tiene_alergias = alergias_elemento.length > 0;
+				if(tiene_alergias){
+					$news.textContent = `${[...alergias_elemento].join(' ')}`;
+					$news.style.background = 'red';					
+				}else{
+					$news.textContent = '✔️ Free';
+					$news.style.background = 'green';
+				}
+			}
+		}else if (rol_el === 'reserver'){
+			// Solo para reservers(quiero saber si un reserver tiene algún cliente con alergia.)
+			if(MA && reservas){
+				const index_en_reserva = this.Salon._get_indice_en_reserva_s($el_dom.id);
+				const reserva = reservas[index_en_reserva];
+				const reserva_flat = Object.values(reserva).flat();			
+				const acumula_alergias_reserva = new Set();
+
+				reserva_flat.forEach(id =>{ 
+					if(id === $el_dom.id) return;					
+					const alergias_elemento_reserva = MA.d_data[id] || [];
+					
+					// 2. Añadimos cada alergia encontrada al Set
+					alergias_elemento_reserva.forEach(alergia => {
+						acumula_alergias_reserva.add(alergia);
+					});
+				});
+				if(acumula_alergias_reserva.size > 0 ){
+					$news.textContent = `❌ ${[...acumula_alergias_reserva].join(' ')}`;
+					$news.style.background = 'red';
+				}else{
+					$news.textContent = '✔️ Free';
+					$news.style.background = 'green';
+				}
+			}
+		}else{
+			console.warn(`❌ rol del elemento ${$el_dom.id}: ${rol_el} No registrado`);
+			return null
+		}
+
+		
+
 		
 		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
@@ -359,11 +459,11 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 		const $contenedor = document.createElement('div');		
 		$contenedor.className = ['contenedor_motor_mensajes', data_logica.css || ''].filter(Boolean).join(' ');
 
-		const textarea = document.createElement('textarea');
-		textarea.className = 'form-control mb-2';
-		textarea.rows = 2;
-		textarea.placeholder = 'Escribe aquí...';
-		textarea.value = this.get_mensaje($el_dom.id);
+		const $textarea = document.createElement('textarea');
+		$textarea.className = 'form-control mb-2';
+		$textarea.rows = 2;
+		$textarea.placeholder = 'Escribe aquí...';
+		$textarea.value = this.get_mensaje($el_dom.id);
 
 		if (tipo_render === 'sumatorio') {
 			const $sumatorio = this._crear_sumatorio($el_dom);
@@ -372,45 +472,45 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 			$contenedor.appendChild( $sumatorio );
 		}
 
-		const $contenedor_btns_accion = this._crear_botones_accion();
+		const $contenedor_btns_accion = this._crear_botones_accion($el_dom.id, $textarea);
 
-		$contenedor.appendChild(textarea);
+		$contenedor.appendChild($textarea);
 		$contenedor.appendChild($contenedor_btns_accion);
 		
-		// Función asíncrona para permitir el uso de await ... necesareo para mostrar las alertas.
-		$contenedor.addEventListener('click', async (ev) => {
-			const button = ev.target.closest('[data-action]');
-			if (!button) return;
+		// // Función asíncrona para permitir el uso de await ... necesareo para mostrar las alertas.
+		// $contenedor.addEventListener('click', async (ev) => {
+		// 	const button = ev.target.closest('[data-action]');
+		// 	if (!button) return;
 
-			const action = button.dataset.action;
-			if (action === 'guardar') {
-				this.set($el_dom.id, textarea.value);
-				Alertas_UI._NotA('Accion Guardar', 'Ejecutada con Exito');
-			}
-			if (action === 'eliminar') {
-				try {
-					const confirm = await Alertas_UI.ConfirM('Accion Eliminar', 'Estas Seguro?', 'warning');
-					if (confirm === true) {
-						this.delete($el_dom.id);
-						textarea.value = '';
-						Alertas_UI._NotA('Eliminar Mnesaje', `Mensaje de ${$el_dom.id} Eliminado con éxito`, 'danger');
-					}
-				} catch (error) {
-					// Captura y gestiona cualquier fallo del sistema de alertas o del DOM
-					console.error("Fallo crítico en el modal de confirmación:", error);
-					Alertas_UI._NotA('Error de Sistema', 'No se pudo procesar la eliminación', 'danger');
-				}
-			}
+		// 	const action = button.dataset.action;
+		// 	if (action === 'guardar') {
+		// 		this.set($el_dom.id, $textarea.value);
+		// 		Alertas_UI._NotA('Accion Guardar', 'Ejecutada con Exito');
+		// 	}
+		// 	if (action === 'eliminar') {
+		// 		try {
+		// 			const confirm = await Alertas_UI.ConfirM('Accion Eliminar', 'Estas Seguro?', 'warning');
+		// 			if (confirm === true) {
+		// 				this.delete($el_dom.id);
+		// 				$textarea.value = '';
+		// 				Alertas_UI._NotA('Eliminar Mnesaje', `Mensaje de ${$el_dom.id} Eliminado con éxito`, 'danger');
+		// 			}
+		// 		} catch (error) {
+		// 			// Captura y gestiona cualquier fallo del sistema de alertas o del DOM
+		// 			console.error("Fallo crítico en el modal de confirmación:", error);
+		// 			Alertas_UI._NotA('Error de Sistema', 'No se pudo procesar la eliminación', 'danger');
+		// 		}
+		// 	}
 
-			if (action === 'reset') {
-				textarea.value = '';
-				textarea.focus();
-			}
-			if (action === 'grabar'){
-				this._accion_grabar(textarea, button);
-				Alertas_UI._NotA('Accion Grabar Audio', 'Ejecutada con Exito');
-			}
-		});
+		// 	if (action === 'reset') {
+		// 		$textarea.value = '';
+		// 		$textarea.focus();
+		// 	}
+		// 	if (action === 'grabar'){
+		// 		this._accion_grabar($textarea, button);
+		// 		Alertas_UI._NotA('Accion Grabar Audio', 'Ejecutada con Exito');
+		// 	}
+		// });
 		
 		return $contenedor;
 	}
@@ -778,11 +878,11 @@ class Motor_Alergias  extends Interfaz_Custom_Motores{
 
 		this._actualizar_resumen($resumen, this.get($el_dom.id));
 
-		$contenedor.appendChild($resumen);
+		// $contenedor.appendChild($resumen);
 
 		const $btn_select_alergias = document.createElement('button');
 		$btn_select_alergias.type = 'button';
-		$btn_select_alergias.className = 'btn btn-sm btn-alergias-pop';
+		$btn_select_alergias.className = 'btn btn-sm    btn-alergias-pop';
 		$btn_select_alergias.textContent = 'Seleccionar Alergias';
 
 		$btn_select_alergias.addEventListener('click', () => {

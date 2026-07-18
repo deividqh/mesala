@@ -76,7 +76,7 @@ static async ConfirM(encabezado, texto, tipo = 'danger') {
      * @param {string} encabezado - Título.
      * @param {string} tipo - Categoría: 'success', 'danger', 'warning'. Por defecto 'success'.
      */
-    static _NotA(encabezado, texto, tipo = 'success') {
+    static _NotA(encabezado, texto, tipo = 'success', delay=4000) {
         const id_contenedor = 'contenedor_toasts';
         let contenedor = document.getElementById(id_contenedor);
 
@@ -116,7 +116,7 @@ static async ConfirM(encabezado, texto, tipo = 'danger') {
         contenedor.insertAdjacentHTML('beforeend', html_toast);
 
         const elemento_toast = document.getElementById(id_toast);
-        const instancia_bs = new bootstrap.Toast(elemento_toast, { delay: 4000, autohide: true });
+        const instancia_bs = new bootstrap.Toast(elemento_toast, { delay: delay, autohide: true });
 
         instancia_bs.show();
 

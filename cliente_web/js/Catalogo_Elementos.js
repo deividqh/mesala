@@ -321,7 +321,7 @@ class Logica_Catalogo  {
     
         // ■ Header del offcanvas
         const header = document.createElement('div');
-        header.className = 'offcanvas-header';
+        header.className = 'offcanvas-header offcanvas-logica-header';
         
         // ■ TITULO
         const title = document.createElement('div');
@@ -395,7 +395,7 @@ class Logica_Catalogo  {
         tabContent.className = 'tab-content';
         tabContent.id = 'logicaTabContent';
 
-        // ■ Generamos Dinámicamente cada pestaña
+        // ■ Generamos Dinámicamente cada pestaña ('Titulo Alertas', 'motor_alertas')
         claves_logica_unicas.forEach((nombre_pestana, key_motor) => {
             // --- Estructura del Botón/Pestaña ---
             const navItem = document.createElement('li');
@@ -434,28 +434,19 @@ class Logica_Catalogo  {
             
             tabContent.appendChild($panel);
         });
-
-        // ■ Foot del Body.
-        // const $foot = document.createElement('div');
-        // $foot.className = 'offcanvas-logica-foot';
-        // $foot.id = 'offcanvas_logica_foot';
-        // $foot.textContent = '■ ZONA FOOT';
-        // $foot.dataset.logica = 'foot';
         
         $body.appendChild(news);
         $body.appendChild(tabList);
         $body.appendChild(tabContent);
-        // $body.appendChild($foot);            // Esto sería un foot del body
 
         $offcanvas_logica.appendChild(header);
         $offcanvas_logica.appendChild($body);
-        // $offcanvas_logica.appendChild($foot);   
         
         document.body.appendChild($offcanvas_logica);
 
         return $offcanvas_logica;
-        // $offcanvas_logica ahora tiene tantas pestañas como logicas distintas hay en el Catalogo.
-        // Cuando vaya a abrir tengo que ver que logicas tiene el elemento que quiero abrir.
+        // ■ $offcanvas_logica ahora tiene tantas pestañas como logicas distintas hay en el Catalogo.
+        // ■ Cuando vaya a abrir tengo que ver que logicas tiene el elemento que quiero abrir.
     }
 
     /**
@@ -475,11 +466,14 @@ class Logica_Catalogo  {
         const ctlg_el = Catalogo.get(id_key);
         if (!ctlg_el || !ctlg_el.logica) return null;
         
+        // ⚠️⚠️ ALERTA .... Elegir una 
         const $offcanvas_dom = document.getElementById('offcanvas_logica');     // x id 
         const $offcanvas_dom_ = document.querySelector('.offcanvas-logica');    // x className
         const $offcanvas_dom__ = e_Salon._to_element('.offcanvas-logica');      // x className custom
-        const $offcanvas_dom___ = e_Salon._to_element('[data-logica=logica]');  // x dataset custom
+        const $offcanvas_dom___ = e_Salon._to_element('[data-logica = logica]');  // x dataset custom
         if (!$offcanvas_dom) return null;
+        
+        // ⚠️⚠️ ALERTA 
         const offc = this.$offcanvas_logica;
         
         // ■ Posición offcanvas-logica (arriba / abajo)
@@ -618,7 +612,7 @@ class Logica_Catalogo  {
     }
 
     /**
-     * @description Ejecuta el método render del motor correspondiente e inyecta el resultado.
+     * ### Ejecuta el método render del motor pasado e inyecta el resultado.
      * @param {String} motor_busca - La clave del motor (ej. 'motor_mensajes', 'motor_alergias')
      * @param {Object} data_logica - Los datos de configuración de esa lógica para el elemento (ej. el objeto con 'nombre', 'content', etc.)
      * @param {HTMLElement} areaContenido - El contenedor DOM donde se inyectará el resultado
@@ -629,7 +623,7 @@ class Logica_Catalogo  {
         if(!instancia_motor || !instancia_motor.render) {
             // Fallback por si el motor no ha sido instanciado con Catalogo.set_motor() previamente
             areaContenido.innerHTML = `<span class="text-danger">Motor <strong>${motor_busca}</strong> no instanciado o sin método render().</span>`;
-            return;
+            return false;
         }
             
         // Limpiamos el área antes de inyectar lo nuevo
@@ -639,10 +633,13 @@ class Logica_Catalogo  {
         // 3. Evaluamos qué tipo de dato ha devuelto el motor para insertarlo correctamente
         if (typeof resultado === 'string') {
             areaContenido.innerHTML = resultado;
+            return true;
         } else if (resultado instanceof Node) {
             areaContenido.appendChild(resultado);
+            return true;
         } else {
             console.warn(`El motor ${motor_busca} no ha devuelto ni un String ni un Nodo del DOM.`);
+            return false;
         }
     }
 
