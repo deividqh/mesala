@@ -260,6 +260,26 @@ class Catalogo {
         });
     }
 
+    /* Sin uso de Momento */
+	static _crear_botonera_crud_grabar(clase_botonera = 'motor-mensajes-botonera') {
+		const $botonera = document.createElement('div');
+		$botonera.className = `d-flex gap-4   ${clase_botonera}`;
+		
+		// Los Botones los cojo de Catalogo
+		const btns = Catalogo.get_btns_crud_grabar();
+		btns.forEach((boton) => {
+			const button = document.createElement('button');
+			button.type = 'button';
+			// Le aplicamos la clase de Catalogo
+			button.className = `btn btn-sm   ${boton.className}`;
+			button.dataset.action = boton.action;
+			button.title = boton.title;
+			button.textContent = boton.texto;
+			$botonera.appendChild(button);
+		});
+		return $botonera;
+	}
+
     // ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
     // Exportación para Node.js o Navegador moderno
     // export default Catalogo;
@@ -416,16 +436,16 @@ class Logica_Catalogo  {
         });
 
         // ■ Foot del Body.
-        const $foot = document.createElement('div');
-        $foot.className = 'offcanvas-logica-foot';
-        $foot.id = 'offcanvas_logica_foot';
-        $foot.textContent = '■ ZONA FOOT';
-        $foot.dataset.logica = 'foot';
+        // const $foot = document.createElement('div');
+        // $foot.className = 'offcanvas-logica-foot';
+        // $foot.id = 'offcanvas_logica_foot';
+        // $foot.textContent = '■ ZONA FOOT';
+        // $foot.dataset.logica = 'foot';
         
         $body.appendChild(news);
         $body.appendChild(tabList);
         $body.appendChild(tabContent);
-        $body.appendChild($foot);            // Esto sería un foot del body
+        // $body.appendChild($foot);            // Esto sería un foot del body
 
         $offcanvas_logica.appendChild(header);
         $offcanvas_logica.appendChild($body);

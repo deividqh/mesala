@@ -2638,6 +2638,7 @@ class e_Salon extends Tablero_Touch {
 		console.log(JSON.stringify(MM.d_data, null, 2)); 
 
 		// Alertas_UI._NotA('Encabezado', 'texto del mensaje');
+		Alertas_UI._NotA('App Cargada con Exito', 'Listo para empezar!');
 
 	}
 

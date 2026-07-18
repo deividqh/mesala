@@ -231,22 +231,25 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 
 	/*  */
 	_crear_botones_accion() {
-		const toolbar = document.createElement('div');
-		toolbar.className = 'd-flex gap-2 motor-mensajes-acciones';
-		// Error: cachar los botones de Catalogo. ya está preparado.(#botones_crud_grabar)
-		const btns = Catalogo.get_btns_crud_grabar()
+		const $botonera = document.createElement('div');
+		$botonera.className = 'd-flex gap-4   motor-mensajes-botonera';
+		
+		// Los Botones los cojo de Catalogo
+		const btns = Catalogo.get_btns_crud_grabar();
 		btns.forEach((boton) => {
 			const button = document.createElement('button');
 			button.type = 'button';
-			button.className = `btn btn-sm ${boton.className}`;
+			// Le aplicamos la clase de Catalogo
+			button.className = `btn btn-sm   ${boton.className}`;
 			button.dataset.action = boton.action;
 			button.title = boton.title;
 			button.textContent = boton.texto;
-			toolbar.appendChild(button);
+			$botonera.appendChild(button);
 		});
-		return toolbar;
+		return $botonera;
 	}
 
+	/*### Sin Uso  */
 	_es_rol(id_elemento = '' , rol_busca='reserver') {
 		const elemento_dom = e_Salon._to_element(id_elemento);
 		const id_catalogo = elemento_dom?.dataset?.id_key || id_elemento.split('_')[0];
@@ -267,7 +270,6 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 		return reservers;
 	}
 	_crear_sumatorio(elemento_dom) {
-
 		const $sumatorio = document.createElement('div');
 		$sumatorio.className = 'sumatorio';
 		$sumatorio.setAttribute('role', 'note');
@@ -334,7 +336,6 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 
 		recognition.start();
 	}
-	
 
 	// Dibuja el codigo HTML de Mensajes según la Lógica.
 	render(data_logica = {}, elemento_dom=null){
@@ -371,10 +372,12 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 			$contenedor.appendChild( $sumatorio );
 		}
 
+		const $contenedor_btns_accion = this._crear_botones_accion();
+
 		$contenedor.appendChild(textarea);
-		$contenedor.appendChild(this._crear_botones_accion());
+		$contenedor.appendChild($contenedor_btns_accion);
 		
-		// Función asíncrona para permitir el uso de await
+		// Función asíncrona para permitir el uso de await ... necesareo para mostrar las alertas.
 		$contenedor.addEventListener('click', async (ev) => {
 			const button = ev.target.closest('[data-action]');
 			if (!button) return;
