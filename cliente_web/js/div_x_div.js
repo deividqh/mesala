@@ -802,7 +802,7 @@ class Matriz_to_MyDiv extends Matriz_Plana {
 	 * @param {Array} lista_info - Lista de ficha_baldosa ... Array de Map('id_contenido', 'indice_baldosa', 'my_div')
 	 * @returns {Array} - Vecinos mesas conectadas ► ['Mesa_0', 'Mesa_3']
 	*/
-	_get_array_vecinos(id_contenido, ficha_s_baldosa, rol_busca = 'reserver') {
+	_get_array_vecinos(id_contenido, ficha_s_baldosa, rol_busca = 'central') {
 		const ficha_baldosa = ficha_s_baldosa.find(m => m.get('id_contenido') === id_contenido);
 		if (!ficha_baldosa) return [];		
 		const my_div = ficha_baldosa.get('my_div');
@@ -2548,7 +2548,7 @@ class e_Salon extends Tablero_Touch {
 		);
 		
 		// ┌••• Relaciona Acciones con los Elementos del catalogo.
-		this.LOGIC = new Logica_Catalogo(this.dicc_config.catalogo);
+		this.LOGIC = new Logica_Catalogo(this);
 		
 		// ┌■ Asocia el Catalogo a la Logica ... y viceversa.
 		const motor_mensajes = new Motor_Mensajes(this);
@@ -2617,12 +2617,12 @@ class e_Salon extends Tablero_Touch {
 		const d_indices_mock = {
 			silla_0: 8, mesa_0: 9, silla_1: 12, mesa_1: 13, silla_2: 14 , 
 			silla_3: 1, silla_6: 10, silla_4: 17, mesa_3: 21, silla_5: 29 , 
-			silla_7: 5, silla_8: 20, silla_9: 22,  
+			silla_7: 5, silla_8: 20, silla_9: 22,  silla_11: 12, 
 			mesa_2: 41, mesa_4: 49, mesa_7: 57, silla_10: 33, silla_1: 42, silla_12: 40, silla_17: 50 , silla_18: 48, silla_13: 57,
 			silla_14: 45, silla_16: 54, silla_15: 52, mesa_5: 53, silla_19: 61 , 
 			mesa_6: 75, silla_21: 74, silla_20: 76,  			
 		};
-		const d_mensajs_mock = {silla_0: "Nadie", mesa_0: 'Sabe', silla_2: 'Nada', mesa_2: 'Mr Smith', mesa_4: 'Miss Smith', };
+		const d_mensajs_mock = {silla_0: "Cliente Especial", mesa_0: 'Reserva Miguel Garrido', silla_2: 'Pesado', mesa_2: 'Mr Smith', mesa_4: 'Miss Smith', };
 		const d_alergias_mock = {silla_0: ['soja', 'lacteos'], silla_1: ['huevos'], silla_21:['pescado']};
 		
 		const ok_elements = this._load_elementos_en_Salon(d_indices_mock);
@@ -2706,13 +2706,13 @@ class e_Salon extends Tablero_Touch {
 	 * ### La Lógica es un offcanvas que tiene tantas pestañas como Motores(acciones) tiene el elemento en Catalogo.
 	*/
 	_elemento_onplay_click(ev) {
+		
 		ev.preventDefault();
 		// ┌■ Datos sobre el elemento clickado.
 		const elemento_clickado = ev.currentTarget;
 		if (!elemento_clickado) return;
 		const id_el = elemento_clickado.id;
 		const id_key_el = elemento_clickado.dataset.id_key;		// el key de Catalogo.
-		// const clases_el = elemento_clickado.classList;	// clases css([class_onplay , silla_onplay])
 		
 		// ┌■ Calcula el indice de la reserva a la que pertenece el elemento clickado.
 		// ┌■ Lo necesito para los cambios en el color(2º click y color)
@@ -2720,15 +2720,13 @@ class e_Salon extends Tablero_Touch {
 		if (index_reserva == -1) return;
 		this.index_reserva = index_reserva;			
 
-		// ┌■ Grupo only players
+		// ┌■ Solo pasan los Grupo players
 		const ctlg_el = Catalogo.get(id_key_el);
 		if (!ctlg_el || ctlg_el.grupo !== 'player') 
 			return;
 		
-		// this._set_elemento_onplay_seleccionado(elemento_clickado);
-
 		// ┌■ Rol. color de la reserva en el click.
-		if (ctlg_el.rol === 'reserver'){
+		if (ctlg_el.rol === 'central'){
 			if (index_reserva != this.last_reserva_clicked)
 				this.last_reserva_clicked = index_reserva;
 			// ┌■■ 🌈 🪑 CAMBIO DEL COLOR DE LOS ELEMENTOS DE LA RESERVA. 			
@@ -2740,20 +2738,25 @@ class e_Salon extends Tablero_Touch {
 		// if(logica?.motor_mensajes || logica?.motor_alergias){
 		if(logica){
 			const ids_reserva = Object.values(this.reservas[index_reserva] || {}).flat();
-			// 🈴🈴
+			
+			// 🈴🈴🈴🈴🈴🈴🈴🈴🈴🈴🈴🈴🈴🈴🈴🈴
 			const MA = Catalogo.get_motor('motor_alergias');
 			const MM = Catalogo.get_motor('motor_mensajes');
 
+			// Hay que saber la posición para colocar el offcanvas arriba o abajo
 			const posicion_offcanvas_logica = this._get_posicion_offcanvas_logica(elemento_clickado);
 
-			const offcanvas_logica = this.LOGIC.abrir_offcanvas(elemento_clickado, posicion_offcanvas_logica);
-
-			if (offcanvas_logica) {
+			const $offcanvas_logica = this.LOGIC.abrir_ventana_logica(elemento_clickado, posicion_offcanvas_logica);
+			
+			// Si aparece el offcanvas-logica, el elemento seleccionado se hace grande y borde gordo
+			// Cuando desparece el offcanvas-logica dejamos de seleccionarlo.
+			if ($offcanvas_logica) {
 				this._set_elemento_onplay_seleccionado(elemento_clickado);
-				offcanvas_logica.addEventListener('hidden.bs.offcanvas', () => {
+				$offcanvas_logica.addEventListener('hidden.bs.offcanvas', () => {
 					this._reset_elemento_onplay_seleccionado();
 				}, { once: true });
 			}
+
 		} else {
 			this._reset_elemento_onplay_seleccionado();	
 		}
@@ -2849,7 +2852,7 @@ class e_Salon extends Tablero_Touch {
 	 * scanner = {'id':'mesa_4', 'n':null, 's':'silla_1', 'e':'mesa_2', 'w':'silla_0', 'ne':null, 'nw':null, 'se':null, 'sw':null}
 	 * ```
 	*/
-	_modulo_reservas( rol_busca='reserver' , b_registro=true) {
+	_modulo_reservas( rol_busca='central' , b_registro=true) {
 		try {
 			// ┌• Objeto datamap: {id_elemento(string), baldosa (myDiv) , indice(integer) }
 			// ┌• [ {'mesa_0', [Object myDiv], 12} , {'mesa_1', [Object myDiv], 3} , ... ]			
@@ -2882,7 +2885,7 @@ class e_Salon extends Tablero_Touch {
 	/** 
 	 * ####	Lo uso para tener información de un tipo de objeto('mesa') sobre el Salón. POR ID.
 	 * ```javascript  
-	 * const lista_mesas = this.crear_fichas_onplay('reserver');
+	 * const lista_mesas = this.crear_fichas_onplay('central');
 	 * ```
 	 * ### Retorna un array de fichas:  
 	 * ```javascript
@@ -2890,7 +2893,7 @@ class e_Salon extends Tablero_Touch {
 	 * { id_contenido: 'mesa_1', my_div: [Object myDiv], indice_baldosa: 15 } , ... ]
 	 * ```
 	 * *  **false**, si hay algún error.	*/
-	#crear_fichas_onplay(rol_busca='reserver') {
+	#crear_fichas_onplay(rol_busca='central') {
 		// ┌•• Obtiene la lista de baldosas que contienen hijos (mesas o sillas)
 		const lista_baldosas_onplay = this._get_mydivs_onplay();
 		if (!lista_baldosas_onplay || lista_baldosas_onplay.length === 0) return [];
@@ -2968,7 +2971,7 @@ class e_Salon extends Tablero_Touch {
 	 * @return {array} 
 	 * ```javascript
 	 *  _get_ids_onplay_('cliente') ► ['silla_0', 'silla_1', 'taburete_0', ... ]
-	 *  _get_ids_onplay_('reserver')  ► ['mesa_0', 'mesa_1', ... ]	
+	 *  _get_ids_onplay_('central')  ► ['mesa_0', 'mesa_1', ... ]	
 	 * ```
 	 */
 	_get_ids_onplay(rol_busca='todo'){		
@@ -3105,7 +3108,7 @@ class e_Salon extends Tablero_Touch {
 
 			// ■■ Creamos el diccionario para este grupo
 			const dicc_reservas = {
-				reservers: arr_reserver_s,
+				reservadores: arr_reserver_s,
 				clientes: [...set_sub_clientes]  // convertimos Set → Array
 			};
 			arraydicc_rsrvs.push(dicc_reservas);
@@ -3135,7 +3138,7 @@ class e_Salon extends Tablero_Touch {
 		if (clientes_sin_reserva.length > 0) {
 			// console.log('Sillas no asignadas a ninguna reserva:', clientes_sin_reserva);
 			let ficha_reservas = {
-				reservers: [],
+				reservadores: [],
 				clientes: [...clientes_sin_reserva]  
 			};
 			clientes_ronin.push(ficha_reservas);
@@ -3214,7 +3217,7 @@ class e_Salon extends Tablero_Touch {
 			this._onplay_scan_salon(); 		
 			
 			// LLAMO AL MODULO DE RESERVAS SOBRE LOS OBJETOS CUYO ID EMPIEZA POR 'mesa' 
-			const reservas = this._modulo_reservas( 'reserver', true);
+			const reservas = this._modulo_reservas( 'central', true);
 			return reservas;
 		} catch (error) {
 			console.log(`Error :::  e-Salon ::: Register ::: msg: ${error}`)
@@ -3319,16 +3322,16 @@ class e_Salon extends Tablero_Touch {
 	
 			// Construcción: mesas/sillas como diccionarios
 			const salida = reservas.map(dicc => {
-				const reservers  = {};
+				const reservadores  = {};
 				const clientes = {};
 	
-				for (const id of (Array.isArray(dicc.reservers) ? dicc.reservers : [])) {
-					reservers[id] = ficha(msg_mesas[id]);
+				for (const id of (Array.isArray(dicc.reservadores) ? dicc.reservadores : [])) {
+					reservadores[id] = ficha(msg_mesas[id]);
 				}
 				for (const id of (Array.isArray(dicc.clientes) ? dicc.clientes : [])) {
 					clientes[id] = ficha(msg_sillas[id]);
 				}
-				return { reservers, clientes };
+				return { reservadores, clientes };
 				});
 			
 			return salida;
@@ -3441,7 +3444,7 @@ class e_Salon extends Tablero_Touch {
 
 		// Procesa todas las reservas para agregar índices
 		const reservas_con_indices = dicc_api_reservas.map((reserv = {}) => ({
-			reservers: agregarIndice(reserv.reservers),
+			reservadores: agregarIndice(reserv.reservadores),
 			clientes: agregarIndice(reserv.clientes)
 		}));		
 
@@ -4293,7 +4296,7 @@ class Configuracion_Salon {
 			
 			// ┌••             •••      •••   
 			// ┌•• Validación Antes y despues de registrar
-			const val_api_reservas_aft = Salon._modulo_reservas( 'reserver' , false);
+			const val_api_reservas_aft = Salon._modulo_reservas( 'central' , false);
 			if(val_api_reservas_aft.length !== val_api_reservas_bef.length) {
 				console.log(`⚠️​ Advertencia: El número de reservas antes (${val_api_reservas_bef.length}) y después (${val_api_reservas_aft.length}) de re-posicionar no coincide.`);
 			}
@@ -4688,7 +4691,7 @@ class Configuracion_Salon {
 
 			// 💥💥💥💥💥💥💥💥
 			// 💥💥💥💥💥💥💥💥
-			// ■ Identificar el ROL del elemento a colocar (reserver, cliente...)
+			// ■ Identificar el ROL del elemento a colocar (central, cliente...)
             const key_item = id_keys.find(k => item.id.startsWith(k));
             const item_catalogo = key_item ? Catalogo.get(key_item) : null;
             const mi_rol = item_catalogo ? item_catalogo.rol : null;
@@ -4723,23 +4726,23 @@ class Configuracion_Salon {
                 const rol_vecino = vecino_catalogo ? vecino_catalogo.rol : null;
 
                 // Si el vecino es decoración o estructura, no interactúa con los players (no hay conflicto)
-                if (rol_vecino !== 'reserver' && rol_vecino !== 'cliente') {
+                if (rol_vecino !== 'central' && rol_vecino !== 'cliente') {
                     continue; 
                 }
 
-                // ► Si YO soy un 'reserver' (ej: mesa, taburete) y tengo un vecino player (sea lo que sea) HAY CONFLICTO ❌
-                if (mi_rol === 'reserver') {
+                // ► Si YO soy un 'central' (ej: mesa, taburete) y tengo un vecino player (sea lo que sea) HAY CONFLICTO ❌
+                if (mi_rol === 'central') {
                     return true;
                 }
                 
-                // ■ Si NO soy un 'reserver' (ej: soy un 'cliente' como una silla)
-                // y me choco con un 'reserver' vecino...
-                if (rol_vecino === 'reserver') {                            
+                // ■ Si NO soy un 'central' (ej: soy un 'cliente' como una silla)
+                // y me choco con un 'central' vecino...
+                if (rol_vecino === 'central') {                            
                     // ¿Es de nuestra propia reserva ("familia")?
                     if (ids_reserva.includes(vecino_id)) {
                         continue; // Reserver propio, NO hay conflicto.
                     } else {
-                        return true; // ¡Es un reserver de otra reserva! CONFLICTO.
+                        return true; // ¡Es un central de otra reserva! CONFLICTO.
                     }
                 }
                 
@@ -4830,15 +4833,15 @@ class Configuracion_Salon {
 		foto_reservas.forEach((reserva, i) => {
 			// 1. Identificar todos los IDs de la reserva
 			
-			const reservers = Array.isArray(reserva?.reservers) ? reserva.reservers : [];
+			const reservadores = Array.isArray(reserva?.reservadores) ? reserva.reservadores : [];
 			const clientes = Array.isArray(reserva?.clientes) ? reserva.clientes : [];
-			const ids_items = [...reservers, ...clientes].filter(Boolean);
+			const ids_items = [...reservadores, ...clientes].filter(Boolean);
 			if (ids_items.length === 0) return [];
 
 			// ┌••   •••••••••••••  •••••••••••••••••••
 			// • • • Caso especial: reservas sin mesas. Las sillas se agrupan en línea
 			// para compactar la geometría y facilitar el re_posicionamiento.
-			if (reservers.length === 0 && clientes.length > 0) {
+			if (reservadores.length === 0 && clientes.length > 0) {
 				const items_geometria = [];
 				clientes.forEach((id, index) => {
 					const elemento_dom = document.getElementById(id);

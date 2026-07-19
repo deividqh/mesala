@@ -1516,15 +1516,15 @@ class Working_Rangos  extends Working_Celdas{
 		foto_reservas.forEach((reserva, i) => {
 			
 			// ┌• Cacho todos los IDs de la reserva			
-			const reservers = Array.isArray(reserva?.reservers) ? reserva.reservers : [];
+			const reservadores = Array.isArray(reserva?.reservadores) ? reserva.reservadores : [];
 			const clientes = Array.isArray(reserva?.clientes) ? reserva.clientes : [];
-			const ids_items = [...reservers, ...clientes].filter(Boolean);
+			const ids_items = [...reservadores, ...clientes].filter(Boolean);
 			if (ids_items.length === 0) return [];
 
 			// ┌••   •••••••••••••  •••••••••••••••••••
 			// • • • Caso especial: reservas sin mesas. Las sillas se agrupan en línea
 			// para compactar la geometría y facilitar el re_posicionamiento.
-			if (reservers.length === 0 && clientes.length > 0) {
+			if (reservadores.length === 0 && clientes.length > 0) {
 				const items_geometria = [];
 				clientes.forEach((id, index) => {
 					const elemento_dom = document.getElementById(id);
@@ -3195,12 +3195,12 @@ class El_Rango_del_Salon extends Wedding_Rangos{
 			// ┌••••••••••••••••••••••••
 			arr_reservas.forEach(reserva => {
 
-				const reservers = Array.isArray(reserva?.reservers) ? reserva.reservers : [];
+				const reservadores = Array.isArray(reserva?.reservadores) ? reserva.reservadores : [];
 				const clientes = Array.isArray(reserva?.clientes) ? reserva.clientes : [];
 				
 				// ┌■■ La Reserva de 'Sillas Ronin': Se da como resultado un [Array de Rangos].
 				// ┌■■ Cada silla genera un rango 1x1 independiente.
-                if (reservers.length === 0 && clientes.length > 0) {
+                if (reservadores.length === 0 && clientes.length > 0) {
 					const array_ronin = [];
                     clientes.forEach(cli => {
                         // Encontrar la celda donde está ubicada la silla actual
@@ -3223,7 +3223,7 @@ class El_Rango_del_Salon extends Wedding_Rangos{
                 }
 				// ┌■■■ PREPARO EL DICC VALUES 
 				// ┌• Junto mesas y sillas, filtro vacíos.
-				const ids_reserva = [...reservers, ...clientes].filter(Boolean);				
+				const ids_reserva = [...reservadores, ...clientes].filter(Boolean);				
 				// ┌• Desmontamos el diccionario en pares [celda, elemento] y filtramos comprobando si el elemento existe en el array.
 				const pares_reservados = Object.entries(dicc_celda_elemento).filter(([celda, elemento]) => ids_reserva.includes(elemento));
 				// ┌• Ensamblamos (reconstruimos) el nuevo diccionario exclusivamente con las reservas confirmadas.

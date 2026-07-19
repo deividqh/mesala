@@ -54,7 +54,7 @@ class Catalogo {
     mesa: {
         slug: 'mesa',
         grupo: 'player',
-        rol: 'reserver', // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc)
+        rol: 'central',         // subgrupo que reune elementos de rol cliente
         fisica: {
             ancho: 1, // Medida en celdas/baldosas
             alto: 1,
@@ -87,7 +87,7 @@ class Catalogo {
     taburete: {
         slug: 'taburete',
         grupo: 'player',
-        rol: 'reserver',   // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc)
+        rol: 'central',   // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc)
         fisica: { ancho: 1, alto: 1, colision: true },
         visual: {
             nombre: 'Titulo del Taburete',
@@ -295,9 +295,13 @@ class Catalogo {
 class Logica_Catalogo  {
     $offcanvas_logica = null;
     
-    constructor() {        
+    constructor(instancia_salon=null) {        
+        this.Salon = instancia_salon;
+        this.$elemento_news_actual = null;
+
         // Creamos el offcanvas en el DOM inmediatamente al instanciar la clase
         this.$offcanvas_logica = this.#crear_offcanvas_logica();
+        this.#add_listeners_news();
     }
 
     // ■■■ MÉTODOS INTERNOS Y CORE ■■■
@@ -454,8 +458,7 @@ class Logica_Catalogo  {
      * las lógicas válidas que posea el elemento cliqueado.
      * @param {HTMLElement} elemento_dom - Elemento del salón sobre el que se hace clic.
      */
-    // abrir_offcanvas(elemento_dom) {
-    abrir_offcanvas(elemento_dom, posicion_offcanvas_logica='down') {
+    abrir_ventana_logica(elemento_dom, posicion_offcanvas_logica='down') {
         if(!['up','down'].includes(posicion_offcanvas_logica)) return;
         const $el_dom = e_Salon._to_element(elemento_dom);
         if(!$el_dom) return;
@@ -484,6 +487,9 @@ class Logica_Catalogo  {
         
         // ■ ■ Establecemos el titulo (icono + id)
         this.set_title($el_dom.id, svg_icon);
+        this.$elemento_news_actual = $el_dom;
+
+        this.#actualizar_news($el_dom);
 
         // ■ Cacho la logica del elemento en Catalogo.
         const logica_el = ctlg_el.logica;
@@ -518,9 +524,9 @@ class Logica_Catalogo  {
                 }
     
                 // ■ ■ Inyección de contenido 
-                const areaContenido = $panel_dom.querySelector('.area-de-contenido');   
+                const $area_de_contenido = $panel_dom.querySelector('.area-de-contenido');   
                              
-                this.#inyectar_render_motor($el_dom , motor, data_logica, areaContenido );
+                this.#inyectar_render_motor($el_dom , motor, data_logica, $area_de_contenido );
 
             }
 
@@ -569,14 +575,8 @@ class Logica_Catalogo  {
         $offcanvas_dom.dataset.posicionLogica = posicion;
     }
 
-    // set_title(html_content) {
-    //     const $title_dom = document.getElementById('offcanvas_logica_title');
-    //     if (!$title_dom) return;
-
-    //     $title_dom.innerHTML = html_content;
-    // }
     /**
-     * @description Establece el título y el icono en el offcanvas.
+     * @description Establece el CONTENIDO DEL título y el icono en el offcanvas.
      * @param {String} texto - El identificador o texto a mostrar.
      * @param {String} icono_html - (Opcional) El string SVG que se inyectará.
      */
@@ -615,27 +615,27 @@ class Logica_Catalogo  {
      * ### Ejecuta el método render del motor pasado e inyecta el resultado.
      * @param {String} motor_busca - La clave del motor (ej. 'motor_mensajes', 'motor_alergias')
      * @param {Object} data_logica - Los datos de configuración de esa lógica para el elemento (ej. el objeto con 'nombre', 'content', etc.)
-     * @param {HTMLElement} areaContenido - El contenedor DOM donde se inyectará el resultado
+     * @param {HTMLElement} $area_de_contenido - El contenedor DOM donde se inyectará el resultado
      */
-    #inyectar_render_motor(elemento_dom , motor_busca, data_logica, areaContenido) {
+    #inyectar_render_motor(elemento_dom , motor_busca, data_logica, $area_de_contenido) {
         // 1. Obtenemos la instancia del motor desde el Catálogo
         const instancia_motor = Catalogo.get_motor(motor_busca);
         if(!instancia_motor || !instancia_motor.render) {
             // Fallback por si el motor no ha sido instanciado con Catalogo.set_motor() previamente
-            areaContenido.innerHTML = `<span class="text-danger">Motor <strong>${motor_busca}</strong> no instanciado o sin método render().</span>`;
+            $area_de_contenido.innerHTML = `<span class="text-danger">Motor <strong>${motor_busca}</strong> no instanciado o sin método render().</span>`;
             return false;
         }
             
         // Limpiamos el área antes de inyectar lo nuevo
-        areaContenido.innerHTML = '';         
-        const resultado = instancia_motor.render(data_logica, elemento_dom);
+        $area_de_contenido.innerHTML = '';         
+        const $renderizado_html = instancia_motor.render(data_logica, elemento_dom);
 
         // 3. Evaluamos qué tipo de dato ha devuelto el motor para insertarlo correctamente
-        if (typeof resultado === 'string') {
-            areaContenido.innerHTML = resultado;
+        if (typeof $renderizado_html === 'string') {
+            $area_de_contenido.innerHTML = $renderizado_html;
             return true;
-        } else if (resultado instanceof Node) {
-            areaContenido.appendChild(resultado);
+        } else if ($renderizado_html instanceof Node) {
+            $area_de_contenido.appendChild($renderizado_html);
             return true;
         } else {
             console.warn(`El motor ${motor_busca} no ha devuelto ni un String ni un Nodo del DOM.`);
@@ -643,7 +643,143 @@ class Logica_Catalogo  {
         }
     }
 
+    /**
+     * ### crea un evento personalizado
+     */
+    #add_listeners_news() {
+        const $news = this.$offcanvas_logica?.querySelector('[data-logica="news"]');
+        if (!$news) return;
 
+        $news.addEventListener('click', (event) => this.#on_click_news(event));
+
+        document.addEventListener('motor_alergias:change', () => {
+            if (this.$elemento_news_actual) {
+                this.#actualizar_news(this.$elemento_news_actual);
+            }
+        });
+    }
+    #on_click_news(event) {
+        const $btn_cerrar = event.target.closest('[data-action="eliminar-alergia-news"]');
+        if (!$btn_cerrar || !this.$elemento_news_actual) return;
+
+        const $el_dom = this.$elemento_news_actual;
+        if ($el_dom.dataset.rol !== 'cliente') return;
+
+        const alergia = $btn_cerrar.dataset.alergia;
+        if (!alergia) return;
+
+        const MA = Catalogo.get_motor('motor_alergias');
+        if (!MA) return;
+
+        const alergias = Array.isArray(MA.get($el_dom.id)) ? MA.get($el_dom.id) : [];
+        const nuevas_alergias = alergias.filter((item) => item !== alergia);
+        MA.set($el_dom.id, nuevas_alergias);
+        this.#actualizar_news($el_dom);
+    }
+    /** 
+     * ### Actualiza el contenido de la zona 'News' creada en offcanvas-logica.
+     * @param {string|Html} elemento_dom, id o elemento html sobre el que actualizar News.
+     */
+    #actualizar_news(elemento_dom) {
+		const $news = this.$offcanvas_logica?.querySelector('[data-logica="news"]');
+		const $el_dom = e_Salon._to_element(elemento_dom);
+		if (!$news || !$el_dom) return;
+
+		const MA = Catalogo.get_motor('motor_alergias');
+		if (!MA) {
+			this.#pintar_news_vacia($news, 'Sin motor de alergias.');
+			return;
+		}
+
+		const rol = $el_dom.dataset.rol;
+		if (rol === 'cliente') {
+			const alergias = Array.isArray(MA.get($el_dom.id)) ? MA.get($el_dom.id) : [];
+			this.#pintar_news_alergias($news, alergias, { editable: true });
+			return;
+		}
+
+		if (rol === 'central') {
+			const alergias_reserva = this.#get_alergias_reserva($el_dom.id);
+			this.#pintar_news_alergias($news, alergias_reserva, { editable: false });
+			return;
+		}
+
+		this.#pintar_news_vacia($news, `Rol no registrado: ${rol || 'sin rol'}`);
+	}
+
+    /** 
+     * ### Actualiza el contenido de la zona 'News' creada en offcanvas-logica.
+     * @param {string|Html} id_elemento, id sobre el que actualizar News.
+     * @param {Motor_Alergias} motor_alergias, instancia del motor_alergias a usar.
+     */
+    #get_alergias_reserva(id_elemento = '') {
+		const MA = Catalogo.get_motor('motor_alergias');
+		if (!this.Salon || !MA || !id_elemento) return [];
+
+		const index_reserva = this.Salon._get_indice_en_reserva_s(id_elemento);
+		const reserva = this.Salon.reservas?.[index_reserva];
+		if (!reserva) return [];
+
+		const ids_reserva = [
+			...(Array.isArray(reserva.reservadores) ? reserva.reservadores : []),
+			...(Array.isArray(reserva.clientes) ? reserva.clientes : [])
+		];
+
+		const alergias = new Set();
+		ids_reserva.forEach((id) => {
+			const alergias_elemento = Array.isArray(MA.get(id)) ? MA.get(id) : [];
+			alergias_elemento.forEach((alergia) => alergias.add(alergia));
+		});
+
+		return Array.from(alergias);
+	}
+    /** 
+     * ### Pinta en la Zona News las alergias pasadas en formato lbl's
+     * @param {Html} $news, objeto html que es el receptor/contenedor de las alergias a pintar.
+     * @param {Array} alergias, array de alergias a pintar.
+     * @param {Dict} opciones, diccionario de opciones a tener en cuenta.
+     */
+    #pintar_news_alergias($news, alergias = [], opciones = {}) {
+		$news.innerHTML = '';
+		$news.style.color = 'white';
+
+		if (!Array.isArray(alergias) || alergias.length === 0) {
+			this.#pintar_news_vacia($news, '✔️ Free');
+			return;
+		}
+
+		$news.style.background = 'red';
+
+		alergias.forEach((alergia) => {
+			const $label = document.createElement('span');
+			$label.className = 'alergia-tag-pop';
+			$label.textContent = alergia;
+
+			if (opciones.editable) {
+				const $cerrar = document.createElement('button');
+				$cerrar.type = 'button';
+				$cerrar.className = 'alergia-tag-close';
+				$cerrar.dataset.action = 'eliminar-alergia-news';
+				$cerrar.dataset.alergia = alergia;
+				$cerrar.setAttribute('aria-label', `Eliminar alergia ${alergia}`);
+				$cerrar.textContent = '×';
+				$label.appendChild($cerrar);
+			}
+
+			$news.appendChild($label);
+		});
+	}
+    /** 
+     * ### Lo que pintamos cuando no hay alergias.
+     * @param {Html} $news, 
+     * @param {string} texto, 
+     */
+    #pintar_news_vacia($news, texto = '') {
+            $news.innerHTML = '';
+            $news.textContent = texto;
+            $news.style.background = 'green';
+            $news.style.color = 'white';
+    }
 }
 
 

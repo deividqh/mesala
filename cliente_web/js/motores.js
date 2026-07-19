@@ -295,24 +295,24 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
     }
 
 	/*### Sin Uso  */
-	_es_rol(id_elemento = '' , rol_busca='reserver') {
+	_es_rol(id_elemento = '' , rol_busca='central') {
 		const elemento_dom = e_Salon._to_element(id_elemento);
 		const id_catalogo = elemento_dom?.dataset?.id_key || id_elemento.split('_')[0];
 		const match_rol = Catalogo.get(id_catalogo)?.rol === rol_busca;
 		return match_rol
 	}
 
-	_get_ids_reservers_de_reserva(id_elemento) {
+	_get_ids_reservadores_de_reserva(id_elemento) {
 		const reservas = this.Salon.reservas ? this.Salon.reservas : []
 		if (!reservas) return [];
 
 		const index_en_reserva = this.Salon._get_indice_en_reserva_s(id_elemento);
 		if(!index_en_reserva) return [];
 
-		const reservers = reservas[index_en_reserva].reservers;
-		if(!reservers) return [];
+		const reservadores = reservas[index_en_reserva].reservadores;
+		if(!reservadores) return [];
 
-		return reservers;
+		return reservadores;
 	}
 	_crear_sumatorio(elemento_dom) {
 		const $sumatorio = document.createElement('div');
@@ -320,9 +320,9 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 		$sumatorio.setAttribute('role', 'note');
 		$sumatorio.setAttribute('aria-live', 'polite');
 
-		// sobre los rol=reserver del Catalogo.
-		const reservers = this._get_ids_reservers_de_reserva(elemento_dom.id);
-		reservers.forEach((id) => {
+		// sobre los rol=central del Catalogo.
+		const reservadores = this._get_ids_reservadores_de_reserva(elemento_dom.id);
+		reservadores.forEach((id) => {
 			// • Excluyo el propio elemento_dom
 			if(elemento_dom.id === id){
 				return;				
@@ -337,7 +337,7 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 			col_ico.className = 'sumatorio-ico';
 			col_id.className = 'sumatorio-id';
 			col_mensaje.className = 'sumatorio-msg';
-			// • Cacha el catalogo de cada reserver(mesa, mesa_redonda, ...)
+			// • Cacha el catalogo de cada central(mesa, mesa_redonda, ...)
 			const ctlg_el = Catalogo.get(id);		
 			const svg_ico = ctlg_el.visual.content;	
 			// • Asigno valores al dom
@@ -382,25 +382,22 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 		recognition.start();
 	}
 
-	/** ### Dibuja el codigo HTML de Mensajes según la Lógica. */
-	render(data_logica = {}, elemento_dom=null){
-		const $el_dom = e_Salon._to_element(elemento_dom);
+	set_news($el_dom){
 		if(!$el_dom) return null;
+
 		const id_key_el = $el_dom.dataset.id_key;
 		const grupo_el = $el_dom.dataset.grupo;
 		const rol_el = $el_dom.dataset.rol;
-		
-		if(grupo_el != 'player') return;
 
-		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ zona News!!
-		// Logica de Alergias desde la Logica de Mensajes.
-		// Necesito esto para la ZONA NEWS. en caso de que haya alergias en la reserva
 		const MA = Catalogo.get_motor('motor_alergias');
 		const reservas = this.Salon.reservas;
+		
 		const $news = e_Salon._to_element('[data-logica = news]'); 
 		if(!$news) 
 			console.log('no news');
+
 		$news.textContent = '';
+		$news.innerHTML = '';
 		$news.style.background = 'none';
 		$news.style.color = 'white';
 
@@ -414,12 +411,12 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 					$news.textContent = `${[...alergias_elemento].join(' ')}`;
 					$news.style.background = 'red';					
 				}else{
-					$news.textContent = '✔️ Free';
+					$news.textContent = 'CLIENTE ✔️ ';
 					$news.style.background = 'green';
 				}
 			}
-		}else if (rol_el === 'reserver'){
-			// Solo para reservers(quiero saber si un reserver tiene algún cliente con alergia.)
+		}else if (rol_el === 'central'){
+			// Solo para reservadores(quiero saber si un central tiene algún cliente con alergia.)
 			if(MA && reservas){
 				const index_en_reserva = this.Salon._get_indice_en_reserva_s($el_dom.id);
 				const reserva = reservas[index_en_reserva];
@@ -436,10 +433,10 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 					});
 				});
 				if(acumula_alergias_reserva.size > 0 ){
-					$news.textContent = `❌ ${[...acumula_alergias_reserva].join(' ')}`;
+					$news.textContent = `RESERVA: ${[...acumula_alergias_reserva].join(' ')}`;
 					$news.style.background = 'red';
 				}else{
-					$news.textContent = '✔️ Free';
+					$news.textContent = 'RESERVA ✔️ ';
 					$news.style.background = 'green';
 				}
 			}
@@ -447,11 +444,17 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 			console.warn(`❌ rol del elemento ${$el_dom.id}: ${rol_el} No registrado`);
 			return null
 		}
+	}
 
+	/** ### Dibuja el codigo HTML de Mensajes según la Lógica. */
+	render(data_logica = {}, elemento_dom=null){
+		const $el_dom = e_Salon._to_element(elemento_dom);
+		if(!$el_dom) return null;
+		const id_key_el = $el_dom.dataset.id_key;
+		const grupo_el = $el_dom.dataset.grupo;
+		const rol_el = $el_dom.dataset.rol;
 		
-
-		
-		// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		if(grupo_el != 'player') return;
 
 		const tipo_render = data_logica.content === 'sumatorio' ? 'sumatorio' : 'single';
 
@@ -476,41 +479,6 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 
 		$contenedor.appendChild($textarea);
 		$contenedor.appendChild($contenedor_btns_accion);
-		
-		// // Función asíncrona para permitir el uso de await ... necesareo para mostrar las alertas.
-		// $contenedor.addEventListener('click', async (ev) => {
-		// 	const button = ev.target.closest('[data-action]');
-		// 	if (!button) return;
-
-		// 	const action = button.dataset.action;
-		// 	if (action === 'guardar') {
-		// 		this.set($el_dom.id, $textarea.value);
-		// 		Alertas_UI._NotA('Accion Guardar', 'Ejecutada con Exito');
-		// 	}
-		// 	if (action === 'eliminar') {
-		// 		try {
-		// 			const confirm = await Alertas_UI.ConfirM('Accion Eliminar', 'Estas Seguro?', 'warning');
-		// 			if (confirm === true) {
-		// 				this.delete($el_dom.id);
-		// 				$textarea.value = '';
-		// 				Alertas_UI._NotA('Eliminar Mnesaje', `Mensaje de ${$el_dom.id} Eliminado con éxito`, 'danger');
-		// 			}
-		// 		} catch (error) {
-		// 			// Captura y gestiona cualquier fallo del sistema de alertas o del DOM
-		// 			console.error("Fallo crítico en el modal de confirmación:", error);
-		// 			Alertas_UI._NotA('Error de Sistema', 'No se pudo procesar la eliminación', 'danger');
-		// 		}
-		// 	}
-
-		// 	if (action === 'reset') {
-		// 		$textarea.value = '';
-		// 		$textarea.focus();
-		// 	}
-		// 	if (action === 'grabar'){
-		// 		this._accion_grabar($textarea, button);
-		// 		Alertas_UI._NotA('Accion Grabar Audio', 'Ejecutada con Exito');
-		// 	}
-		// });
 		
 		return $contenedor;
 	}
@@ -580,7 +548,6 @@ class Motor_Alergias  extends Interfaz_Custom_Motores{
 		if(!$el_dom) return {};
 
         return this.d_data[$el_dom.id] || {};
-        // return this.d_data[id_elemento] || {};
     }
 	
 	/** d_data = [  silla_0:['soja', 'lacteos'] , silla_3:['cereal'], ...  ] */
@@ -627,7 +594,8 @@ class Motor_Alergias  extends Interfaz_Custom_Motores{
         return this.set(id_elemento, Array.from(seleccion));
     }
 	
-	/** */
+	/** ⚠️⚠️ ⚠️⚠️  tiene que cambiar x id_elemento, alergia , y borrar la alergia 
+	 * en concreto del elemetno si existe*/
     delete(id_elemento = '') {
         if (!id_elemento) return false;
         delete this.d_data[id_elemento];
@@ -660,12 +628,17 @@ class Motor_Alergias  extends Interfaz_Custom_Motores{
 		if (content && typeof content === 'object' && !Array.isArray(content)) return content;
 		return this.get_alergenos();
 	}
+	
 	_set_alerta_elemento(id_elemento = '', forzar = null) {
 		const elemento = document.getElementById(id_elemento);
 		if (!elemento) return;
+		if(forzar === null){
+
+		}
 		const tiene_alergias = forzar === null ? this.has(id_elemento) : Boolean(forzar);
 		elemento.classList.toggle('elemento_con_alergia', tiene_alergias);
 	}
+	
 	
 	_emitir_cambio(id_elemento = '') {
 		if (!id_elemento) return;
@@ -673,18 +646,24 @@ class Motor_Alergias  extends Interfaz_Custom_Motores{
 			detail: { id_elemento, alergias: this.get(id_elemento) }
 		}));
 	}
-
-	_actualizar_resumen($resumen, alergias = [], opciones = {}) {
-		if (!$resumen) return;
-		$resumen.innerHTML = '';
-		$resumen.classList.toggle('is-empty', alergias.length === 0);
+	/** ### Actualiza el contenedor que se pasa como argumento alergias_container.
+	 * ### Cargando con lbs's pequeños con boton cerrar que tienen que llamar a delete cuando se pulsen.
+	 * @param {Html} $alergias_container , es el contenedor donde meter los lbls
+	 * @param {Array} alergias ['soja' , 'lacteos', 'cereal']
+	 * @param {dictionary} opciones .editable = true Crea el boton cerrar en la lbl | 
+	 * texto_vacio = 'Alerg free'.
+	 */
+	_actualizar_lbls_alergias($alergias_container, alergias = [], opciones = {}) {
+		if (!$alergias_container) return;
+		$alergias_container.innerHTML = '';
+		$alergias_container.classList.toggle('is-empty', alergias.length === 0);
 
 		if (!alergias.length) {
-			// $resumen.textContent = 'Sin alergias seleccionadas.';
-			$resumen.textContent = opciones.texto_vacio || 'Sin alergias seleccionadas.';
+			// $alergias_container.textContent = 'Sin alergias seleccionadas.';
+			$alergias_container.textContent = opciones.texto_vacio || '';
 			return;
 		}
-
+		// Crea las lbl's según las alergias que le entran en alergias..
 		alergias.forEach((alergia) => {
 			const $tag = document.createElement('span');
 			$tag.className = 'alergia-tag-pop';
@@ -697,10 +676,12 @@ class Motor_Alergias  extends Interfaz_Custom_Motores{
 				cerrar.dataset.alergia = alergia;
 				cerrar.setAttribute('aria-label', `Eliminar alergia ${alergia}`);
 				cerrar.textContent = '×';
+				// ⚠️⚠️ ⚠️⚠️ estos botones tienen que tener un listener.
+				// cerrar.addEventListener(ev => this.delete());
 				$tag.appendChild(cerrar);
 			}
 			
-			$resumen.appendChild($tag);
+			$alergias_container.appendChild($tag);
 		});
 	}
 
@@ -873,12 +854,11 @@ class Motor_Alergias  extends Interfaz_Custom_Motores{
 		const $contenedor = document.createElement('div');
 		$contenedor.className = data_logica.css;
 
-		const $resumen = document.createElement('div');
-		$resumen.className = 'labels-alergias-pop';
+		const $alergias_container = document.createElement('div');
+		$alergias_container.className = 'labels-alergias-pop';
 
-		this._actualizar_resumen($resumen, this.get($el_dom.id));
-
-		// $contenedor.appendChild($resumen);
+		this._actualizar_lbls_alergias($alergias_container, this.get($el_dom.id), {texto_vacio: '', editable:true});
+		// $contenedor.appendChild($alergias_container);
 
 		const $btn_select_alergias = document.createElement('button');
 		$btn_select_alergias.type = 'button';
