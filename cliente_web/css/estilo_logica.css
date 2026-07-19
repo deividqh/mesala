@@ -41,6 +41,7 @@
 
 /* ■ ■ ■ CÍRCULO INDICADOR DEL MENSAJE (común, color por tema) */
 .elemento_con_mensaje{ position: relative; }
+
 .markador_mensaje{
     position: absolute;
     top: -9px;
@@ -158,12 +159,15 @@
   ■ ■ ■ ■ */
 .offcanvas-logica {
   background: var(--color-offcanvas-logica);
+  height: auto;   min-height: 20vh;   max-height: 'auto'; 
 }
 .offcanvas-logica .offcanvas-header {
   align-items: flex-start;
   gap: 0.45rem;
-  padding-top: 0.4rem;
-  padding-bottom: 0.25rem;
+  /* padding-top: 0.4rem;
+  padding-bottom: 0.25rem; */
+  padding-top: 0.3rem;
+  padding-bottom: 0.2rem;
 }
 
 .offcanvas-logica .nav-tabs {
@@ -183,10 +187,13 @@
   font-family: "Verdana", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
   display: flex;
   align-items: center;       /* Centra verticalmente el icono y el texto */
-  flex: 1;
+  
+  /* flex: 1; */
+  flex: 0 1 auto;
+
   gap: 0.42rem;
   margin: 0;
-  margin-bottom: 0.5rem;
+  /* margin-bottom: 0.5rem; */
   min-width: 0;
 }
 
@@ -213,6 +220,56 @@
   background: rgba(127, 29, 29, 0.14);  color: inherit; font-size: 0.78rem; line-height: 1;
 }
 
+
+/* Zona de estado del offcanvas de lógica. */
+.offcanvas-logica-news {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  min-height: 3rem;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid transparent;
+  /* border-radius: 0.65rem; */
+  font-size: 0.82rem;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.offcanvas-logica-news.is-ok {
+  background: #d9f7e5;
+  border-color: #86efac;
+  color: #14532d;
+}
+
+.offcanvas-logica-news.is-alert {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #7f1d1d;
+}
+
+.offcanvas-logica-news .alergia-tag-pop {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border: 1px solid #fca5a5;
+  border-radius: 999px;
+  background: #fff7ed;
+  color: #7f1d1d;
+  padding: 0.12rem 0.45rem;
+  font-size: 0.62rem;
+  line-height: 1.1;
+  text-transform: capitalize;
+}
+
+.offcanvas-logica-news .alergia-tag-close {
+  width: 0.75rem;
+  height: 0.75rem;
+  background: rgba(127, 29, 29, 0.12);
+  font-size: 0.7rem;
+}
+
 /* ■■ Logica Arriba */
 .offcanvas-logica.offcanvas-top {
   height: auto !important;
@@ -222,6 +279,7 @@
 /* ■■ Logica Abajo */
 .offcanvas-logica.offcanvas-bottom {
   --bs-offcanvas-height: 35vh; 
+  height: auto !important;
   
   /* Si prefieres que mida menos de 35vh si hay poco texto, usa esto en su lugar: */
   /*

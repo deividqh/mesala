@@ -569,9 +569,9 @@ class Logica_Catalogo  {
         $offcanvas_dom.classList.remove('offcanvas-bottom');
 
         $offcanvas_dom.classList.add(clase_actual);
-        $offcanvas_dom.style.height = 'auto';
-        $offcanvas_dom.style.minHeight = '20vh';
-        $offcanvas_dom.style.maxHeight = '35vh';
+        // $offcanvas_dom.style.height = 'auto';
+        // $offcanvas_dom.style.minHeight = '20vh';
+        // $offcanvas_dom.style.maxHeight = 'auto';
         $offcanvas_dom.dataset.posicionLogica = posicion;
     }
 
@@ -644,7 +644,7 @@ class Logica_Catalogo  {
     }
 
     /**
-     * ### crea un evento personalizado
+     * ### crea un evento personalizado y lo pone a la escucha. un evento personalizado se lanza con dispatchEvent
      */
     #add_listeners_news() {
         const $news = this.$offcanvas_logica?.querySelector('[data-logica="news"]');
@@ -658,6 +658,9 @@ class Logica_Catalogo  {
             }
         });
     }
+
+    // ■ Cuando se cierra uno de los lbl's , se lanza desde aquí y aquí se propaga. 
+    // 
     #on_click_news(event) {
         const $btn_cerrar = event.target.closest('[data-action="eliminar-alergia-news"]');
         if (!$btn_cerrar || !this.$elemento_news_actual) return;
@@ -741,14 +744,16 @@ class Logica_Catalogo  {
      */
     #pintar_news_alergias($news, alergias = [], opciones = {}) {
 		$news.innerHTML = '';
-		$news.style.color = 'white';
+		// $news.style.color = 'white';
+        $news.classList.remove('is-ok');
+        // $news.style.background = 'red';
+        $news.classList.add('is-alert');
 
 		if (!Array.isArray(alergias) || alergias.length === 0) {
 			this.#pintar_news_vacia($news, '✔️ Free');
 			return;
 		}
 
-		$news.style.background = 'red';
 
 		alergias.forEach((alergia) => {
 			const $label = document.createElement('span');
@@ -777,8 +782,10 @@ class Logica_Catalogo  {
     #pintar_news_vacia($news, texto = '') {
             $news.innerHTML = '';
             $news.textContent = texto;
-            $news.style.background = 'green';
-            $news.style.color = 'white';
+            // $news.style.background = 'green';
+            // $news.style.color = 'white';
+            $news.classList.remove('is-alert');
+            $news.classList.add('is-ok');
     }
 }
 

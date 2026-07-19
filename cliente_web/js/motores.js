@@ -382,69 +382,69 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 		recognition.start();
 	}
 
-	set_news($el_dom){
-		if(!$el_dom) return null;
+	// set_news($el_dom){
+	// 	if(!$el_dom) return null;
 
-		const id_key_el = $el_dom.dataset.id_key;
-		const grupo_el = $el_dom.dataset.grupo;
-		const rol_el = $el_dom.dataset.rol;
+	// 	const id_key_el = $el_dom.dataset.id_key;
+	// 	const grupo_el = $el_dom.dataset.grupo;
+	// 	const rol_el = $el_dom.dataset.rol;
 
-		const MA = Catalogo.get_motor('motor_alergias');
-		const reservas = this.Salon.reservas;
+	// 	const MA = Catalogo.get_motor('motor_alergias');
+	// 	const reservas = this.Salon.reservas;
 		
-		const $news = e_Salon._to_element('[data-logica = news]'); 
-		if(!$news) 
-			console.log('no news');
+	// 	const $news = e_Salon._to_element('[data-logica = news]'); 
+	// 	if(!$news) 
+	// 		console.log('no news');
 
-		$news.textContent = '';
-		$news.innerHTML = '';
-		$news.style.background = 'none';
-		$news.style.color = 'white';
+	// 	$news.textContent = '';
+	// 	$news.innerHTML = '';
+	// 	$news.style.background = 'none';
+	// 	$news.style.color = 'white';
 
-		if(rol_el === 'cliente'){
-			if(MA){
-				console.log('■ ■ ■ Motor Alergias.d_data desde Motor__Mensajes.!!')
-				// console.log(JSON.stringify(MA.d_data, null, 2)); 
-				const alergias_elemento = MA.d_data[$el_dom.id] || [];
-				const tiene_alergias = alergias_elemento.length > 0;
-				if(tiene_alergias){
-					$news.textContent = `${[...alergias_elemento].join(' ')}`;
-					$news.style.background = 'red';					
-				}else{
-					$news.textContent = 'CLIENTE ✔️ ';
-					$news.style.background = 'green';
-				}
-			}
-		}else if (rol_el === 'central'){
-			// Solo para reservadores(quiero saber si un central tiene algún cliente con alergia.)
-			if(MA && reservas){
-				const index_en_reserva = this.Salon._get_indice_en_reserva_s($el_dom.id);
-				const reserva = reservas[index_en_reserva];
-				const reserva_flat = Object.values(reserva).flat();			
-				const acumula_alergias_reserva = new Set();
+	// 	if(rol_el === 'cliente'){
+	// 		if(MA){
+	// 			console.log('■ ■ ■ Motor Alergias.d_data desde Motor__Mensajes.!!')
+	// 			// console.log(JSON.stringify(MA.d_data, null, 2)); 
+	// 			const alergias_elemento = MA.d_data[$el_dom.id] || [];
+	// 			const tiene_alergias = alergias_elemento.length > 0;
+	// 			if(tiene_alergias){
+	// 				$news.textContent = `${[...alergias_elemento].join(' ')}`;
+	// 				$news.style.background = 'red';					
+	// 			}else{
+	// 				$news.textContent = 'CLIENTE ✔️ ';
+	// 				$news.style.background = 'green';
+	// 			}
+	// 		}
+	// 	}else if (rol_el === 'central'){
+	// 		// Solo para reservadores(quiero saber si un central tiene algún cliente con alergia.)
+	// 		if(MA && reservas){
+	// 			const index_en_reserva = this.Salon._get_indice_en_reserva_s($el_dom.id);
+	// 			const reserva = reservas[index_en_reserva];
+	// 			const reserva_flat = Object.values(reserva).flat();			
+	// 			const acumula_alergias_reserva = new Set();
 
-				reserva_flat.forEach(id =>{ 
-					if(id === $el_dom.id) return;					
-					const alergias_elemento_reserva = MA.d_data[id] || [];
+	// 			reserva_flat.forEach(id =>{ 
+	// 				if(id === $el_dom.id) return;					
+	// 				const alergias_elemento_reserva = MA.d_data[id] || [];
 					
-					// 2. Añadimos cada alergia encontrada al Set
-					alergias_elemento_reserva.forEach(alergia => {
-						acumula_alergias_reserva.add(alergia);
-					});
-				});
-				if(acumula_alergias_reserva.size > 0 ){
-					$news.textContent = `RESERVA: ${[...acumula_alergias_reserva].join(' ')}`;
-					$news.style.background = 'red';
-				}else{
-					$news.textContent = 'RESERVA ✔️ ';
-					$news.style.background = 'green';
-				}
-			}
-		}else{
-			console.warn(`❌ rol del elemento ${$el_dom.id}: ${rol_el} No registrado`);
-			return null
-		}
-	}
+	// 				// 2. Añadimos cada alergia encontrada al Set
+	// 				alergias_elemento_reserva.forEach(alergia => {
+	// 					acumula_alergias_reserva.add(alergia);
+	// 				});
+	// 			});
+	// 			if(acumula_alergias_reserva.size > 0 ){
+	// 				$news.textContent = `RESERVA: ${[...acumula_alergias_reserva].join(' ')}`;
+	// 				$news.style.background = 'red';
+	// 			}else{
+	// 				$news.textContent = 'RESERVA ✔️ ';
+	// 				$news.style.background = 'green';
+	// 			}
+	// 		}
+	// 	}else{
+	// 		console.warn(`❌ rol del elemento ${$el_dom.id}: ${rol_el} No registrado`);
+	// 		return null
+	// 	}
+	// }
 
 	/** ### Dibuja el codigo HTML de Mensajes según la Lógica. */
 	render(data_logica = {}, elemento_dom=null){
@@ -639,7 +639,7 @@ class Motor_Alergias  extends Interfaz_Custom_Motores{
 		elemento.classList.toggle('elemento_con_alergia', tiene_alergias);
 	}
 	
-	
+
 	_emitir_cambio(id_elemento = '') {
 		if (!id_elemento) return;
 		document.dispatchEvent(new CustomEvent('motor_alergias:change', {
