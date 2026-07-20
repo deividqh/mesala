@@ -90,7 +90,10 @@
 .w-alergias-grid {
   display: grid;
   
-  grid-template-columns: repeat(auto-fit, minmax(58px, 1fr));
+  /* grid-template-columns: repeat(auto-fit, minmax(58px, 1fr)); */
+  grid-template-columns: repeat(auto-fit, 58px);
+  justify-content: center;
+
   gap: 0.45rem;
 
   max-height: 48vh;
@@ -169,7 +172,7 @@
   height: auto;   min-height: 20vh;   max-height: 'auto'; 
 }
 .offcanvas-logica .offcanvas-header {
-  align-items: flex-start;
+  align-items: center;
   gap: 0.45rem;
   /* padding-top: 0.4rem;
   padding-bottom: 0.25rem; */
@@ -207,16 +210,38 @@
 
 .offcanvas-logica-title {
   font-family: "Verdana", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
-  display: flex;
-  align-items: center;       /* Centra verticalmente el icono y el texto */
   
-  /* flex: 1; */
-  flex: 0 1 auto;
+  /* display: flex;
+  align-items: center;  
+  flex: 0 1 auto; */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  flex: 1 1 auto;
+
 
   gap: 0.42rem;
   margin: 0;
-  /* margin-bottom: 0.5rem; */
   min-width: 0;
+}
+.offcanvas-logica-title-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  justify-self: start;
+}
+
+.offcanvas-logica-title-role {
+  color: #334155;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.offcanvas-logica-title-text {
+  color: #111827;
+  font-weight: 700;
+  justify-self: center;
 }
 
 
@@ -225,6 +250,7 @@
   width: 1rem;
   height: 1rem;
   color: #334155;
+  flex: 0 0 auto;
 }
 
 .offcanvas-logica-title-icon svg,
@@ -253,7 +279,6 @@
   min-height: 3rem;
   padding: 0.35rem 0.6rem;
   border: 1px solid transparent;
-  /* border-radius: 0.65rem; */
   font-size: 0.82rem;
   line-height: 1.2;
   text-align: center;
@@ -325,7 +350,7 @@
 .offcanvas-logica .tab-pane,
 .offcanvas-logica .area-de-contenido {
   width: 100%;
-  border: 1px solid #ffa500; 
+  /* border: 1px solid #ffa500;  */
 }
 
 .offcanvas-logica .area-de-contenido {

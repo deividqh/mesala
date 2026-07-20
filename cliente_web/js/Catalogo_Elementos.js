@@ -331,18 +331,31 @@ class Logica_Catalogo  {
         const title = document.createElement('div');
         title.className = 'offcanvas-title  offcanvas-logica-title';
         title.id = 'offcanvas_logica_title';
-        // title.textContent = 'THE LOGIC ZONE';
+        // ■ Bloque izquierdo del título: icono + marca opcional de central.
+        const title_left = document.createElement('span');
+        title_left.className = 'offcanvas-logica-title-left';
         
         // ■ ESPACIO DEL ICONO
         const title_icon = document.createElement('span');
         title_icon.id = 'offcanvas_logica_title_icon';
         title_icon.className = 'offcanvas-logica-title-icon';
+
+        const title_role = document.createElement('span');
+        title_role.id = 'offcanvas_logica_title_role';
+        title_role.className = 'offcanvas-logica-title-role d-none';
+        title_role.textContent = '(CENTRAL)';
+
         // ■ ESPACIO DEL TEXTO
         const title_text = document.createElement('span');
         title_text.id = 'offcanvas_logica_title_text';
+        title_text.className = 'offcanvas-logica-title-text';
         title_text.textContent = 'THE LOGIC ZONE';
                
-        title.appendChild(title_icon);
+        // title.appendChild(title_icon);
+        title_left.appendChild(title_icon);
+        title_left.appendChild(title_role);
+        title.appendChild(title_left);
+
         title.appendChild(title_text);
 
         // ■ BOTON CERRAR DEL TITIULO
@@ -485,10 +498,10 @@ class Logica_Catalogo  {
         // ■ Obtenemos el icono del elemento.
         const svg_icon = this.#get_icono(id_key);
         
-        // ■ ■ Establecemos el titulo (icono + id)
-        this.set_title($el_dom.id, svg_icon);
-        this.$elemento_news_actual = $el_dom;
+        // ■ ■ Establecemos el titulo (icono + marca de rol + id)
+        this.set_title($el_dom.id, svg_icon, $el_dom.dataset.rol);
 
+        this.$elemento_news_actual = $el_dom;
         this.#actualizar_news($el_dom);
 
         // ■ Cacho la logica del elemento en Catalogo.
@@ -580,11 +593,15 @@ class Logica_Catalogo  {
      * @param {String} texto - El identificador o texto a mostrar.
      * @param {String} icono_html - (Opcional) El string SVG que se inyectará.
      */
-    set_title(texto, icono_html = '') {
+    // set_title(texto, icono_html = '') {
+    set_title(texto, icono_html = '', rol = '') {
         const $icon_dom = document.getElementById('offcanvas_logica_title_icon');
+        const $role_dom = document.getElementById('offcanvas_logica_title_role');
         const $text_dom = document.getElementById('offcanvas_logica_title_text');
+        const es_central = rol === 'central';
 
         if ($icon_dom) $icon_dom.innerHTML = icono_html;
+        if ($role_dom) $role_dom.classList.toggle('d-none', !es_central);
         if ($text_dom) $text_dom.textContent = texto;
     }
     
