@@ -117,14 +117,14 @@ class Catalogo {
     
     static get_alergenos() {
         const d_alergenos = {
-            gluten:    { slug: 'gluten',    svg: '<img src="./imgs/alergia-gluten.svg" alt="Gluten" />' },
-            lacteos:   { slug: 'lacteos',   svg: '<img src="./imgs/alergia-lacteos.svg" alt="Lácteos" />' },
-            crustaceos:{ slug: 'crustaceos',svg: '<img src="./imgs/alergia-crustaceo.svg" alt="Crustáceos" />' },
-            moluscos:  { slug: 'moluscos',  svg: '<img src="./imgs/alergia-moluscos.svg" alt="Moluscos" />' },
-            pescado:   { slug: 'pescado',   svg: '<img src="./imgs/alergia-pescado.svg" alt="Pescado" />' },
-            soja:      { slug: 'soja',      svg: '<img src="./imgs/alergia-soja.svg" alt="Soja" />' },
-            huevos:    { slug: 'huevos',    svg: '<img src="./imgs/alergia-huevo.svg" alt="Huevos" />' },
-            cascara:   { slug: 'cascara',   svg: '<img src="./imgs/alergia-cascara.svg" alt="Frutos de cáscara" />' }
+            gluten:    { slug: 'gluten',    svg: '<img src="./imgs/a_gluten.svg" alt="Gluten" />' },
+            lacteos:   { slug: 'lacteos',   svg: '<img src="./imgs/a_lacteos.svg" alt="Lácteos" />' },
+            crustaceos:{ slug: 'crustaceos',svg: '<img src="./imgs/a_crustaceo.svg" alt="Crustáceos" />' },
+            moluscos:  { slug: 'moluscos',  svg: '<img src="./imgs/a_moluscos.svg" alt="Moluscos" />' },
+            pescado:   { slug: 'pescado',   svg: '<img src="./imgs/a_pescado.svg" alt="Pescado" />' },
+            soja:      { slug: 'soja',      svg: '<img src="./imgs/a_soja.svg" alt="Soja" />' },
+            huevos:    { slug: 'huevos',    svg: '<img src="./imgs/a_huevo.svg" alt="Huevos" />' },
+            cascara:   { slug: 'cascara',   svg: '<img src="./imgs/a_cascara.svg" alt="Frutos de cáscara" />' }
         };
         return d_alergenos;
     }

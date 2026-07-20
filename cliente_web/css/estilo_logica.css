@@ -1,4 +1,26 @@
+:root{
+  
+  /* --color-offcanvas-logica:     rgb(255, 239, 175); */
+   --color-offcanvas-logica:     rgb(253, 247, 223);
 
+   /* 
+   --btn-grabar-bg
+   --btn-grabar-bg-border
+   --btn-grabar-bg-hov
+   
+   --btn-guardar-bg
+   --btn-guardar-border
+   --btn-guardar-bg-hov 
+   
+   --btn-delete-bg
+   --btn-delete-border
+   --btn-delete-bg-hov
+   
+   --btn-parar-bg
+   --btn-parar-bg-border
+   --btn-parar-bg-hov
+   */
+}
 
 /* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
    BOTONES (guardar / reset / eliminar / grabar / parar)
@@ -60,54 +82,39 @@
 /* ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ 
    ■ ■ ■ ■ ■       ALERGIAS:     ■ ■ ■ ■ ■ 
    ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ */
-
-/* ========== Modal de alergias (Bootstrap 5) ========== */
-#modal_motor_alergias .modal-content {
-  background: rgba(58, 58, 85, 0.93);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: #fff;
-}
-
-#modal_motor_alergias .modal-header,
-#modal_motor_alergias .modal-footer {
-  border-color: rgba(255, 255, 255, 0.14);
-}
-
-
-.w-alergias-label {
-  display: inline-block;
-  color: #f3f4f6;
-  font-weight: 600;
-  min-height: 1.5rem;
-}
-
-.w-alergias-label.is-valid {
-  color: #f1eeee7b;
+/* ========== Selector directo de alergias ========== */
+.w-alergias-inline {
+  width: 100%;
 }
 
 .w-alergias-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
-  gap: 0.6rem;
+  
+  grid-template-columns: repeat(auto-fit, minmax(58px, 1fr));
+  gap: 0.45rem;
+
   max-height: 48vh;
   overflow-y: auto;
 }
 
 .w-alergeno-btn {
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
-  display: flex;
-  flex-direction: column;
+
+  display: inline-flex;
+  
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.6rem 0.35rem;
+  
+  justify-content: center;
+  min-height: 3.5rem;
+  padding: 0.45rem;
 }
 
 .w-alergeno-btn img {
-  width: 48px;
-  height: 48px;
+  width: 42px;
+  height: 42px;
   object-fit: contain;
 }
 
@@ -116,10 +123,10 @@
   background: rgba(34, 186, 197, 0.333);
 }
 
-.w-alergeno-text {
+/* .w-alergeno-text {
   font-size: 0.72rem;
   text-transform: capitalize;
-}
+} */
 
 /* Alerta visual persistente para elementos del salón con alergias. */
 .elemento_con_alergia {
@@ -151,7 +158,7 @@
   text-transform: capitalize;
   border: 1px solid #86efac;
   background: #dcfce7;
-  color: #14532d;
+  color: #b83d93;
 }
 
 /* ■ ■ ■ ■
@@ -173,14 +180,29 @@
 .offcanvas-logica .nav-tabs {
   /* margin-bottom: 0.35rem !important; */
   margin-bottom: 0.15rem !important;
+  /* border: 2px solid #ffa500;  */
 }
 
 .offcanvas-logica .nav-link {
   padding: 0.35rem 0.85rem;
   font-family: "Verdana", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.1em;
+}
+
+/* Pestaña activa: línea inferior naranja */
+/* .offcanvas-logica .nav-link.active {
+    border-bottom: 2px solid #ffa500; 
+} */
+.offcanvas-logica .nav-link.active {
+    border-bottom: 2px solid #ffa500; 
+  }
+  
+  /* Pestaña inactiva: cambiar el texto azul por verde */
+  .offcanvas-logica .nav-link:not(.active) {
+    border: 2px solid #ffa60000; 
+    color: #008000; /* Reemplaza por tu código de color verde exacto */
 }
 
 .offcanvas-logica-title {
@@ -244,8 +266,8 @@
 }
 
 .offcanvas-logica-news.is-alert {
-  background: #fee2e2;
-  border-color: #fca5a5;
+  background: #f83f3f;
+  border-color: #ff9e20;
   color: #7f1d1d;
 }
 
@@ -273,13 +295,13 @@
 /* ■■ Logica Arriba */
 .offcanvas-logica.offcanvas-top {
   height: auto !important;
-  max-height: 35vh; 
+  max-height: 'auto'; 
   bottom: auto !important; /* Rompe el estiramiento vertical de Bootstrap */
 }
 /* ■■ Logica Abajo */
 .offcanvas-logica.offcanvas-bottom {
-  --bs-offcanvas-height: 35vh; 
   height: auto !important;
+  max-height: 'auto'; 
   
   /* Si prefieres que mida menos de 35vh si hay poco texto, usa esto en su lugar: */
   /*
@@ -303,6 +325,7 @@
 .offcanvas-logica .tab-pane,
 .offcanvas-logica .area-de-contenido {
   width: 100%;
+  border: 1px solid #ffa500; 
 }
 
 .offcanvas-logica .area-de-contenido {
@@ -321,6 +344,7 @@
 
 .offcanvas-logica .contenedor_motor_mensajes textarea {
   min-height: 4.2rem;
+
 }
 
 .offcanvas-logica .motor-mensajes-botonera {

@@ -507,13 +507,7 @@ class Motor_Alergias  extends Interfaz_Custom_Motores{
 		super();
         this.d_data = {};
 
-        this.$modal = null;
-        this.$labelSeleccion = null;
-        this.$grid = null;
-        this.modalInstancia = null;
-        this.seleccion_actual = new Set();
-        this._callbackActual = null;
-        this._cancelado = false;
+        
 
     }
 
@@ -538,16 +532,17 @@ class Motor_Alergias  extends Interfaz_Custom_Motores{
         ));
     }
 
-	/** ### Devuelve un diccionario de las alergias de un elemento.
-	 * @returns {dictionary|{}} silla_0:['soja', 'lacteos']
+	/** ### Devuelve las alergias de un elemento.
+	 * @returns {Array} Ej: ['soja', 'lacteos']
 	*/
     get(id_elemento = '') {
 		if (!id_elemento) return [];
 
 		const $el_dom = e_Salon._to_element(id_elemento);
-		if(!$el_dom) return {};
+		if(!$el_dom) return [];
 
-        return this.d_data[$el_dom.id] || {};
+        // return this.d_data[$el_dom.id] || {};
+		return Array.isArray(this.d_data[$el_dom.id]) ? this.d_data[$el_dom.id] : [];
     }
 	
 	/** d_data = [  silla_0:['soja', 'lacteos'] , silla_3:['cereal'], ...  ] */
@@ -685,95 +680,7 @@ class Motor_Alergias  extends Interfaz_Custom_Motores{
 		});
 	}
 
-	_crear_modal_alergenos(alergenos = {}) {
-		let $modal = document.getElementById('modal_motor_alergias');
-		if (!$modal) {
-			$modal = document.createElement('div');
-			$modal.id = 'modal_motor_alergias';
-			$modal.className = 'modal fade';
-			$modal.tabIndex = -1;
-			$modal.setAttribute('aria-hidden', 'true');
-			$modal.innerHTML = `
-				<div class="modal-dialog modal-dialog-centered">
-					<div class="modal-content">
-						<div class="modal-header"><h5 class="modal-title">Seleccionar alergias</h5></div>
-						<div class="modal-body">
-							<label class="w-alergias-label">Sin selección</label>
-							<div class="w-alergias-grid mt-3"></div>
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-sm btn-success" data-action="guardar-alergias">Guardar</button>
-							<button type="button" class="btn btn-sm btn-outline-secondary" data-action="salir-alergias">Salir</button>
-						</div>
-					</div>
-				</div>`;
-			document.body.appendChild($modal);
-			$modal.addEventListener('click', (event) => this._on_modal_click(event));
-		}
-
-		this.$modal = $modal;
-		this.$labelSeleccion = $modal.querySelector('.w-alergias-label');
-		this.$grid = $modal.querySelector('.w-alergias-grid');
-		this.modalInstancia = bootstrap.Modal.getOrCreateInstance($modal, { backdrop: true, keyboard: false });
-		this._pintar_botones_modal(alergenos);
-	}
-
-	_pintar_botones_modal(alergenos = {}) {
-		if (!this.$grid) return;
-		this.$grid.innerHTML = '';
-		Object.entries(alergenos).forEach(([key, data]) => {
-			const button = document.createElement('button');
-			button.type = 'button';
-			button.className = 'w-alergeno-btn';
-			button.dataset.alergeno = key;
-			button.setAttribute('aria-pressed', 'false');
-			button.innerHTML = `<span class="w-alergeno-icon">${data.svg || ''}</span><span class="w-alergeno-text">${data.slug || key}</span>`;
-			this.$grid.appendChild(button);
-		});
-	}
-
-	_on_modal_click(event) {
-		const btnAlergeno = event.target.closest('[data-alergeno]');
-		if (btnAlergeno) {
-			this._toggle_alergeno_modal(btnAlergeno.dataset.alergeno);
-			return;
-		}
-
-		const action = event.target.closest('[data-action]')?.dataset.action;
-		if (action === 'guardar-alergias') {
-			this._callbackActual?.(Array.from(this.seleccion_actual));
-			this.modalInstancia?.hide();
-		}
-		if (action === 'salir-alergias') this.modalInstancia?.hide();
-	}
-
-	_toggle_alergeno_modal(alergeno = '') {
-		if (!alergeno || !this.get_alergenos(alergeno)) return;
-		if (this.seleccion_actual.has(alergeno)) this.seleccion_actual.delete(alergeno);
-		else this.seleccion_actual.add(alergeno);
-		this._refrescar_modal();
-	}
-
-	_refrescar_modal() {
-		const seleccion = Array.from(this.seleccion_actual);
-		this.$grid?.querySelectorAll('[data-alergeno]').forEach((btn) => {
-			const activo = this.seleccion_actual.has(btn.dataset.alergeno);
-			btn.classList.toggle('is-active', activo);
-			btn.setAttribute('aria-pressed', activo ? 'true' : 'false');
-		});
-		if (!this.$labelSeleccion) return;
-		this.$labelSeleccion.textContent = seleccion.length ? seleccion.join(', ') : 'Sin selección';
-		this.$labelSeleccion.classList.toggle('is-valid', seleccion.length > 0);
-	}
-
-	abrir_modal_alergenos(alergias_previas = [], callback_guardar = null, alergenos = null) {
-		this._crear_modal_alergenos(alergenos || this.get_alergenos());
-		this._callbackActual = typeof callback_guardar === 'function' ? callback_guardar : null;
-		this.seleccion_actual = new Set(this._normalizar(alergias_previas));
-		this._refrescar_modal();
-		this.modalInstancia?.show();
-	}
-
+	
 	/**
 	 * @param {string[]} array_alergias ► ['soja','lacteos']
 	 * @returns {HTMLElement} - Div contenedor con todas las etiquetas generadas.
@@ -841,6 +748,32 @@ class Motor_Alergias  extends Interfaz_Custom_Motores{
 		return contenedor;
 	}
 
+	_refrescar_botones_alergenos($contenedor, id_elemento = '') {
+		if (!$contenedor || !id_elemento) return;
+
+		const alergias_actuales = new Set(this.get(id_elemento));
+		$contenedor.querySelectorAll('[data-alergeno]').forEach(($btn) => {
+			const activo = alergias_actuales.has($btn.dataset.alergeno);
+			$btn.classList.toggle('is-active', activo);
+			$btn.setAttribute('aria-pressed', activo ? 'true' : 'false');
+		});
+	}
+
+	_crear_boton_alergeno(key = '', data = {}) {
+		const texto = data.slug || key;
+		const $button = document.createElement('button');
+
+		$button.type = 'button';
+		$button.className = 'w-alergeno-btn';
+		$button.dataset.alergeno = key;
+		$button.title = texto;
+		$button.setAttribute('aria-label', texto);
+		$button.setAttribute('aria-pressed', 'false');
+		$button.innerHTML = `<span class="w-alergeno-icon" aria-hidden="true">${data.svg || ''}</span>`;
+
+		return $button;
+	}
+
 	// Dibuja el HTML de Alergias según la lógica. Devuelve un Node.
 	render(data_logica = {}, elemento_dom=null){
 		
@@ -848,32 +781,38 @@ class Motor_Alergias  extends Interfaz_Custom_Motores{
 		if(!$el_dom) return;
 		
 		const id_elemento = $el_dom.id || elemento_dom?.id;
-
-		const es_news = data_logica.news === true;
+		const alergenos = this._get_alergenos_render(data_logica);
 
 		const $contenedor = document.createElement('div');
-		$contenedor.className = data_logica.css;
+		// $contenedor.className = data_logica.css;
+		$contenedor.className = `${data_logica.css || ''} w-alergias-inline`.trim();
 
-		const $alergias_container = document.createElement('div');
-		$alergias_container.className = 'labels-alergias-pop';
+		// const $alergias_container = document.createElement('div');
+		// $alergias_container.className = 'labels-alergias-pop';
+		const $grid = document.createElement('div');
+		$grid.className = 'w-alergias-grid';
 
-		this._actualizar_lbls_alergias($alergias_container, this.get($el_dom.id), {texto_vacio: '', editable:true});
-		// $contenedor.appendChild($alergias_container);
-
-		const $btn_select_alergias = document.createElement('button');
-		$btn_select_alergias.type = 'button';
-		$btn_select_alergias.className = 'btn btn-sm    btn-alergias-pop';
-		$btn_select_alergias.textContent = 'Seleccionar Alergias';
-
-		$btn_select_alergias.addEventListener('click', () => {
-			const alergias_previas = this.get($el_dom.id);
-			const callback_after_save = (seleccion) => this.set($el_dom.id, seleccion);
-			const alergenos = this._get_alergenos_render(data_logica);
-
-			this.abrir_modal_alergenos(	alergias_previas, callback_after_save, alergenos);
+		// this._actualizar_lbls_alergias($alergias_container, this.get($el_dom.id), {texto_vacio: '', editable:true});
+		Object.entries(alergenos).forEach(([key, data]) => {
+			$grid.appendChild(this._crear_boton_alergeno(key, data));
 		});
 
-		$contenedor.appendChild($btn_select_alergias);
+		$grid.addEventListener('click', (event) => {
+			const $btn_alergeno = event.target.closest('[data-alergeno]');
+			if (!$btn_alergeno) return;
+			this.toggle(id_elemento, $btn_alergeno.dataset.alergeno);
+			this._refrescar_botones_alergenos($contenedor, id_elemento);
+
+		});
+		document.addEventListener('motor_alergias:change', (event) => {
+			if (event.detail?.id_elemento === id_elemento) {
+				this._refrescar_botones_alergenos($contenedor, id_elemento);
+			}
+		});
+
+		// $contenedor.appendChild($btn_select_alergias);
+		$contenedor.appendChild($grid);
+		this._refrescar_botones_alergenos($contenedor, id_elemento);
 
 		
 		return $contenedor;
