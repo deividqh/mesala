@@ -2631,7 +2631,8 @@ class e_Salon extends Tablero_Touch {
 		
 		const d_alergias_mock = {silla_0: ['soja', 'lacteos'], 
 								silla_1: ['huevos'], 
-								silla_21:['pescado']
+								silla_21:['pescado'] ,
+								silla_18:['gluten']
 		};
 		
 		const ok_elements = this._load_elementos_en_Salon(d_indices_mock);
