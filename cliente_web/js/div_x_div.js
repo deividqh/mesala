@@ -2622,8 +2622,17 @@ class e_Salon extends Tablero_Touch {
 			silla_14: 45, silla_16: 54, silla_15: 52, mesa_5: 53, silla_19: 61 , 
 			mesa_6: 75, silla_21: 74, silla_20: 76,  			
 		};
-		const d_mensajs_mock = {silla_0: "Cliente Especial", mesa_0: 'Reserva Miguel Garrido', silla_2: 'Pesado', mesa_2: 'Mr Smith', mesa_4: 'Miss Smith', };
-		const d_alergias_mock = {silla_0: ['soja', 'lacteos'], silla_1: ['huevos'], silla_21:['pescado']};
+		const d_mensajs_mock = {silla_0: "Cliente Especial", 
+								mesa_0: 'Reserva Miguel Garrido', 
+								silla_2: 'Cliente Pesado', 
+								mesa_2: 'Mr Smith Jr', 
+								mesa_4: 'Quiere 5 sillas. No sabe cuantos van a venir. 3 mesas', 
+		};
+		
+		const d_alergias_mock = {silla_0: ['soja', 'lacteos'], 
+								silla_1: ['huevos'], 
+								silla_21:['pescado']
+		};
 		
 		const ok_elements = this._load_elementos_en_Salon(d_indices_mock);
 		this.RegisteR();
@@ -3890,7 +3899,8 @@ class Configuracion_Salon {
 		this.$formulario = e_Salon._to_element('form_config_salon'); 		// el formulario
 		this.$info_columnas = e_Salon._to_element('[data-config-info="columnas"]');
 		this.$info_filas = e_Salon._to_element('[data-config-info="filas"]');
-		this.$sidebar_posiciones = e_Salon._to_element('[data-side-position]');
+		// this.$sidebar_posiciones = e_Salon._to_element('[data-side-position]');
+		this.$sidebar_posicion_toggle = e_Salon._to_element('[data-side-position-toggle]');
 		
 		// ┌•• Cargo los txt's del formulario
 		// this._load_offcanvas_configuracion(this.dimension_inicial, this.limites);		
@@ -4434,33 +4444,47 @@ class Configuracion_Salon {
 	/**
 	 * ### Conecta la UI de posiciones del sidebar con el sidebar real.	 */
 	_sincronizar_sidebar_UI() {
-		const botones = Array.from(this.$sidebar_posiciones || []);
-		if (botones.length === 0) return;
+		// const botones = Array.from(this.$sidebar_posiciones || []);
+		// if (botones.length === 0) return;
+		const toggle = this.$sidebar_posicion_toggle;
+		if (!toggle) return;
 
 		const posicion_inicial = this.Salon?.Side_Elementos?.posicion ?? 'right';
-		this.__marcar_boton_posicion_sidebar(posicion_inicial, botones);
+		// this.__marcar_boton_posicion_sidebar(posicion_inicial, botones);
+		this.__marcar_toggle_posicion_sidebar(posicion_inicial, toggle);
 
-		botones.forEach((boton) => {
-			boton.addEventListener('click', () => {
-				const nueva_posicion = boton.dataset.sidePosition;
-				if (!nueva_posicion) return;
-				this.Salon?.Side_Elementos?.set_posicion(nueva_posicion);
-				this.__marcar_boton_posicion_sidebar(nueva_posicion, botones);
+		// botones.forEach((boton) => {
+		// 	boton.addEventListener('click', () => {
+		// 		const nueva_posicion = boton.dataset.sidePosition;
+		// 		if (!nueva_posicion) return;
+		// 		this.Salon?.Side_Elementos?.set_posicion(nueva_posicion);
+		// 		this.__marcar_boton_posicion_sidebar(nueva_posicion, botones);
 
-			});
+		// 	});
+		// });
+		toggle.addEventListener('change', () => {
+			const nueva_posicion = toggle.checked ? 'right' : 'left';
+			this.Salon?.Side_Elementos?.set_posicion(nueva_posicion);
+			this.__marcar_toggle_posicion_sidebar(nueva_posicion, toggle);
 		});
+
 	}
 
 	/**
-	 * ### Refresca el estado visual de los botones de posición.
+	 * ### Refresca el estado visual del selector de posición.
 	 */
-	__marcar_boton_posicion_sidebar(posicion, botones) {
-		botones.forEach((boton) => {
-			const es_activo = boton.dataset.sidePosition === posicion;
-			boton.classList.toggle('active', es_activo);
-			boton.setAttribute('aria-pressed', es_activo ? 'true' : 'false');
-		});
+	// __marcar_boton_posicion_sidebar(posicion, botones) {
+	// 	botones.forEach((boton) => {
+	// 		const es_activo = boton.dataset.sidePosition === posicion;
+	// 		boton.classList.toggle('active', es_activo);
+	// 		boton.setAttribute('aria-pressed', es_activo ? 'true' : 'false');
+	// 	});
+	// }
+	__marcar_toggle_posicion_sidebar(posicion, toggle) {
+		toggle.checked = posicion === 'right';
+		toggle.setAttribute('aria-checked', toggle.checked ? 'true' : 'false');
 	}
+
 
 	/** ​👂​👂 
 	 * ### Maneja la lógica del boton del offcanvas (filas/columnas) y llama a la función de re_posicionamiento.

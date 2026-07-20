@@ -112,42 +112,71 @@
 
       <!-- Tabs personalizadas -->
       <div class="custom-tabs">
+          <ul class="nav nav-tabs config-tabs" role="tablist" aria-label="Secciones de configuración">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="config-salon-tab" data-bs-toggle="tab" data-bs-target="#config-salon" type="button" role="tab" aria-controls="config-salon" aria-selected="true">Salón</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="config-players-tab" data-bs-toggle="tab" data-bs-target="#config-players" type="button" role="tab" aria-controls="config-players" aria-selected="false">Players</button>
+          </li>
+        </ul>
+
+        <div class="tab-content config-tab-content">
+
 
           <!-- ■■■■■ Contenido ■■■■■ -->
-          <div  class="tab-content-custom active">
+          <div class="tab-pane fade show active tab-content-custom" id="config-salon" role="tabpanel" aria-labelledby="config-salon-tab" tabindex="0"></div>
             
             <!-- ┌•••••••••••••• -->
             <!-- ┌•• Formulario  -->
-            <!-- ┌•••••••••••••• -->
               <form id="form_config_salon">
-
-                <!-- <div class="options-bar w-100" data-config="sidebar-pos"> -->
-                  <span class="options-bar__label">Posición del sidebar</span>
-                  <div class="options-bar__group w-100" role="group" aria-label="Posición del sidebar">
-                    <button type="button" class="option-pill w-100" data-side-position="left">Izquierda</button>
-                    <button type="button" class="option-pill w-100" data-side-position="right"  aria-pressed = "true" >Derecha</button>
+                <section class="config-section config-section--sidebar" aria-labelledby="config_sidebar_title">
+                  <div class="config-section__header">
+                    <span id="config_sidebar_title" class="options-bar__label">Posición del sidebar</span>
+                    <label class="sidebar-position-switch" aria-label="Cambiar posición del sidebar">
+                      <span>Izq.</span>
+                      <input type="checkbox" data-side-position-toggle checked>
+                      <span class="sidebar-position-switch__slider" aria-hidden="true"></span>
+                      <span>Dcha.</span>
+                    </label>
                   </div>
-                <!-- </div> -->
+                </section>
+
+                <section class="config-section" aria-label="Datos del salón">
+                  <label for="config_nombre_salon">Nombre Salón</label>
+                  <input id="config_nombre_salon" type="text" name="nombre" placeholder="Ej: Mi Salón" readonly>
+                  <div class="form-group-header">
+                    <label for="config_columnas">Número Columnas</label>
+                    <div class="config-info" data-config-info="columnas"></div>
+                  </div>
+                  <input id="config_columnas" type="text" name="columnas" placeholder="Ej: 4" readonly>
+                  
+                  <div class="form-group-header">
+                      <label for="config_filas">Número Filas</label>
+                      <div class="config-info" data-config-info="filas"></div>
+                  </div>
+                  <input id="config_filas" type="text" name="filas" placeholder="Ej: 3" readonly>
+                </section>
                 
-                <label for="config_nombre_salon">Nombre Salon</label>
-                <input id="config_nombre_salon" type="text" name="nombre" placeholder="Ej: Mi Salón" readonly>
 
-
-                <div class="form-group-header">
-                  <label for="config_columnas">Número Columnas</label>
-                  <div class="config-info" data-config-info="columnas"></div>
-                </div>
-                <input id="config_columnas" type="text" name="columnas" placeholder="Ej: 4" readonly>
                 
-                <div class="form-group-header">
-                    <label for="config_filas">Número Filas</label>
-                    <div class="config-info" data-config-info="filas"></div>
-                </div>
-                <input id="config_filas" type="text" name="filas" placeholder="Ej: 3" readonly>
 
-                <button type="submit">Guardar</button>
+                <!-- <button type="submit">Guardar</button> -->
+                <div class="config-actions">
+                  <button type="submit" disabled aria-disabled="true">Guardar</button>
+                </div>
+
               </form>
-          </div>               
+          </div>
+
+          <div class="tab-pane fade tab-content-custom" id="config-players" role="tabpanel" aria-labelledby="config-players-tab" tabindex="0">
+            <section class="config-section config-empty-section">
+              <p>Sin Contenido</p>
+            </section>
+          </div>
+
+        </div>
+
       </div>
       
       <div class="d-lg-none align-self-center py-3 social-icons-container">

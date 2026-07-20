@@ -369,7 +369,10 @@
 
 .offcanvas-logica .contenedor_motor_mensajes textarea {
   min-height: 4.2rem;
-
+}
+.offcanvas-logica .contenedor_motor_mensajes textarea::placeholder {
+  color: #a0a0a0;     /* Un gris más claro */
+  opacity: 0.6;       /* Controla la transparencia */
 }
 
 .offcanvas-logica .motor-mensajes-botonera {
@@ -385,26 +388,16 @@ uno detras de otro con un espacio
     flex-wrap: wrap; /* Permite que los elementos salten a la siguiente línea si no caben */
     gap: 1rem; /* Espacio horizontal y vertical entre cada bloque de reserva */
     padding: 0.5rem 0;
-    /* margin-bottom: 0.85rem; */
-    /* margin-top: 0.2rem; */
 }
 
-/* Contenedor de la fila para alinear los elementos horizontalmente */
-/* .sumatorio-row {
-    display: flex;
-    Centra verticalmente el icono con el texto
-    align-items: center;    
-    Espacio entre el icono, el ID y el mensaje
-    gap: 0.5rem;            
-    Separación entre cada fila
-    margin-bottom: 0.4rem;  
-} */
 
 /* Fila individual (ahora se comporta como un bloque en línea) */
 .sumatorio-row {
     display: inline-flex; /* ¡La clave! Permite que se coloquen uno al lado del otro */
     align-items: center; 
     gap: 0.3rem; /* Espacio interno entre el icono, el ID y el mensaje */
+    
+    
 }
 
 /* Contenedor del icono */
@@ -430,7 +423,14 @@ uno detras de otro con un espacio
 
 /* Estilo para el mensaje */
 .sumatorio-msg {
-    color: #6c757d; /* Un gris más claro para diferenciarlo del ID */
-    flex: 1; /* Ocupa el espacio restante de la fila */
-    white-space: nowrap; /* Mantiene el mensaje en la misma línea que su ID e icono */
+  flex: 1; 
+  white-space: nowrap; 
+  
+  border: 1px solid rgb(65, 40, 11);
+  border-radius: 10px;
+  /* background: rgb(255, 255, 255); */
+  padding: 4px;
+
+  color: #879db1; 
+
 }
