@@ -461,9 +461,31 @@ class Logica_Catalogo  {
         
         document.body.appendChild($offcanvas_logica);
 
+        $offcanvas_logica.addEventListener('hidden.bs.offcanvas', () => {
+            this.#guardar_textareas_mensajes($offcanvas_logica);
+        });
+
         return $offcanvas_logica;
         // ■ $offcanvas_logica ahora tiene tantas pestañas como logicas distintas hay en el Catalogo.
         // ■ Cuando vaya a abrir tengo que ver que logicas tiene el elemento que quiero abrir.
+    }
+
+    /**
+     * @description Guarda los mensajes escritos al cerrar el offcanvas de lógica.
+     * @param {HTMLElement} $offcanvas_logica
+     */
+    #guardar_textareas_mensajes($offcanvas_logica) {
+        const motor_mensajes = Catalogo.get_motor('motor_mensajes');
+        if (!motor_mensajes?.set || !$offcanvas_logica) return;
+
+        const textareas = $offcanvas_logica.querySelectorAll('.area-texto-mensaje');
+
+        textareas.forEach((textarea) => {
+            const id_elemento = textarea.dataset.idElemento;
+            if (!id_elemento) return;
+
+            motor_mensajes.set(id_elemento, textarea.value);
+        });
     }
 
     /**
@@ -513,7 +535,7 @@ class Logica_Catalogo  {
         
         let primerTabVisible = null;
         // ■ Recorro cada pestaña.
-        tab_motores.forEach(item => {
+        navItems.forEach(item => {
             const motor = item.dataset.motor;          // dataset establecido al crear offcanvas-logica.
             const data_logica = logica_el[motor];      // Datos del catalogo del elemento.
             

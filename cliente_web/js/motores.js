@@ -463,10 +463,12 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 		$contenedor.className = ['contenedor_motor_mensajes', data_logica.css || ''].filter(Boolean).join(' ');
 
 		const $textarea = document.createElement('textarea');
-		$textarea.className = 'form-control mb-2';
+		$textarea.className = 'form-control mb-2 area-texto-mensaje';
 		$textarea.rows = 2;
 		$textarea.placeholder = 'Escribe aquí...';
 		$textarea.value = this.get_mensaje($el_dom.id);
+		// $textarea.dataset.motor = 'motor_mensajes';
+		$textarea.dataset.idElemento = $el_dom.id;
 
 		if (tipo_render === 'sumatorio') {
 			const $sumatorio = this._crear_sumatorio($el_dom);

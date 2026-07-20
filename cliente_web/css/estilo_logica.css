@@ -199,7 +199,7 @@
     border-bottom: 2px solid #ffa500; 
 } */
 .offcanvas-logica .nav-link.active {
-    border-bottom: 2px solid #ffa500; 
+    border-bottom: 4px solid #422f0a; 
   }
   
   /* Pestaña inactiva: cambiar el texto azul por verde */
@@ -388,15 +388,18 @@ uno detras de otro con un espacio
     flex-wrap: wrap; /* Permite que los elementos salten a la siguiente línea si no caben */
     gap: 1rem; /* Espacio horizontal y vertical entre cada bloque de reserva */
     padding: 0.5rem 0;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 
 /* Fila individual (ahora se comporta como un bloque en línea) */
 .sumatorio-row {
     display: inline-flex; /* ¡La clave! Permite que se coloquen uno al lado del otro */
-    align-items: center; 
+    align-items: flex-start;
     gap: 0.3rem; /* Espacio interno entre el icono, el ID y el mensaje */
-    
+    max-width: 100%;
+    min-width: 0;
     
 }
 
@@ -424,12 +427,17 @@ uno detras de otro con un espacio
 /* Estilo para el mensaje */
 .sumatorio-msg {
   flex: 1; 
-  white-space: nowrap; 
+  
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word; 
   
   border: 1px solid rgb(65, 40, 11);
   border-radius: 10px;
   /* background: rgb(255, 255, 255); */
-  padding: 4px;
+  /* padding: 4px; */
+  padding: 0px 4px;
 
   color: #879db1; 
 
