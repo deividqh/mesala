@@ -63,13 +63,12 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
     static FICHA_VACIA = Object.freeze({ fecha: '', hora: '', usuario: '', mensaje: '' });
 
     constructor(instancia_salon, parametros_opt={}) {
-		super();
-		this.d_data = {};
-        this.ids_reserva_actual = [];
-        
-        this.id_elemento = '';
 
-		this.Salon = instancia_salon;
+		super();
+
+		this.d_data = {};		// (Oblig) el diccionario de datos
+        
+		this.Salon = instancia_salon;	// instancia de salon para tener las reservas de los centralizadores(mesas)
 		
     }
 
@@ -194,7 +193,8 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
         else 
 			this.__ocultar_markador(id_elemento);
     }
-	/*  */
+
+	/* Cuando se pone un mensaje sobre un elemento hay que marcarlo. */
     __mostrar_markador(id_elemento = '') {
         const elemento_dom = e_Salon._to_element(id_elemento);
         if (!elemento_dom) return;
@@ -214,8 +214,7 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
         $markador.style.display = 'block';
     }
 
-	/* markador_mensaje
-	elemento_con_mensaje */
+	/* Cuando se elimina un mensaje, hay que ocultarlo */
     __ocultar_markador(id_elemento = '') {
         // const elemento_dom = document.getElementById(id_elemento);
         const elemento_dom = e_Salon._to_element(id_elemento);

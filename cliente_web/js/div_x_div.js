@@ -2558,8 +2558,6 @@ class e_Salon extends Tablero_Touch {
 		Catalogo.set_motor('motor_alergias', motor_alergias);
 		// ┌■ a partir de este momento Recupero los motores a través del Catalogo.
 		// const MA = Catalogo.get_motor('motor_alergias');
-		this.MSG_M = motor_mensajes;
-		this.MSG_A = motor_alergias;
 		
 		// ┌••• LOGIN Y REGISTRO: 
         // this.LogIn = new Login_Modal('[data-action-nav="conn"]');
@@ -2642,10 +2640,14 @@ class e_Salon extends Tablero_Touch {
 		// this.CFG.api_re_posicionar();				
 		const ok_alerg = this._load_alergias_en_Salon(d_alergias_mock);		
 		console.log(JSON.stringify(MA.d_data, null, 2)); 
+		const ok_api_a = this.api_alergias();
 		
 		const MM = Catalogo.get_motor('motor_mensajes');
 		const ok_msg = this._load_mensajes_en_Salon(d_mensajs_mock);
 		console.log(JSON.stringify(MM.d_data, null, 2)); 
+		const ok_api_m = this.api_mensajes();
+		
+
 
 		Alertas_UI._NotA('App Cargada con Exito', 'Listo para empezar!', 'success', 1500);
 
@@ -2705,8 +2707,8 @@ class e_Salon extends Tablero_Touch {
 		const MA = Catalogo.get_motor('motor_alergias');
 		const MM = Catalogo.get_motor('motor_mensajes');
 
-		this.MSG_A.delete(this.objeto_drag.id);
-		this.MSG_M.delete(this.objeto_drag.id);
+		MA.delete(this.objeto_drag.id);
+		MM.delete(this.objeto_drag.id);
 		
 		// ■■ 
 		this._set_exit_toast_bs(this.objeto_drag.id);
@@ -3210,16 +3212,12 @@ class e_Salon extends Tablero_Touch {
 			svgs ? svgs.style.setProperty('fill', color_random, 'important') : null;
 
 			const path = el.querySelector("svg path", "svg");
-			if (path) {
-				path.style.setProperty("fill", color_random, "important");
-			}
+			path ? path.style.setProperty("fill", color_random, "important") : null;			
+			
 			// en el svg, la pata de la silla no se pq va a su bola. De esta forma se arregla. es como un svg aparte
 			const path_pata_silla = el.querySelector("svg .st0");
-			if (path_pata_silla) {
-				path_pata_silla.style.setProperty("fill", color_random, "important");
-			}
+			path_pata_silla ? path_pata_silla.style.setProperty("fill", color_random, "important") : null;
 		});		
-
 	}
 
 	/**
@@ -3322,8 +3320,8 @@ class e_Salon extends Tablero_Touch {
 			const MA = Catalogo.get_motor('motor_alergias');
 			const MM = Catalogo.get_motor('motor_mensajes');
 			
-			const msg_sillas   = this.MSG_A?.d_data  ?? {};
-			const msg_mesas  = this.MSG_M?.d_data  ?? {};
+			const msg_clientes = MA?.d_data  ?? {};
+			const msg_centralizador  = MM?.d_data  ?? {};
 	
 			// Normalizador
 			const ficha = (d = {}) => ({
@@ -3340,10 +3338,10 @@ class e_Salon extends Tablero_Touch {
 				const clientes = {};
 	
 				for (const id of (Array.isArray(dicc.reservadores) ? dicc.reservadores : [])) {
-					reservadores[id] = ficha(msg_mesas[id]);
+					reservadores[id] = ficha(msg_centralizador[id]);
 				}
 				for (const id of (Array.isArray(dicc.clientes) ? dicc.clientes : [])) {
-					clientes[id] = ficha(msg_sillas[id]);
+					clientes[id] = ficha(msg_clientes[id]);
 				}
 				return { reservadores, clientes };
 				});
@@ -3404,11 +3402,9 @@ class e_Salon extends Tablero_Touch {
 	 */
 	api_mensajes(){
 		// 🈴🈴
-		const MA = Catalogo.get_motor('motor_alergias');
-
-		const d_mensajes  = this.MSG_M.d_data;
-		// const dicc_popo_sillas = this.MSG_A.d_data;
-		// const dicc_popo = { ...d_mensajes, ...dicc_popo_sillas }; 
+		const MM = Catalogo.get_motor('motor_mensajes');
+		const d_mensajes  = MM?.d_data || {};
+		
 		const resultado = {};
 		for (const id in d_mensajes) {
 			const mensaje = d_mensajes[id]?.mensaje;
@@ -3416,11 +3412,12 @@ class e_Salon extends Tablero_Touch {
 				resultado[id] = mensaje;
 			}
 		}
-  		return resultado;
+		return resultado;
 	}
 	
 	api_alergias(){
-		const d_alergias  = this.MSG_A.d_data;
+		const MA = Catalogo.get_motor('motor_alergias');
+		const d_alergias  = MA?.d_data || {};
   		return d_alergias;
 	}
 
@@ -3524,7 +3521,7 @@ class e_Salon extends Tablero_Touch {
 
 		const dicc_api_indices   = this.api_indices() || {};
 		const dicc_api_mensajes  = this.api_mensajes() || {};
-		const dicc_api_alergias  = this.MSG_A?.api_alergias() || {};
+		const dicc_api_alergias  = this.api_alergias() || {};
 
 		// ■■■■■■ RETORNO FINAL
 		return {
@@ -5019,8 +5016,6 @@ class Configuracion_Salon {
 	 * #### • Elementos mesa , silla  
 	 * #### • Registro de Reservas
 	 * #### • Mensajes de Clientes y Reservas
-	 * Usado en: {@link Foto_CRUD. _accion_cargar_elementos_en_Salon} ■ {@link Configuracion_Salon. api_reiniciar_salon}
-	 * 
 	 */
 	limpiar_Salon() {
 		if (!this.Salon) return;

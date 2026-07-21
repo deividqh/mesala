@@ -829,3 +829,102 @@ class Logica_Catalogo  {
 }
 
 
+/**
+ * @class Botonera_Crud_Grabar
+ * @description Crea y gestiona la botonera CRUD de grabación definida en Catalogo.
+ *
+ * Mantiene un contenedor con los botones configurados, sus estados y escuchadores.
+ * Los callbacks se pasan en un diccionario donde la clave es el className de Catalogo.
+ */
+class Botonera_Crud_Grabar {
+    static ESTADO_INICIAL = Object.freeze({
+        'btn-grabar': false,
+        'btn-guardar': false,
+        'btn-reset': false,
+        'btn-delete': false
+    });
+
+    static ESTADO_GRABANDO = Object.freeze({
+        'btn-grabar': true,
+        'btn-guardar': false,
+        'btn-reset': true,
+        'btn-delete': false
+    });
+
+    constructor(callbacks_por_clase = {}, clase_botonera = 'motor-mensajes-botonera') {
+        this.callbacks_por_clase = callbacks_por_clase || {};
+        this.clase_botonera = clase_botonera;
+        this.botones_catalogo = Catalogo.get_btns_crud_grabar();
+        this.botones_por_clase = {};
+        this.$contenedor = this.#crear_contenedor();
+
+        this.#crear_botones();
+        this.#add_listener();
+        this.#aplicar_estado(Botonera_Crud_Grabar.ESTADO_INICIAL);
+    }
+
+    get contenedor() {
+        return this.$contenedor;
+    }
+
+    #crear_contenedor() {
+        const $botonera = document.createElement('div');
+        $botonera.className = `d-flex gap-4   ${this.clase_botonera}`;
+        return $botonera;
+    }
+
+    #crear_botones() {
+        this.botones_catalogo.forEach((boton) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = `btn btn-sm   ${boton.className}`;
+            button.dataset.action = boton.action;
+            button.dataset.className = boton.className;
+            button.title = boton.title;
+            button.textContent = boton.texto;
+
+            this.botones_por_clase[boton.className] = button;
+            this.$contenedor.appendChild(button);
+        });
+    }
+
+    #add_listener() {
+        this.$contenedor.addEventListener('click', async (ev) => {
+            const button = ev.target.closest('[data-action]');
+            if (!button || button.disabled) return;
+
+            const action = button.dataset.action;
+            const className = button.dataset.className;
+            const callback = this.callbacks_por_clase[className];
+
+            if (action === 'grabar') {
+                this.#aplicar_estado(Botonera_Crud_Grabar.ESTADO_GRABANDO);
+                await this.#ejecutar_callback(callback, button);
+                return;
+            }
+
+            if (action === 'guardar' || action === 'reset') {
+                await this.#ejecutar_callback(callback, button);
+                return;
+            }
+
+            if (action === 'eliminar') {
+                await this.#ejecutar_callback(callback, button);
+                this.#aplicar_estado(Botonera_Crud_Grabar.ESTADO_INICIAL);
+            }
+        });
+    }
+
+    async #ejecutar_callback(callback, button) {
+        if (typeof callback !== 'function') return;
+        await callback(button, this);
+    }
+
+    #aplicar_estado(estado = {}) {
+        Object.entries(this.botones_por_clase).forEach(([className, button]) => {
+            button.disabled = estado[className] === true;
+        });
+    }
+}
+
+

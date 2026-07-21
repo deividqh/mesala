@@ -22,9 +22,8 @@
    */
 }
 
-/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-   BOTONES (guardar / reset / eliminar / grabar / parar)
-   ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
+/* BOTONES (guardar / reset / eliminar / grabar / parar)
+  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
 
 .btn.btn-guardar{
   background: var(--btn-guardar-bg);
@@ -70,7 +69,8 @@
     right: -9px;
     font-size: 0.82rem;
     line-height: 1;
-    color: #5727a5;
+    color: #353228;
+    /* color: #5727a5; */
     
     /* background-color: #0c5025; */
     text-shadow: 0 1px 2px rgba(15, 23, 42, 0.25);
@@ -79,91 +79,47 @@
     pointer-events: none;
 }
 
-/* ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ 
-   ■ ■ ■ ■ ■       ALERGIAS:     ■ ■ ■ ■ ■ 
-   ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ */
-/* ========== Selector directo de alergias ========== */
+/* ■ ■ ■ ■ ■ 
+   ■ ■ ■ ■ ■ ALERGIAS: 
+   ■ ■ ■ ■ ■  
+   */
 .w-alergias-inline {
   width: 100%;
 }
-
 .w-alergias-grid {
-  display: grid;
-  
-  /* grid-template-columns: repeat(auto-fit, minmax(58px, 1fr)); */
-  grid-template-columns: repeat(auto-fit, 58px);
-  justify-content: center;
-
-  gap: 0.45rem;
-
-  max-height: 48vh;
-  overflow-y: auto;
+  display: grid;   grid-template-columns: repeat(auto-fit, 58px);
+  justify-content: center;   gap: 0.45rem;   max-height: 48vh;   overflow-y: auto;
 }
-
 .w-alergeno-btn {
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-
-  display: inline-flex;
-  
-  align-items: center;
-  
-  justify-content: center;
-  min-height: 3.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);   border-radius: 10px;   background: rgba(255, 255, 255, 0.08);
+  color: #fff;   display: inline-flex;   align-items: center;   justify-content: center;   min-height: 3.5rem;
   padding: 0.45rem;
 }
-
 .w-alergeno-btn img {
   width: 42px;
   height: 42px;
   object-fit: contain;
 }
-
 .w-alergeno-btn.is-active {
-  border-color: #000000;
-  background: rgba(34, 186, 197, 0.333);
+  border-color: #000000; background: rgba(34, 186, 197, 0.333);
 }
-
-/* .w-alergeno-text {
-  font-size: 0.72rem;
-  text-transform: capitalize;
-} */
-
+/* .w-alergeno-text { font-size: 0.72rem; text-transform: capitalize; } 
+*/
 /* Alerta visual persistente para elementos del salón con alergias. */
-.elemento_con_alergia {
-  background: rgba(239, 68, 68, 0.22) !important;
-  /* border-radius: 0.45rem; */
-  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.28);
+.elemento_con_alergia {  
+  background: rgba(239, 68, 68, 0.22) !important; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.28);
 }
-
 .contenedor_motor_alergias .labels-alergias-pop {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  /* margin-bottom: 0.6rem; */
+  display: flex; flex-wrap: wrap; gap: 0.35rem; 
 }
-
 .contenedor_motor_alergias .labels-alergias-pop.is-empty {
-  color: #6b7280;
-  font-size: 0.82rem;
-  margin: 0;
+  color: #6b7280; font-size: 0.82rem; margin: 0;
 }
-
 .contenedor_motor_alergias .alergia-tag-pop {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  padding: 0.12rem 0.5rem;
-  font-size: 0.68rem;
-  line-height: 1.1;
-  text-transform: capitalize;
-  border: 1px solid #86efac;
-  background: #dcfce7;
-  color: #b83d93;
+  display: inline-flex;   align-items: center; border-radius: 999px; padding: 0.12rem 0.5rem;
+  font-size: 0.68rem; line-height: 1.1; text-transform: capitalize; 
+  border: 1px solid #86efac; background: #dcfce7; color: #b83d93;
 }
-
 /* ■ ■ ■ ■
   ■ ■ ■ ■ Cabecera del offcanvas de lógica: línea de identidad + línea de noticias. 
   ■ ■ ■ ■ */
@@ -172,92 +128,46 @@
   height: auto;   min-height: 20vh;   max-height: 'auto'; 
 }
 .offcanvas-logica .offcanvas-header {
-  align-items: center;
-  gap: 0.45rem;
-  /* padding-top: 0.4rem;
-  padding-bottom: 0.25rem; */
-  padding-top: 0.3rem;
-  padding-bottom: 0.2rem;
+  align-items: center;   gap: 0.45rem;   padding-top: 0.3rem;   padding-bottom: 0.2rem;
 }
-
 .offcanvas-logica .nav-tabs {
-  /* margin-bottom: 0.35rem !important; */
   margin-bottom: 0.15rem !important;
-  /* border: 2px solid #ffa500;  */
 }
-
 .offcanvas-logica .nav-link {
-  padding: 0.35rem 0.85rem;
-  font-family: "Verdana", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
+  padding: 0.35rem 0.85rem;   font-family: "Verdana", "Trebuchet MS", "Segoe UI", system-ui, sans-serif; 
+  font-size: 0.7rem;   font-weight: 600;   letter-spacing: 0.1em;
 }
-
 /* Pestaña activa: línea inferior naranja */
 /* .offcanvas-logica .nav-link.active {
-    border-bottom: 2px solid #ffa500; 
-} */
+    border-bottom: 2px solid #ffa500; } 
+  */
 .offcanvas-logica .nav-link.active {
     border-bottom: 4px solid #422f0a; 
-  }
-  
-  /* Pestaña inactiva: cambiar el texto azul por verde */
-  .offcanvas-logica .nav-link:not(.active) {
-    border: 2px solid #ffa60000; 
-    color: #008000; /* Reemplaza por tu código de color verde exacto */
 }
-
+/* Pestaña inactiva: cambiar el texto azul por verde */
+.offcanvas-logica .nav-link:not(.active) {
+  border: 2px solid #ffa60000;     color: #008000; 
+}
 .offcanvas-logica-title {
   font-family: "Verdana", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
-  
-  /* display: flex;
-  align-items: center;  
-  flex: 0 1 auto; */
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  flex: 1 1 auto;
-
-
-  gap: 0.42rem;
-  margin: 0;
-  min-width: 0;
+  display: grid;   grid-template-columns: 1fr auto 1fr;   align-items: center;   flex: 1 1 auto;
+  gap: 0.42rem;   margin: 0;   min-width: 0;
 }
 .offcanvas-logica-title-left {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  justify-self: start;
+  display: inline-flex;   align-items: center;   gap: 0.35rem;   justify-self: start;
 }
-
 .offcanvas-logica-title-role {
-  color: #334155;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  color: #334155;   font-size: 0.72rem;   font-weight: 700;   letter-spacing: 0.04em;
 }
-
 .offcanvas-logica-title-text {
-  color: #111827;
-  font-weight: 700;
-  justify-self: center;
+  color: #111827;   font-weight: 700;   justify-self: center;
 }
-
-
 .offcanvas-logica-title-icon {
-  display: inline-flex;
-  width: 1rem;
-  height: 1rem;
-  color: #334155;
-  flex: 0 0 auto;
+  display: inline-flex;   width: 1rem;   height: 1rem;   color: #334155;   flex: 0 0 auto; 
 }
-
 .offcanvas-logica-title-icon svg,
 .offcanvas-logica-title-icon img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  width: 100%;   height: 100%;   object-fit: contain;
 }
 
 
@@ -400,6 +310,7 @@ uno detras de otro con un espacio
     gap: 0.3rem; /* Espacio interno entre el icono, el ID y el mensaje */
     max-width: 100%;
     min-width: 0;
+    padding: 0px;
     
 }
 
