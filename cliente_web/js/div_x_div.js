@@ -3245,7 +3245,7 @@ class e_Salon extends Tablero_Touch {
 	/**
 	 * ### Reinicia el Salon. Da Opción Previa de Guardar.
 	 */
-	accion_re_init_salon(){
+	async accion_re_init_salon(){
 		
 		if(this.CFG) this.CFG.api_reiniciar_salon();
 	}
@@ -3719,7 +3719,10 @@ class e_Salon extends Tablero_Touch {
 			// Caso B: Es un selector explícito (empieza por #, . o [)  por ejemplo:  '[data-creat="formulario"]'
 			if (str.startsWith('#') || str.startsWith('.') || str.startsWith('[')) {
 				element = document.querySelector(str);
-				if(element) return element;
+				if(element) 
+					return element;
+				else
+					return null
 			}
 
 			// Caso C: - Probamos x ID (es lo más rápido y común).
