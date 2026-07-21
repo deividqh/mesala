@@ -88,7 +88,7 @@
             </div>
             
             <!-- ■■■■■■■■ Toggler ■■■■■■■■ -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuOffcanvas" aria-label="Abrir menú de configuración">
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_configuracion" aria-label="Abrir menú de configuración">
               <span class="navbar-toggler-icon"></span>
             </button>
           </div>
@@ -103,7 +103,7 @@
   ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
   Offcanvas CONFIGURACION ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
   ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   -->
-  <div class="offcanvas offcanvas-end off-config" tabindex="-1" id="menuOffcanvas" data-tipo-bs="offcanvas-configuracion">
+  <div class="offcanvas offcanvas-end off-config" tabindex="-1" id="offcanvas_configuracion" data-tipo-bs="offcanvas-configuracion">
     <div class="offcanvas-header">
       <!-- <i class="bi bi-cup-hot me-2"></i> -->
       ⚙️ Configuración - davidquesadaheredia@gmail.com
@@ -171,9 +171,12 @@
           </div>
 
           <div class="tab-pane fade tab-content-custom" id="config-players" role="tabpanel" aria-labelledby="config-players-tab" tabindex="0">
-            <section class="config-section config-empty-section">
-              <p>Sin Contenido</p>
+
+            <section class="config-section config-section--catalogo" aria-labelledby="config_players_catalogo_title">
+              <h3 id="config_players_catalogo_title" class="config-section__title">Catálogo de elementos</h3>
+              <div class="config-catalog-table-wrapper" data-config-catalogo-players></div>
             </section>
+
           </div>
 
         </div>

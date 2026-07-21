@@ -2735,13 +2735,12 @@ class e_Salon extends Tablero_Touch {
 		if (!ctlg_el || ctlg_el.grupo !== 'player') 
 			return;
 		
-		// ┌■ Rol. color de la reserva en el click.
-		if (ctlg_el.rol === 'central'){
-			if (index_reserva != this.last_reserva_clicked)
-				this.last_reserva_clicked = index_reserva;
-			// ┌■■ 🌈 🪑 CAMBIO DEL COLOR DE LOS ELEMENTOS DE LA RESERVA. 			
-			this._set_color_reserva(this.index_reserva);
-		}
+		// ┌■ Para Saber si se ha cambiado de reserva al hacer click o está en una misma reserva.		
+		if (index_reserva != this.last_reserva_clicked)
+			this.last_reserva_clicked = index_reserva;
+
+		// ┌■■ 🌈 🪑 CAMBIO DEL COLOR DE LOS ELEMENTOS DE LA RESERVA. 			
+		this._set_color_reserva(this.index_reserva);
 		
 		// ┌■ ■ ■ Lógica: la selección visual solo vive mientras el offcanvas de lógica está abierto.
 		const logica = ctlg_el.logica;
@@ -2761,14 +2760,14 @@ class e_Salon extends Tablero_Touch {
 			// Si aparece el offcanvas-logica, el elemento seleccionado se hace grande y borde gordo
 			// Cuando desparece el offcanvas-logica dejamos de seleccionarlo.
 			if ($offcanvas_logica) {
-				this._set_elemento_onplay_seleccionado(elemento_clickado);
+				this._set_seleccion_elemento_onclick(elemento_clickado);
 				$offcanvas_logica.addEventListener('hidden.bs.offcanvas', () => {
-					this._reset_elemento_onplay_seleccionado();
+					this._reset_seleccion_elemento();
 				}, { once: true });
 			}
 
 		} else {
-			this._reset_elemento_onplay_seleccionado();	
+			this._reset_seleccion_elemento();	
 		}
 
 	}
@@ -2791,17 +2790,17 @@ class e_Salon extends Tablero_Touch {
 	}
 
 	/** ### Marca visualmente el player seleccionado y limpia la selección anterior. */
-	_set_elemento_onplay_seleccionado(elemento_seleccionado) {
-		const player = e_Salon._to_element(elemento_seleccionado);
-		if (!player) return;
-
-		this._reset_elemento_onplay_seleccionado();
-		player.classList.add('elemento_onplay_seleccionado');
-		player.closest('.estiloBaldosas')?.classList.add('baldosa_onplay_seleccionada');
+	_set_seleccion_elemento_onclick(elemento_seleccionado) {
+		const $player = e_Salon._to_element(elemento_seleccionado);
+		if (!$player) return;
+		// ■ Limpia la seleccion anterior
+		this._reset_seleccion_elemento();
+		$player.classList.add('elemento_onplay_seleccionado');
+		$player.closest('.estiloBaldosas')?.classList.add('baldosa_onplay_seleccionada');
 	}
 
 	/** ### Devuelve el borde y el tamaño del elemento seleccionado al estado original. */
-	_reset_elemento_onplay_seleccionado() {
+	_reset_seleccion_elemento() {
 		document.querySelectorAll('.class_onplay.elemento_onplay_seleccionado').forEach((elemento) => {
 			elemento.classList.remove('elemento_onplay_seleccionado');
 		});
@@ -3205,7 +3204,11 @@ class e_Salon extends Tablero_Touch {
 		const obj_elementos = elementos_flat.map(id => document.getElementById(id));		
 
 		const color_random = Herramientas.randomColor();
-		obj_elementos.forEach(el => {       
+		obj_elementos.forEach(el => { 
+			// Selecciona el grupo <g> y cambia su atributo fill
+			const svgs = el.querySelector('svg g');
+			svgs ? svgs.style.setProperty('fill', color_random, 'important') : null;
+
 			const path = el.querySelector("svg path", "svg");
 			if (path) {
 				path.style.setProperty("fill", color_random, "important");
@@ -3245,6 +3248,7 @@ class e_Salon extends Tablero_Touch {
 	 * ### Reinicia el Salon. Da Opción Previa de Guardar.
 	 */
 	accion_re_init_salon(){
+		
 		if(this.CFG) this.CFG.api_reiniciar_salon();
 	}
 	
@@ -3900,14 +3904,13 @@ class Configuracion_Salon {
 		this.$formulario = e_Salon._to_element('form_config_salon'); 		// el formulario
 		this.$info_columnas = e_Salon._to_element('[data-config-info="columnas"]');
 		this.$info_filas = e_Salon._to_element('[data-config-info="filas"]');
-		// this.$sidebar_posiciones = e_Salon._to_element('[data-side-position]');
 		this.$sidebar_posicion_toggle = e_Salon._to_element('[data-side-position-toggle]');
+		this.$catalogo_players = e_Salon._to_element('[data-config-catalogo-players]');
 		
 		// ┌•• Cargo los txt's del formulario
-		// this._load_offcanvas_configuracion(this.dimension_inicial, this.limites);		
 		this._load_offcanvas_configuracion(this.Salon.dimension, this.Salon.limites);		
-		// Configuracion_Salon._asegurar_plantillas_menu();
-
+		this._pintar_catalogo_players();
+		
 		// ■■ NUMERO COLUMNAS	
 		// ┌•• Fundamental para terminar de configuarar la cuadratura del Salon.
 		this.api_update_columnas('.' + this.configuracion.salon.clases_css.contenedor, this.Salon.columnas);
@@ -3923,12 +3926,7 @@ class Configuracion_Salon {
 
 		
 	}
-
-	// Acciones para Crear un OffCanvas de Configuración(Por pestañas, tiene que tener botones de accion.)
-	set_UI_configuration(){
-
-	}
-
+	
 	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	// ■■ VALIDACION DICCIONARIO CONFIGURACION
 	// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -4411,7 +4409,7 @@ class Configuracion_Salon {
 					// ┌• ENTORNO MOVIL, cierra el offcanvas tras guardar.
 					const entorno_now = Compatibilidad._detectar_entorno();
 					if(entorno_now.tipo == 'MOVIL') 
-						this._cerrar_menu_offcanvas_configuracion('menuOffcanvas');
+						this._cerrar_menu_offcanvas_configuracion('offcanvas_configuracion');
 				}
 			});
 		}
@@ -4419,8 +4417,66 @@ class Configuracion_Salon {
 	}
 
 	/**
+	 * ### Pinta una tabla legible con los elementos configurados en el Catálogo.
+	 * @link constructor
+	 */
+	_pintar_catalogo_players() {
+		if (!this.$catalogo_players) return;
+
+		const catalogo = Catalogo.get();
+		const filas_catalogo = Object.entries(catalogo).map(([id_key, item]) => ({
+			id_key,
+			grupo: item?.grupo || 'none',
+			rol: item?.rol || 'none',
+			motores: this._nombres_motores_catalogo(item?.logica),
+		}));
+
+		if (!filas_catalogo.length) {
+			this.$catalogo_players.textContent = 'No hay elementos configurados en el catálogo.';
+			return;
+		}
+
+		const tabla = document.createElement('table');
+		tabla.className = 'config-catalog-table';
+		tabla.innerHTML = `
+			<thead>
+				<tr>
+					<th scope="col">id_key</th>
+					<th scope="col">grupo</th>
+					<th scope="col">rol</th>
+					<th scope="col">motores</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		`;
+
+		const tbody = tabla.querySelector('tbody');
+		filas_catalogo.forEach((fila) => {
+			const tr = document.createElement('tr');
+			tr.appendChild(this._celda_tabla(fila.id_key));
+			tr.appendChild(this._celda_tabla(fila.grupo));
+			tr.appendChild(this._celda_tabla(fila.rol));
+			tr.appendChild(this._celda_tabla(fila.motores.join(', ') || 'none'));
+			tbody.appendChild(tr);
+		});
+
+		this.$catalogo_players.replaceChildren(tabla);
+	}
+
+	_nombres_motores_catalogo(logica = null) {
+		if (!logica || typeof logica !== 'object') return [];
+
+		return Object.keys(logica).map((motor) => motor.replaceAll('_', ' '));
+	}
+
+	_celda_tabla(texto = '') {
+		const td = document.createElement('td');
+		td.textContent = texto;
+		return td;
+	}
+
+	/**
 	 * ### Muestra los valores originales de dicc_config (no editables) sobre filas/columnas.
-	 * {@link _load_offcanvas_configuracion}
 	 */
 	_pintar_info_config_inicial() {
 		if (this.$info_columnas) {
@@ -4494,7 +4550,6 @@ class Configuracion_Salon {
 	 * @param {string} nuevas_filas - El nuevo número de filas como string.
 	 * @param {string} nuevas_columnas - El nuevo número de columnas como string.
 	 * @param {boolean} permite_vulnerar_limites, de momento siempre true.... preparado para ampliar funcionalidad.
-	 * {@link _load_offcanvas_configuracion}
 	 */
 	accion_submit_offcanvas_configuracion(nuevas_filas, nuevas_columnas, nombre_salon, permite_vulnerar_limites = true) {
 
@@ -4558,7 +4613,6 @@ class Configuracion_Salon {
 	/**
 	 * ### Cierra el menu offcanvas de configuración. 
 	 * @param {string} id_menu 
-	 * {@link _load_offcanvas_configuracion}
 	 */
 	_cerrar_menu_offcanvas_configuracion(id_menu){
 		if(typeof(id_menu) != 'string' || id_menu.trim() === '') return;

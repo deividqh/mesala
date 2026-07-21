@@ -27,7 +27,7 @@ Este README documenta, con foco en mantenimiento, los controles UI y el mapa de 
 | `cliente_web/mesala.html` | Acción info salón | `i[data-action-nav="info"]` | Abrir información contextual | Muestra datos de ayuda/estado del salón activo. |
 | `cliente_web/mesala.html` | Acción reinicio | `i[data-action-nav="re-init"]` | Limpiar tablero | Reestablece el estado del salón. |
 | `cliente_web/mesala.html` | Acción login/registro | `i[data-action-nav="conn"]` | Conexión de usuario | Punto de entrada a autenticación. |
-| `cliente_web/mesala.html` | Menú configuración offcanvas | `#menuOffcanvas` | Configuración lateral | Ajusta parámetros operativos y visuales del entorno de salón. |
+| `cliente_web/mesala.html` | Menú configuración offcanvas | `#offcanvas_configuracion` | Configuración lateral | Ajusta parámetros operativos y visuales del entorno de salón. |
 | `cliente_web/mesala.html` | Form config del salón | `#f_data_salon` | Lectura/edición de parámetros | Presenta nombre, columnas y filas del salón con controles asociados. |
 | `cliente_web/mesala.html` | Modal Crear/Actualizar snapshot | `#id_modal_cu` | CRUD de estado | Orquesta el formulario para crear o actualizar “fotos” del salón. |
 | `cliente_web/mesala.html` | Form guardar foto | `#form_guardar_foto` | Persistencia de snapshot | Captura título y contenidos de reservas/mensajes/alergias antes de guardar. |

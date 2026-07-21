@@ -314,9 +314,10 @@ estas Clases SE CREAN cuando desde NavBar se Arrastran(D&D) hasta el Salón.
 }
 
 
-@media screen and (max-width: 768px) {
+/* ■■■■■ font-size: 16px evita el zoom en IOS ■■■■ */
+/* @media screen and (max-width: 768px) {
   .offcanvas-logica .contenedor_motor_mensajes textarea {
-    font-size: 16px; /* Evita el zoom automático en iOS */
+    font-size: 16px; 
   }
-}
+} */
 

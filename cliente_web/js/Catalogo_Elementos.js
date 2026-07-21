@@ -87,11 +87,11 @@ class Catalogo {
     taburete: {
         slug: 'taburete',
         grupo: 'player',
-        rol: 'central',   // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc)
+        rol: 'cliente',   // Ejemplo de subgrupo que reune elementos (sillas, taburetes, etc)
         fisica: { ancho: 1, alto: 1, colision: true },
         visual: {
             nombre: 'Titulo del Taburete',
-            content: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50"><g fill="#8B4513"><rect x="12" y="25" width="4" height="20" rx="1" /><rect x="34" y="25" width="4" height="20" rx="1" /><rect x="18" y="20" width="4" height="15" rx="1" opacity="0.8" /><rect x="28" y="20" width="4" height="15" rx="1" opacity="0.8" /><ellipse cx="25" cy="20" rx="18" ry="12" /><path d="M7,20 Q7,30 25,30 Q43,30 43,20 L43,22 Q43,32 25,32 Q7,32 7,22 Z" /></g></svg>',
+            content: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50"><g fill="currentColor"><rect x="12" y="25" width="4" height="20" rx="1" /><rect x="34" y="25" width="4" height="20" rx="1" /><rect x="18" y="20" width="4" height="15" rx="1" opacity="0.8" /><rect x="28" y="20" width="4" height="15" rx="1" opacity="0.8" /><ellipse cx="25" cy="20" rx="18" ry="12" /><path d="M7,20 Q7,30 25,30 Q43,30 43,20 L43,22 Q43,32 25,32 Q7,32 7,22 Z" /></g></svg>',
             css: 'style_visual_cliente'
         },
         logica: {
