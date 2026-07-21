@@ -901,7 +901,8 @@ class Botonera_Crud_Grabar {
 
             if (action === 'grabar') {
                 this.#aplicar_estado(Botonera_Crud_Grabar.ESTADO_GRABANDO);
-                await this.#ejecutar_callback(callback, button);
+                // await this.#ejecutar_callback(callback, button);
+                await this.#ejecutar_accion_temporal(callback, button);
                 return;
             }
 
@@ -922,9 +923,23 @@ class Botonera_Crud_Grabar {
         await callback(button, this);
     }
 
+    async #ejecutar_accion_temporal(callback, button) {
+        try {
+            await this.#ejecutar_callback(callback, button);
+        } finally {
+            this.#aplicar_estado(Botonera_Crud_Grabar.ESTADO_INICIAL);
+        }
+    }
+
     #aplicar_estado(estado = {}) {
         Object.entries(this.botones_por_clase).forEach(([className, button]) => {
-            button.disabled = estado[className] === true;
+            
+            const disabled = estado[className] === true;
+            button.disabled = disabled;
+            button.classList.toggle('is-disabled', disabled);
+            button.setAttribute('aria-disabled', String(disabled));
+
+
         });
     }
 }

@@ -340,7 +340,8 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 		return $sumatorio;
 	}
 
-	_accion_grabar(textarea, button) {
+	// _accion_grabar(textarea, button) {
+	async _accion_grabar(textarea) {
 		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 		if (!SpeechRecognition || !textarea) {
 			console.warn('🎙️ Reconocimiento de voz no disponible en este navegador.');
@@ -353,8 +354,10 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 		recognition.interimResults = false;
 		recognition.maxAlternatives = 1;
 
-		recognition.onstart = () => { button.textContent = '■'; };
-		recognition.onend = () => { button.textContent = '🎤'; };
+		// recognition.onstart = () => { button.textContent = '■'; };
+		// recognition.onend = () => { button.textContent = '🎤'; };
+
+
 		recognition.onresult = (event) => {
 			const texto = event?.results?.[0]?.[0]?.transcript || '';
 			if (!texto) return;
@@ -364,9 +367,29 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 			textarea.focus();
 		};
 
-		recognition.start();
+		// recognition.start();
+		recognition.onerror = (event) => {
+			console.warn('🎙️ Error durante la grabación de voz:', event?.error || event);
+		};
+
+		try {
+			recognition.start();
+			await this._esperar_fin_grabacion_voz(recognition);
+		} catch (error) {
+			console.warn('🎙️ No se pudo iniciar la grabación de voz:', error);
+		}
 	}
 
+	/** */
+	_esperar_fin_grabacion_voz(recognition) {
+		return new Promise((resolve) => {
+			recognition.onend = () => resolve();
+		});
+	}
+
+	/**  
+	 * Funcion sin uso para reconocer las distintas alergias de las reservas o clientes
+	 * */
 	// set_news($el_dom){
 	// 	if(!$el_dom) return null;
 
