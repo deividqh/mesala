@@ -272,12 +272,12 @@
 } */
 
 .offcanvas-logica .contenedor_motor_mensajes,
-.offcanvas-logica .sumatorio,
-.offcanvas-logica .contenedor_motor_mensajes textarea {
+.offcanvas-logica .sumatorio {
   font-size: 0.76rem;
 }
 
 .offcanvas-logica .contenedor_motor_mensajes textarea {
+  font-size: 1rem;
   min-height: 4.2rem;
 }
 .offcanvas-logica .contenedor_motor_mensajes textarea::placeholder {
