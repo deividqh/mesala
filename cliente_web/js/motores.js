@@ -328,7 +328,8 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 			// • Asigno valores al dom
 			col_ico.innerHTML = svg_ico;			
 			col_id.textContent = `${id}: `;
-			col_mensaje.textContent = this.get_mensaje(id);
+			const msg = this.get_mensaje(id);
+			col_mensaje.textContent = msg ? msg : "•";
 			// • Asingno las columnas a la Fila primero
 			row.appendChild(col_ico);
 			row.appendChild(col_id);
@@ -353,10 +354,6 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 		recognition.continuous = false;
 		recognition.interimResults = false;
 		recognition.maxAlternatives = 1;
-
-		// recognition.onstart = () => { button.textContent = '■'; };
-		// recognition.onend = () => { button.textContent = '🎤'; };
-
 
 		recognition.onresult = (event) => {
 			const texto = event?.results?.[0]?.[0]?.transcript || '';

@@ -313,6 +313,7 @@
 .offcanvas-logica .contenedor_motor_mensajes textarea {
   font-size: 1rem;
   min-height: 4.2rem;
+  color: #5c4403;
 }
 .offcanvas-logica .contenedor_motor_mensajes textarea::placeholder {
   color: #a0a0a0;     /* Un gris más claro */
@@ -384,6 +385,6 @@ uno detras de otro con un espacio
   /* padding: 4px; */
   padding: 0px 4px;
 
-  color: #879db1; 
+  color: #687f94; 
 
 }
