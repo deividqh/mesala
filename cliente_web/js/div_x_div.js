@@ -3382,7 +3382,6 @@ class e_Salon extends Tablero_Touch {
 	}
 
 	/**
-	 * @see {@link Configuracion_Salon.api_ver_informacion_Salon}
 	 * ### Diccionario de mensajes de cada mesa y silla onplay del salon.
 	 * ```javascript
 	 *	d_mensajes = {
@@ -3613,7 +3612,6 @@ class e_Salon extends Tablero_Touch {
 	
 	/** 
 	 * ### Carga los mensajes de las mesas y sillas 
-	 * @param {object} dicc_api_mensajes 
 	 */
 	_load_mensajes_en_Salon(dicc_api_mensajes){
 		if (!dicc_api_mensajes || Object.keys(dicc_api_mensajes).length === 0) return;
@@ -3638,7 +3636,6 @@ class e_Salon extends Tablero_Touch {
 	
 	/**
 	 * ### Carga los mensajes de las mesas y sillas 
-	 * @param {object} dicc_api_mensajes 
 	 */
 	_load_alergias_en_Salon(dicc_api_alergias){
 		if (!dicc_api_alergias || Object.keys(dicc_api_alergias).length === 0) return;
@@ -3912,10 +3909,7 @@ class Configuracion_Salon {
 		// ┌•• Fundamental para terminar de configuarar la cuadratura del Salon.
 		this.api_update_columnas('.' + this.configuracion.salon.clases_css.contenedor, this.Salon.columnas);
 				
-		// ■■ Mensajes de la app	
-		this.UI = new Alertas_UI();
-
-		// ■■ GAP de re-posicionar.
+		// ■■ GAP de re-posicionar. Sin uso pero para incorporar en mejoras.
 		this.gap = 0;
 		
 		// ■■ Proporciones cuadradas de las Baldosas.
@@ -4034,7 +4028,7 @@ class Configuracion_Salon {
 		let msgs = { reservas:'', clientes:'', alergias:'' };
 		try {
 			// ■■■■■■■■■■■■■■■ DICCIONARIO DE CONFIGURACION 
-			const msg_json_config = `<h6>• DICCIONARIO CONFIGURACION</h6>\n${JSON.stringify(this.diccionario, null, 2)}`;
+			const msg_json_config = `<h6>• DICCIONARIO CONFIGURACION</h6>\n${JSON.stringify(this.diccionario.salon, null, 2)}`;
 			
 			// ■■■■■■■■■■■■■■■ DICCIONARIO DE RESERVAS			
 			const matriz_reservas_flat = this.Salon._get_array_reservas_flat();   
@@ -4059,7 +4053,7 @@ class Configuracion_Salon {
 			}		
 
 			// ■■■■■■■■■■■■■■■ ALERGIAS
-			const dicc_alergias = this.Salon.MSG_A.api_alergias() || {};
+			const dicc_alergias = this.Salon.api_alergias() || {};
 			if (!Object.keys(dicc_alergias).length) {
 				msgs.alergias = '<b>■ No hay Alergias.</b>\n';
 			} else {
@@ -4350,7 +4344,6 @@ class Configuracion_Salon {
 	 * {@link Configuracion_Salon}
 	 */
 	_load_offcanvas_configuracion() {
-		// const UI = this.UI;
 		// ■ Guardo los valores en una variable(rescate) para poder volver al inicio si algo sale mal.
 		let rescate = { cols: '',fils: '',name: '',};
 
@@ -4381,8 +4374,6 @@ class Configuracion_Salon {
 
 		// ​👂​👂 Sincroniza los botones del offcanvas configuración con 
 		this._sincronizar_sidebar_UI();		
-
-		// const UI = this.Salon?.CFG?.UI;
 
 		// ​👂​👂 Agregar Event Listener al formulario (solo si el usuario NO está logueado)
 		if (this.$formulario) {
@@ -5022,8 +5013,13 @@ class Configuracion_Salon {
 		// console.log("🧹 🧹 Limpiando mesas, sillas y decoración...");
 		this.Salon.clean_elementos_Salon('todo');	// reset elementos.
 		this.Salon.reservas = [];					// reset reservas.
-		this.Salon.MSG_M?.reset();		// reset mensajes de mesas.
-		this.Salon.MSG_A?.reset();		// reset diccionario de alergias(solo sillas-clientes).
+		
+		const MA = Catalogo.get_motor('motor_alergias');
+		const MM = Catalogo.get_motor('motor_mensajes');
+
+		MM.reset();		// reset mensajes de mesas.
+		MA.reset();		// reset diccionario de alergias(solo sillas-clientes).
+
 		console.log("┌■■ Salon Limpio 🚿. Preparado para Cargar Foto . . . ✔️");		
 	}
 	
@@ -6141,7 +6137,7 @@ class Foto_CRUD{
 		try {
 			// cd.innerHTML =
 			const mensaje = "¿Seguro que quieres eliminar este salón? Esta acción no se puede deshacer.";
-			const confirmacion = this.Salon.CFG.UI.ConfirM("Confimación Accion Eliminar", mensaje, "warning")
+			const confirmacion = Alertas_UI.ConfirM("Confimación Accion Eliminar", mensaje, "warning")
 			if (!confirmacion) return;
 			// this._feedback_RUD('Eliminando photo...', 'warning');
 
@@ -7069,9 +7065,12 @@ class Foto_CRUD{
 		const $alergias = acordeon.querySelector('[data-creat="acordeon-alergias"]');
 		
 		// ┌■ Cacha los Datos
+		const MA = Catalogo.get_motor('motor_alergias');
+		const MM = Catalogo.get_motor('motor_mensajes');
+
 		const reservas = this.Salon?._get_array_reservas_flat?.() || [];
-		const mensajes = this.Salon?.MSG_M.api_mensajes?.() || {};
-		const alergias = this.Salon?.MSG_A.api_alergias() || {};
+		const mensajes = this.Salon?.api_mensajes?.() || {};
+		const alergias = this.Salon?.api_alergias() || {};
 		
 		// ┌■ Reservas
 		if ($reservas) {
@@ -7327,7 +7326,6 @@ class Foto_CRUD{
 			// ┌••••••••••••••••••••••••••••••••
 			// ┌•• ANALISIS DE LAS RESPUESTAS
 			// ┌••••••••••••••••••••••••••••••••
-			const UI = this.Salon?.CFG?.UI;
 			// ┌•• Si el token expiró o no existe, el servidor devolverá 401 o 403
 			if (response.status === 401 || response.status === 403) {
 				// alert("Sesión expirada. Por favor, vuelve a iniciar sesión.");
@@ -7468,7 +7466,6 @@ class Foto_CRUD{
 	 */
 	async __validar_carga(foto_id){
 		const Salon = this.Salon || null;
-		const UI = this.Salon?.CFG?.UI;			// UI de Configuracion_Salon, usado para mensajes y alertas.
 		const lista_fotos = this.lista_fotos_RUD || [];
 		
 		const foto = lista_fotos.find(reg => reg.id === foto_id);
@@ -7479,8 +7476,6 @@ class Foto_CRUD{
 		const puedo_pasar = this._logica_match_dimensiones(foto);				
 		if (puedo_pasar === false){
 			const msg = `<br>■ Dimension <b>Salon:</b> ${Salon.filas}x${Salon.columnas}<br> ■ Dimension <b>Foto:</b> ${foto.filas}x${foto.columnas}`;
-			// Alertas_UI._NotA("Operacion Anulada", `${msg}<br><br>🟥 🟥 🟥 🟥 QUITO EL RETURN PARA PRUEBAS....VOLVER A PONER!!!!!`, "danger");
-			// const retorno = await UI.DatIN("Advertencia: Dimensiones Distintas!", `${msg}`, `<br><br>Escribe la Celda de Inicio del que vas a Importar:`, "warning");
 			return true;
 		}
 		return true;
@@ -7497,7 +7492,6 @@ class Foto_CRUD{
 	async _accion_cargar_elementos_en_Salon(foto_id) {
 		const Salon = this.Salon || null;
 		const CFG = this.Salon?.CFG;			// Configuracion_Salon
-		const UI = this.Salon?.CFG?.UI;			// UI de Configuracion_Salon, usado para mensajes y alertas.
 		const RnG = this.Salon.eRdS || null;
 		// ┌■■ Busca la foto en la lista de fotos
 		const photo = this.lista_fotos_RUD.find(reg => reg.id === foto_id);
@@ -7589,7 +7583,7 @@ class Foto_CRUD{
 			// let celda_s = 
 			
 			const entre_estos = ['A0', 'B0', 'C0', 'D0', 'E0'];
-			const retorno = await UI.CombIN(`${titulo}`, `${msg}`, `${label}`, entre_estos, "warning", 'A0');
+			const retorno = await Alertas_UI.CombIN(`${titulo}`, `${msg}`, `${label}`, entre_estos, "warning", 'A0');
 			celda_inicio_rango_open = retorno.toUpperCase();
 			
 			// Extrae fila y columna de los datos de la resupuesta de usuario:
@@ -7601,7 +7595,7 @@ class Foto_CRUD{
 		}else{
 			// ┌•• Mensaje Confirmacion - Dimension
 			let mensaje = `Al cargar este salón se perderá el trabajo actual no guardado.`;				
-			const confirmacion = await UI.ConfirM("❔ Confirmación:", mensaje, "warning");
+			const confirmacion = await Alertas_UI.ConfirM("❔ Confirmación:", mensaje, "warning");
 			if(!confirmacion) return;
 		}
 		// ┌■■■

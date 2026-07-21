@@ -91,7 +91,7 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
         if (!valor || typeof valor !== 'object') return this._crear_ficha('');
         return this._crear_ficha(valor.mensaje || '', valor);
     }
-
+	/** ### (Oblig) Devuelve el mensaje del elemento o null  */
     get(id_elemento = '') {
         if (!id_elemento) return null;
         return this.d_data[id_elemento] || null;
@@ -100,11 +100,12 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
     get_mensaje(id_elemento = '') {
         return this.get(id_elemento)?.mensaje || '';
     }
-
+	/** ### (Oblig) Devuelve todo d_data (diccionario principal)  */
     get_all() {
         return this.d_data;
     }
 
+	/** ### (Oblig) Establece/Pone un mensaje en el elemento  */
     set(id_elemento = '', mensaje = '', ficha_base = {}) {
         if (!id_elemento) return false;
 
@@ -138,30 +139,7 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
         });
         return true;
     }
-
-    delete(id_elemento = '') {
-        if (!id_elemento) return false;
-        delete this.d_data[id_elemento];
-
-		this._actualizar_markador_elemento(id_elemento);
-        return true;
-    }
-
-    has(id_elemento = '') {
-        return this.get_mensaje(id_elemento).trim() !== '';
-    }
-
-    reset() {
-		Object.keys(this.d_data).forEach((id) => this.__ocultar_markador(id));
-        this.d_data = {};
-    }
-
-    /* Metodo que se instancia desde fuera para tener todo el diccionario d_data. */
-	api_mensajes(){
-		return this.get_all();
-	}
-	
-	/*  */
+	/** ### (Oblig) Actualiza un elemento   */
     update(id_elemento = '', valor_mensaje = null) {
 		if (!id_elemento) return false;
         if (valor_mensaje === null) {
@@ -173,6 +151,30 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
         }
         return this.set(id_elemento, valor_mensaje);
     }
+	/** ### (Oblig) elimina un elemento y su mensaje de d_data  */
+    delete(id_elemento = '') {
+        if (!id_elemento) return false;
+        delete this.d_data[id_elemento];
+
+		this._actualizar_markador_elemento(id_elemento);
+        return true;
+    }
+	/** ### (Opt) verifica si existe un elemento en d_data. retorna true/false  */
+    has(id_elemento = '') {
+        return this.get_mensaje(id_elemento).trim() !== '';
+    }
+	/** ### (Opt) verifica si existe un elemento en d_data. retorna true/false  */
+    reset() {
+		Object.keys(this.d_data).forEach((id) => this.__ocultar_markador(id));
+        this.d_data = {};
+    }
+
+    /* Metodo que se instancia desde fuera para tener todo el diccionario d_data. */
+	api_mensajes(){
+		return this.get_all();
+	}
+	
+	
 
 	/*  */
     read_data() {
@@ -228,69 +230,53 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
         elemento_dom.classList.remove('elemento_con_mensaje');
     }
 
-	/*  */
-    _crear_botones_accion(id_elemento, textarea) {
-        const $botonera = document.createElement('div');
-        $botonera.className = 'd-flex gap-4   motor-mensajes-botonera';
+	/* mod */
+    _crear_botones_accion(id_elemento, textarea) {        
+		const callbacks_por_clase = {
+			'btn-guardar': () => this._accion_guardar(id_elemento, textarea),
+            'btn-delete': async () => this._accion_eliminar(id_elemento, textarea),
+            'btn-reset': () => this._accion_reset(textarea),
+            'btn-grabar': (button) => this._accion_grabar(textarea, button)
+        };
+
         
-        // Los Botones los cojo de Catalogo
-        const btns = Catalogo.get_btns_crud_grabar();
-        btns.forEach((boton) => {
-            const button = document.createElement('button');
-            button.type = 'button';
-            // Le aplicamos la clase de Catalogo
-            button.className = `btn btn-sm   ${boton.className}`;
-            button.dataset.action = boton.action;
-            button.title = boton.title;
-            button.textContent = boton.texto;
-            $botonera.appendChild(button);
-        });
+        const botonera = new Botonera_Crud_Grabar(callbacks_por_clase);
+        return botonera.contenedor;
+    }
+	
+	/* new */
+	_accion_guardar(id_elemento, textarea) {
+		const ret_ok = this.set(id_elemento, textarea.value);
+        if(ret_ok)
+            Alertas_UI._NotA('Accion Guardar', 'Ejecutada con Exito');
+        else
+            Alertas_UI._NotA('Accion Guardar', '❌ Error Al Guardar', 'danger');
+    }
+	
 
-        // Delegación de eventos en el contenedor de la botonera
-        $botonera.addEventListener('click', async (ev) => {
-            const button = ev.target.closest('[data-action]');
-            if (!button) return;
-
-            const action = button.dataset.action;
-            
-            if (action === 'guardar') {
-                const ret_ok = this.set(id_elemento, textarea.value);
-				if(ret_ok)
-                	Alertas_UI._NotA('Accion Guardar', 'Ejecutada con Exito');
-				else
-                	Alertas_UI._NotA('Accion Guardar', '❌ Error Al Guardar', 'danger');
+	/* new */
+	async _accion_eliminar(id_elemento, textarea) {
+		try {
+            const confirm = await Alertas_UI.ConfirM('Accion Eliminar', 'Estas Seguro?', 'warning');
+            if (confirm !== true) return;
+			const ret_ok = this.delete(id_elemento);
+            if (ret_ok){
+				
+				textarea.value = '';
+                Alertas_UI._NotA('Eliminar Mensaje', `Mensaje de ${id_elemento} Eliminado con éxito`, 'success');
+            }else{
+				Alertas_UI._NotA('Eliminar Mensaje', `❌ Error al Eliminar el Mensaje de ${id_elemento}`, 'danger');
             }
-            
-            if (action === 'eliminar') {
-                try {
-                    const confirm = await Alertas_UI.ConfirM('Accion Eliminar', 'Estas Seguro?', 'warning');
-                    if (confirm === true) {
-                        const ret_ok = this.delete(id_elemento);
-						if (ret_ok){
-							textarea.value = '';
-							Alertas_UI._NotA('Eliminar Mensaje', `Mensaje de ${id_elemento} Eliminado con éxito`, 'success');
-						}else{
-							Alertas_UI._NotA('Eliminar Mensaje', `❌ Error al Eliminar el Mensaje de ${id_elemento}`, 'danger');
-						}
-                    }
-                } catch (error) {
-                    console.error("Fallo crítico en el modal de confirmación:", error);
-                    Alertas_UI._NotA('Error de Sistema', 'No se pudo procesar la eliminación', 'danger');
-                }
-            }
-
-            if (action === 'reset') {
-                textarea.value = '';
-                textarea.focus();
-            }
-            
-            if (action === 'grabar') {
-                this._accion_grabar(textarea, button);
-                // Alertas_UI._NotA('Accion Grabar Audio', 'Ejecutada con Exito');
-            }
-        });
-
-        return $botonera;
+        } catch (error) {
+            console.error("Fallo crítico en el modal de confirmación:", error);
+            Alertas_UI._NotA('Error de Sistema', 'No se pudo procesar la eliminación', 'danger');
+        }
+    }
+	
+	/* new */
+	_accion_reset(textarea) {
+        textarea.value = '';
+        textarea.focus();
     }
 
 	/*### Sin Uso  */

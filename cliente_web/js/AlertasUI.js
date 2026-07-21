@@ -133,7 +133,7 @@ static async ConfirM(encabezado, texto, tipo = 'danger') {
      * @param {boolean} is_oblig - Indica si el campo es obligatorio.
      * @returns {Promise<string|false>} - Valor ingresado si confirma, False si cancela o cierra.
      */
-    async DatIN(encabezado, texto, label, tipo = 'danger', is_oblig = true) {
+    static async DatIN(encabezado, texto, label, tipo = 'danger', is_oblig = true) {
         const id_modal = `modal_${Date.now()}`;
         const id_input = `${id_modal}_input`;
 
@@ -217,101 +217,7 @@ static async ConfirM(encabezado, texto, tipo = 'danger') {
         });
     }
 
-	// /**
-    //  * Muestra un modal con un campo de texto y devuelve el valor validado cuando se confirma.
-    //  * Obliga al usuario a introducir un valor que esté contenido en el array de resultados.
-    //  * * @param {string} encabezado - Título del modal.
-    //  * @param {string} texto - Mensaje de la pregunta.
-    //  * @param {string} label - Etiqueta del input.
-    //  * @param {Array<string|number>} resultado - Array con las opciones válidas aceptadas.
-    //  * @param {string} tipo - Color del botón principal ('danger', 'success', 'warning').
-    //  * @returns {Promise<string|false>} - Valor ingresado si confirma, false si cancela o cierra.
-    //  */
-    // async DatIN(encabezado, texto, label, resultado, tipo = 'danger') {
-    //     // Validación preventiva y estructurada
-    //     if (!Array.isArray(resultado) || resultado.length === 0) {
-    //         console.error("DatIN Error: El parámetro 'resultado' debe ser un array con al menos una opción.");
-    //         return false;
-    //     }
-
-    //     const id_modal = `modal_${Date.now()}`;
-    //     const id_input = `${id_modal}_input`;
-
-    //     const clases_btn = {
-    //         'success': 'btn-success',
-    //         'danger':  'btn-danger',
-    //         'warning': 'btn-warning text-dark'
-    //     };
-    //     const clase_accion = clases_btn[tipo] || clases_btn['danger'];
-
-    //     const label_text = label ? label.trim() : '';
-    //     // Normalizamos el array a strings para asegurar una comparación estricta sin fallos de tipado
-    //     const opciones_validas = resultado.map(String); 
-
-    //     const html_modal = `
-    //         <div class="modal fade" id="${id_modal}" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-    //             <div class="modal-dialog modal-dialog-centered">
-    //                 <div class="modal-content">
-    //                     <div class="modal-header">
-    //                         <h5 class="modal-title">${encabezado}</h5>
-    //                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-    //                     </div>
-    //                     <div class="modal-body">
-    //                         ${texto}
-    //                         <div class="mb-3 mt-3">
-    //                             <label for="${id_input}" class="form-label">${label_text} <span class="text-danger">( * )</span></label>
-    //                             <input type="text" class="form-control" id="${id_input}" required autocomplete="off">
-    //                             <div class="invalid-feedback" id="${id_input}_error"></div>
-    //                         </div>
-    //                     </div>
-    //                     <div class="modal-footer">
-    //                         <button type="button" class="btn btn-secondary" id="${id_modal}_cancelar" data-bs-dismiss="modal">Cancelar</button>
-    //                         <button type="button" class="btn ${clase_accion}" id="${id_modal}_confirmar">Confirmar</button>
-    //                     </div>
-    //                 </div>
-    //             </div>
-    //         </div>`;
-
-    //     document.body.insertAdjacentHTML('beforeend', html_modal);
-
-    //     const elemento_modal = document.getElementById(id_modal);
-    //     const input = document.getElementById(id_input);
-    //     const error_div = document.getElementById(`${id_input}_error`);
-        
-    //     const instancia_bs = new bootstrap.Modal(elemento_modal);
-    //     instancia_bs.show();
-
-    //     return new Promise((resolve) => {
-    //         const btn_confirmar = document.getElementById(`${id_modal}_confirmar`);
-
-    //         // Limpia el estado de error tan pronto como el usuario empiece a corregir la entrada
-    //         input.addEventListener('input', () => {
-    //             input.classList.remove('is-invalid');
-    //         });
-
-    //         btn_confirmar.addEventListener('click', () => {
-    //             const valor = input.value.trim();
-
-    //             // Validación estricta y sencilla
-    //             if (opciones_validas.includes(valor)) {
-    //                 input.classList.remove('is-invalid');
-    //                 instancia_bs.hide();
-    //                 resolve(valor); 
-    //             } else {
-    //                 // Retiene al usuario en la ventana indicando claramente el fallo
-    //                 error_div.textContent = `Opción no válida. Valores permitidos: ${opciones_validas.join(', ')}`;
-    //                 input.classList.add('is-invalid');
-    //                 input.focus();
-    //             }
-    //         });
-
-    //         // Resuelve y destruye el modal si el usuario sale (evita memory leaks en el DOM)
-    //         elemento_modal.addEventListener('hidden.bs.modal', () => {
-    //             resolve(false); 
-    //             elemento_modal.remove(); 
-    //         });
-    //     });
-    // }
+	
 	/**
      * Muestra un modal con un menú desplegable (select) y devuelve la opción seleccionada.
      * Restringe al usuario a elegir únicamente una de las opciones válidas.
@@ -323,7 +229,7 @@ static async ConfirM(encabezado, texto, tipo = 'danger') {
      * @param {string|number|null} by_def - Valor seleccionado por defecto (opcional).
      * @returns {Promise<string|false>} - Valor seleccionado si confirma, false si cancela o cierra.
      */
-    async CombIN(encabezado, texto, label, resultado, tipo = 'danger', by_def = null) {
+    static async CombIN(encabezado, texto, label, resultado, tipo = 'danger', by_def = null) {
         // Validación preventiva y estructurada del parámetro resultado
         if (!Array.isArray(resultado) || resultado.length === 0) {
             console.error("CombIN Error: El parámetro 'resultado' debe ser un array con al menos una opción.");
