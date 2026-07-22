@@ -341,7 +341,6 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 		return $sumatorio;
 	}
 
-	// _accion_grabar(textarea, button) {
 	async _accion_grabar(textarea) {
 		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 		if (!SpeechRecognition || !textarea) {
