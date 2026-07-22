@@ -369,9 +369,10 @@ class Logica_Catalogo  {
      */
     #crear_offcanvas_logica() {
         let $offcanvas_logica = document.getElementById('offcanvas_logica');
-        if ($offcanvas_logica) 
+        if ($offcanvas_logica) {
+            this.#add_listener_cambio_textarea_mensaje($offcanvas_logica);
             return $offcanvas_logica;
-        
+        }        
         // ■ Contenedor principal del offcanvas
         $offcanvas_logica = document.createElement('div');
         $offcanvas_logica.id = 'offcanvas_logica';
@@ -519,6 +520,8 @@ class Logica_Catalogo  {
         
         document.body.appendChild($offcanvas_logica);
 
+        this.#add_listener_cambio_textarea_mensaje($offcanvas_logica);
+
         $offcanvas_logica.addEventListener('hidden.bs.offcanvas', () => {
             this.#guardar_textareas_mensajes($offcanvas_logica);
         });
@@ -530,19 +533,41 @@ class Logica_Catalogo  {
 
     /**
      * @description Guarda los mensajes escritos al cerrar el offcanvas de lógica.
+     * @description Registra un único listener delegado para marcar mensajes editados.
+     * @param {HTMLElement} $offcanvas_logica
+     */
+    #add_listener_cambio_textarea_mensaje($offcanvas_logica) {
+        if (!$offcanvas_logica || $offcanvas_logica.dataset.listenerMensajes === 'true') return;
+
+        $offcanvas_logica.addEventListener('input', (event) => {
+            const textarea = event.target?.closest?.('.area-texto-mensaje');
+            if (!textarea || !$offcanvas_logica.contains(textarea)) return;
+
+            textarea.dataset.mensajeModificado = textarea.value !== textarea.dataset.valorInicial ? 'true' : 'false';
+        });
+
+        $offcanvas_logica.dataset.listenerMensajes = 'true';
+    }
+
+    /**
+     * @description Guarda únicamente los mensajes modificados al cerrar el offcanvas de lógica.
      * @param {HTMLElement} $offcanvas_logica
      */
     #guardar_textareas_mensajes($offcanvas_logica) {
         const motor_mensajes = Catalogo.get_motor('motor_mensajes');
         if (!motor_mensajes?.set || !$offcanvas_logica) return;
 
-        const textareas = $offcanvas_logica.querySelectorAll('.area-texto-mensaje');
+        // const textareas = $offcanvas_logica.querySelectorAll('.area-texto-mensaje');
+        const textareas_modificados = $offcanvas_logica.querySelectorAll('.area-texto-mensaje[data-mensaje-modificado="true"]');
 
-        textareas.forEach((textarea) => {
+        textareas_modificados.forEach((textarea) => {
             const id_elemento = textarea.dataset.idElemento;
             if (!id_elemento) return;
 
+            // Metodo oblig de la Interfaz de  Motores.
             motor_mensajes.set(id_elemento, textarea.value);
+            textarea.dataset.valorInicial = textarea.value;
+            textarea.dataset.mensajeModificado = 'false';
         });
     }
 

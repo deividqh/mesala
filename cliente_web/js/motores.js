@@ -361,6 +361,9 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 		$textarea.value = this.get_mensaje($el_dom.id);
 		// $textarea.dataset.motor = 'motor_mensajes';
 		$textarea.dataset.idElemento = $el_dom.id;
+		
+		$textarea.dataset.valorInicial = $textarea.value;
+		$textarea.dataset.mensajeModificado = 'false';
 
 		if (tipo_render === 'sumatorio') {
 			const $sumatorio = this._crear_sumatorio($el_dom);
