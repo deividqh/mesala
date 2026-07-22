@@ -4,9 +4,6 @@
    --color-offcanvas-logica:     rgb(253, 247, 223);
 
    /* 
-   --btn-grabar-bg
-   --btn-grabar-bg-border
-   --btn-grabar-bg-hov
    
    --btn-guardar-bg
    --btn-guardar-border
@@ -22,12 +19,11 @@
    */
 }
 
-/* BOTONES (guardar / reset / eliminar / grabar / parar)
+/* BOTONES (guardar / reset / eliminar / )
   ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
 
 .btn.btn-guardar,
 .btn.btn-delete,
-.btn.btn-grabar,
 .btn.btn-reset{
   color: inherit;
   transition: background-color 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease, transform 0.18s ease;
@@ -44,10 +40,6 @@
   border: 1px solid var(--btn-delete-border);
 }
 
-.btn.btn-grabar{
-  background:       var(--btn-grabar-bg);
-  border: 1px solid var(--btn-grabar-border);
-}
 
 .btn.btn-reset{
   background: var(--btn-reset-bg, rgba(148, 163, 184, 0.18));
@@ -56,12 +48,10 @@
 
 .btn.btn-guardar:hover:not(:disabled){ background: var(--btn-guardar-bg-hov); }
 .btn.btn-delete:hover:not(:disabled){ background: var(--btn-delete-bg-hov); }
-.btn.btn-grabar:hover:not(:disabled){ background: var(--btn-grabar-bg-hov); }
 .btn.btn-reset:hover:not(:disabled){ background: var(--btn-reset-bg-hov, rgba(148, 163, 184, 0.32)); }
 
 .btn.btn-guardar:hover:not(:disabled),
 .btn.btn-delete:hover:not(:disabled),
-.btn.btn-grabar:hover:not(:disabled),
 .btn.btn-reset:hover:not(:disabled){
   box-shadow: 0 0.4rem 0.9rem rgba(15, 23, 42, 0.18);
   transform: translateY(-2px) scale(1.08);
@@ -69,7 +59,6 @@
 
 .btn.btn-guardar:active:not(:disabled),
 .btn.btn-delete:active:not(:disabled),
-.btn.btn-grabar:active:not(:disabled),
 .btn.btn-reset:active:not(:disabled){
   box-shadow: 0 0.2rem 0.45rem rgba(15, 23, 42, 0.14);
   transform: translateY(0) scale(1.02);
@@ -77,7 +66,6 @@
 
 .btn.btn-guardar.is-disabled,
 .btn.btn-delete.is-disabled,
-.btn.btn-grabar.is-disabled,
 .btn.btn-reset.is-disabled{
   filter: grayscale(0.35);
   opacity: 0.45;
