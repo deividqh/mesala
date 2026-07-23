@@ -289,7 +289,7 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 		if (!reservas) return [];
 
 		const index_en_reserva = this.Salon._get_indice_en_reserva_s(id_elemento);
-		if(!index_en_reserva) return [];
+		if(index_en_reserva === -1 ) return [];
 
 		const reservadores = reservas[index_en_reserva].reservadores;
 		if(!reservadores) return [];
@@ -304,6 +304,7 @@ class Motor_Mensajes extends Interfaz_Custom_Motores{
 
 		// sobre los rol=central del Catalogo.
 		const reservadores = this._get_ids_reservadores_de_reserva(elemento_dom.id);
+		
 		reservadores.forEach((id) => {
 			// • Excluyo el propio elemento_dom
 			if(elemento_dom.id === id){

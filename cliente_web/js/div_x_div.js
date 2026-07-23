@@ -2647,8 +2647,7 @@ class e_Salon extends Tablero_Touch {
 		console.log(JSON.stringify(MM.d_data, null, 2)); 
 		const ok_api_m = this.api_mensajes();
 		
-
-
+		// MENSAJE DE CONFIRMACIÓN PARA EL USUARIO 
 		Alertas_UI._NotA('App Cargada con Exito', 'Listo para empezar!', 'success', 1500);
 
 	}
